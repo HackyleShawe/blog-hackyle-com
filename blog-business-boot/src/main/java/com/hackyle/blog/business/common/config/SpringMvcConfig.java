@@ -1,0 +1,40 @@
+package com.hackyle.blog.business.common.config;
+
+import com.hackyle.blog.business.common.interceptor.AccessInterceptor;
+import com.hackyle.blog.business.common.interceptor.EncryptDecryptInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+
+@Configuration
+public class SpringMvcConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private AccessInterceptor accessInterceptor;
+    @Autowired
+    private EncryptDecryptInterceptor encryptDecryptInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        //请求访问拦截器
+        registry.addInterceptor(accessInterceptor)
+        //拦截这些请求走MvcInterceptor中的逻辑
+        .addPathPatterns("/**")
+        //不需要走MvcInterceptor中的逻辑
+        //只有注册、登录的接口不需要token，其他的接口全部都要
+        .excludePathPatterns(
+                "/admin/sign-up",
+                "/admin/register",
+                "/admin/login",
+                "/admin/sign-in/",
+                "/error"
+        );
+
+        //请求数据的加密解密拦截器
+        registry.addInterceptor(encryptDecryptInterceptor)
+                .addPathPatterns("/**");
+    }
+
+}
