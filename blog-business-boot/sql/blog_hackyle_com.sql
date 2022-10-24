@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS tb_administrator;
 CREATE TABLE tb_administrator (
     id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
 
-    username VARCHAR(128) NOT NULL UNIQUE COMMENT '登录用户名',
+    username VARCHAR(128) NOT NULL COMMENT '登录用户名',
     password VARCHAR(512) NOT NULL COMMENT '登录密码',
 
     nick_name VARCHAR(64) DEFAULT NULL COMMENT '昵称',
@@ -57,7 +57,7 @@ CREATE TABLE tb_category (
     id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
 
     name  VARCHAR(32) NOT NULL COMMENT '分类名称',
-    code  VARCHAR(16) NOT NULL UNIQUE COMMENT '分类编码',
+    code  VARCHAR(16) NOT NULL COMMENT '分类编码',
     description VARCHAR(1024) DEFAULT NULL COMMENT '分类描述',
     icon_url    VARCHAR(512) DEFAULT NULL COMMENT '分类的图标URL',
     parent_id   BIGINT DEFAULT NULL COMMENT '上一级分类',
@@ -89,7 +89,7 @@ CREATE TABLE tb_tag (
     id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
 
     name VARCHAR(16) NOT NULL COMMENT '标签名称',
-    code  VARCHAR(16) NOT NULL UNIQUE COMMENT '标签编码',
+    code  VARCHAR(16) NOT NULL COMMENT '标签编码',
     color VARCHAR(16) DEFAULT NULL COMMENT '标签颜色',
     description VARCHAR(2048) DEFAULT NULL COMMENT '描述',
 
