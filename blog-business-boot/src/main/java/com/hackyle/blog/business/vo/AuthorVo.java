@@ -3,7 +3,7 @@ package com.hackyle.blog.business.vo;
 import java.util.Date;
 
 public class AuthorVo {
-    private Long id;
+    private String id;
 
     /**
      * 昵称
@@ -53,11 +53,11 @@ public class AuthorVo {
     private Date updateTime;
 
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

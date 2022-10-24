@@ -6,7 +6,7 @@ import java.util.Date;
  * 文章查询条件
  */
 public class ArticleQo {
-    private Long id;
+    private String id;
 
     /**
      * 标题
@@ -46,11 +46,11 @@ public class ArticleQo {
      */
     private Boolean deleted;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

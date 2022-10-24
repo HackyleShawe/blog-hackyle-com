@@ -9,16 +9,15 @@ import com.hackyle.blog.business.common.constant.RegexVerificationCons;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.dto.ArticleAddDto;
-import com.hackyle.blog.business.qo.ArticleQo;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.entity.ArticleEntity;
 import com.hackyle.blog.business.mapper.ArticleMapper;
-import com.hackyle.blog.business.service.ArticleAuthorService;
-import com.hackyle.blog.business.service.ArticleCategoryService;
-import com.hackyle.blog.business.service.ArticleService;
-import com.hackyle.blog.business.service.ArticleTagService;
-import com.hackyle.blog.business.service.CommentService;
+import com.hackyle.blog.business.po.ArticleAuthorPo;
+import com.hackyle.blog.business.po.ArticleCategoryPo;
+import com.hackyle.blog.business.po.ArticleTagPo;
+import com.hackyle.blog.business.qo.ArticleQo;
+import com.hackyle.blog.business.service.*;
 import com.hackyle.blog.business.util.BeanCopyUtils;
 import com.hackyle.blog.business.util.IDUtils;
 import com.hackyle.blog.business.util.PaginationUtils;
@@ -33,9 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -74,7 +71,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         if(checkArticleEntity != null) {
             //文章已存在，执行更新操作
-            articleAddDto.setId(checkArticleEntity.getId());
+            articleAddDto.setId(IDUtils.encryptByAES(checkArticleEntity.getId()));
             return update(articleAddDto);
 
         } else {
@@ -85,9 +82,20 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
                 throw new RuntimeException("新增文章失败");
             }
 
-            articleAuthorService.batchInsert(articleEntity.getId(), articleAddDto.getAuthorIds());
-            articleCategoryService.batchInsert(articleEntity.getId(), articleAddDto.getCategoryIds());
-            articleTagService.batchInsert(articleEntity.getId(), articleAddDto.getTagIds());
+            if(StringUtils.isNotBlank(articleAddDto.getAuthorIds())) {
+                List<String> authorIdList = Arrays.asList(articleAddDto.getAuthorIds().split(","));
+                List<Long> authorIds = IDUtils.decrypt(authorIdList);
+                articleAuthorService.batchInsert(articleEntity.getId(), authorIds);
+            }
+            if(StringUtils.isNotBlank(articleAddDto.getCategoryIds())) {
+                List<String> categoryIdList = Arrays.asList(articleAddDto.getCategoryIds().split(","));
+                List<Long> categoryIds = IDUtils.decrypt(categoryIdList);
+                articleCategoryService.batchInsert(articleEntity.getId(), categoryIds);
+            }
+            if(StringUtils.isNotBlank(articleAddDto.getTagIds())) {
+                List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleAddDto.getTagIds().split(",")));
+                articleTagService.batchInsert(articleEntity.getId(), tagIds);
+            }
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -100,7 +108,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(Long.parseLong(idStr));
+            idList.add(IDUtils.decryptByAES(idStr));
         }
         articleMapper.logicDeleteByIds(idList);
 
@@ -120,7 +128,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<Long> articleIds = new ArrayList<>();
         for (String idStr : idSplit) {
-            articleIds.add(Long.parseLong(idStr));
+            articleIds.add(IDUtils.decryptByAES(idStr));
         }
 
         this.removeByIds(articleIds);
@@ -140,62 +148,63 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         adjustUri(articleUpdateDto);
 
         ArticleEntity articleEntity = BeanCopyUtils.copy(articleUpdateDto, ArticleEntity.class);
+        IDUtils.decrypt(articleUpdateDto, articleEntity);
 
-        Boolean newVersion = articleUpdateDto.getNewVersion();
-        if(null != newVersion && newVersion) { //存为新版本
-            //获取旧版本的编号
-            ArticleEntity selectArticle= articleMapper.selectById(articleUpdateDto.getId());
-            Integer version = selectArticle.getVersion();
-            version ++;
+        UpdateWrapper<ArticleEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().eq(ArticleEntity::getId, articleEntity.getId());
+        int update = articleMapper.update(articleEntity, updateWrapper);
+        if(update != 1) {
+            throw new RuntimeException("文章更新失败");
+        }
 
-            //TODO 版本号对于URI重复检查、查询操作等
-            ArticleEntity newVersionArticle = BeanCopyUtils.copy(articleUpdateDto, ArticleEntity.class);
-            newVersionArticle.setId(IDUtils.timestampID());
-            newVersionArticle.setVersion(version);
-            int insert = articleMapper.insert(newVersionArticle);
-            if(insert < 1) {
-                throw new RuntimeException("文章更新失败！");
-            }
+        long articleId = articleEntity.getId();
 
-            articleAuthorService.batchInsert(newVersionArticle.getId(), articleUpdateDto.getAuthorIds());
-            articleCategoryService.batchInsert(newVersionArticle.getId(), articleUpdateDto.getCategoryIds());
-            articleTagService.batchInsert(newVersionArticle.getId(), articleUpdateDto.getTagIds());
-
-        } else {
-            UpdateWrapper<ArticleEntity> updateWrapper = new UpdateWrapper<>();
-            updateWrapper.lambda().eq(ArticleEntity::getId, articleUpdateDto.getId());
-            int update = articleMapper.update(articleEntity, updateWrapper);
-            if(update != 1) {
-                throw new RuntimeException("文章更新失败");
-            }
-
-            long articleId = articleEntity.getId();
-            articleAuthorService.batchUpdate(articleId, articleUpdateDto.getAuthorIds());
-            articleCategoryService.batchUpdate(articleId, articleUpdateDto.getCategoryIds());
-            articleTagService.batchUpdate(articleId, articleUpdateDto.getTagIds());
+        if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) {
+            List<Long> authorIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getAuthorIds().split(",")));
+            articleAuthorService.update(articleId, authorIds);
+        }
+        if(StringUtils.isNotBlank(articleUpdateDto.getCategoryIds())) {
+            List<Long> categoryIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getCategoryIds().split(",")));
+            articleCategoryService.update(articleId, categoryIds);
+        }
+        if(StringUtils.isNotBlank(articleUpdateDto.getTagIds())) {
+            List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getTagIds().split(",")));
+            articleTagService.update(articleId, tagIds);
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
     }
 
     @Override
-    public ArticleVo fetch(long idd) {
+    public ArticleVo fetch(String id) {
+        long idd = IDUtils.decryptByAES(id);
+
         ArticleEntity articleEntity = articleMapper.selectById(idd);
         LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(articleEntity));
 
         ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
+        articleVo.setId(IDUtils.encryptByAES(articleEntity.getId()));
 
         List<Long> articleIds = new ArrayList<>();
         articleIds.add(idd);
 
-        Map<Long, List<AuthorVo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
-        articleVo.setAuthors(authorMap.get(idd));
+        Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
+        List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
+        List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
+        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        articleVo.setAuthors(authorVos);
 
-        Map<Long, List<CategoryVo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
-        articleVo.setCategories(categoryMap.get(idd));
+        Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
+        List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
+        List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
+        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        articleVo.setCategories(categoryVos);
 
-        Map<Long, List<TagVo>> tagMap = articleTagService.selectByArticleIds(articleIds);
-        articleVo.setTags(tagMap.get(idd));
+        Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
+        List<ArticleTagPo> articleTagPos = tagMap.get(idd);
+        List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
+        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        articleVo.setTags(tagVos);
 
         return articleVo;
     }
@@ -236,20 +245,34 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         PageResponseDto<ArticleVo> articleVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, ArticleVo.class);
         List<ArticleEntity> articleEntityList = resultPage.getRecords();
+        IDUtils.batchEncrypt(articleEntityList, articleVoPageResponseDto.getRows());
         List<Long> articleIdList = articleEntityList.stream().map(ArticleEntity::getId).collect(Collectors.toList());
         if(articleIdList.size() < 1) {
             return articleVoPageResponseDto;
         }
 
-        Map<Long, List<AuthorVo>> authorMap = articleAuthorService.selectByArticleIds(articleIdList);
-        Map<Long, List<CategoryVo>> categoryMap = articleCategoryService.selectByArticleIds(articleIdList);
-        Map<Long, List<TagVo>> tagMap = articleTagService.selectByArticleIds(articleIdList);
+        Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIdList);
+        Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIdList);
+        Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIdList);
 
         List<ArticleVo> articleVoList = articleVoPageResponseDto.getRows();
         for (ArticleVo articleVo : articleVoList) {
-            articleVo.setAuthors(authorMap.get(articleVo.getId()));
-            articleVo.setCategories(categoryMap.get(articleVo.getId()));
-            articleVo.setTags(tagMap.get(articleVo.getId()));
+            long idd = IDUtils.decryptByAES(articleVo.getId());
+
+            List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
+            List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
+            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            articleVo.setAuthors(authorVos);
+
+            List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
+            List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
+            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            articleVo.setCategories(categoryVos);
+
+            List<ArticleTagPo> articleTagPos = tagMap.get(idd);
+            List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
+            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            articleVo.setTags(tagVos);
         }
         articleVoPageResponseDto.setRows(articleVoList);
 
@@ -265,7 +288,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         String uri = articleAddDto.getUri();
 
         if(StringUtils.isBlank(uri)) {
-            throw new RuntimeException("URI为空");
+            return;
         }
 
         uri = uri.toLowerCase();

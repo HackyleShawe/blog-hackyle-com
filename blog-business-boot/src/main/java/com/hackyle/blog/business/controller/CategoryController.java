@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -52,17 +51,14 @@ public class CategoryController {
      * 删除文章分类
      */
     @DeleteMapping("/del")
-    public ApiResponse<String> del(HttpServletRequest request) {
-        String ids = (String) request.getAttribute("ids");
+    public ApiResponse<String> del(@RequestParam("ids")String ids) {
         LOGGER.info("删除文章分类-Controller层入参-ids={}", ids);
-
         if(ids == null || StringUtils.isBlank(ids)) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
             return categoryService.del(ids);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("删除文章分类-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -74,16 +70,15 @@ public class CategoryController {
      */
     @PutMapping("/update")
     public ApiResponse<String> update(@RequestBody ApiRequest<CategoryAddDto> apiRequest) {
-        LOGGER.info("修改文章分类-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         CategoryAddDto categoryAddDto = apiRequest.getData();
+        LOGGER.info("修改文章分类-Controller层入参-categoryAddDto={}", JSON.toJSONString(categoryAddDto));
+
         if(categoryAddDto == null || categoryAddDto.getId() == null) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
             return categoryService.update(categoryAddDto);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("修改文章分类-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -94,8 +89,7 @@ public class CategoryController {
      * 获取文章分类详情
      */
     @DeleteMapping("/fetch")
-    public ApiResponse<CategoryVo> fetch(HttpServletRequest request) {
-        String id = String.valueOf(request.getAttribute("id"));
+    public ApiResponse<CategoryVo> fetch(@RequestParam("id") String id) {
         LOGGER.info("获取文章分类详情-Controller层入参-id={}", id);
 
         if(id == null || StringUtils.isBlank(id)) {
@@ -103,9 +97,7 @@ public class CategoryController {
         }
 
         try {
-            long idd = Long.parseLong(id);
-
-            CategoryVo categoryVo = categoryService.fetch(idd);
+            CategoryVo categoryVo = categoryService.fetch(id);
             LOGGER.info("获取文章分类详情-Controller层出参-articleCategoryVo={}", JSON.toJSONString(categoryVo));
 
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), categoryVo);
@@ -120,9 +112,9 @@ public class CategoryController {
      */
     @PostMapping("/fetchList")
     public ApiResponse<PageResponseDto<CategoryVo>> fetchList(@RequestBody ApiRequest<PageRequestDto<CategoryQo>> apiRequest) {
-        LOGGER.info("根据查询条件获取文章分类-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         PageRequestDto<CategoryQo> pageRequestDto = apiRequest.getData();
+        LOGGER.info("根据查询条件获取文章分类-Controller层入参-pageRequestDto={}", JSON.toJSONString(pageRequestDto));
+
         if(pageRequestDto == null) {
             //return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
             pageRequestDto = new PageRequestDto<>();

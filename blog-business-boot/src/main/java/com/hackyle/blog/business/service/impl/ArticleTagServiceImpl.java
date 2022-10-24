@@ -3,20 +3,16 @@ package com.hackyle.blog.business.service.impl;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hackyle.blog.business.entity.ArticleTagEntity;
-import com.hackyle.blog.business.entity.ArticleTagEntity;
 import com.hackyle.blog.business.mapper.ArticleTagMapper;
 import com.hackyle.blog.business.po.ArticleTagPo;
 import com.hackyle.blog.business.service.ArticleTagService;
-import com.hackyle.blog.business.util.BeanCopyUtils;
-import com.hackyle.blog.business.vo.TagVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, ArticleTagEntity>
@@ -25,20 +21,20 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     @Autowired
     private ArticleTagMapper articleTagMapper;
 
+    @Transactional
     @Override
-    public void batchInsert(long articleId, String tagIds) {
-        if(articleId < 0 || StringUtils.isBlank(tagIds)) {
+    public void batchInsert(long articleId, List<Long> tagIds) {
+        if(articleId < 0 || null == tagIds || tagIds.size() < 1) {
             return;
         }
 
-        String[] tagIdArr = tagIds.split(",");
-        int articleTagInserted = articleTagMapper.batchInsert(articleId, tagIdArr);
+        int articleTagInserted = articleTagMapper.batchInsert(articleId, tagIds);
         if(articleTagInserted < 1) {
             throw new RuntimeException("文章标签插入失败！");
         }
     }
 
-
+    @Transactional
     @Override
     public void batchDelByArticleIds(List<Long> articleIds) {
         if(articleIds.isEmpty()) {
@@ -47,45 +43,25 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
         articleTagMapper.batchDelByArticleIds(articleIds);
     }
 
+    @Transactional
     @Override
-    public void batchUpdate(long articleId, String tagIds) {
-        if(articleId < 0 || StringUtils.isBlank(tagIds)) {
+    public void update(long articleId, List<Long> tagIds) {
+        if(articleId < 0 || null == tagIds || tagIds.size() < 1) {
             return;
         }
 
-        String[] categoryIdArr = tagIds.split(",");
-
         UpdateWrapper<ArticleTagEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(ArticleTagEntity::getArticleId, articleId);
+        articleTagMapper.delete(updateWrapper);
 
-        for (String id : categoryIdArr) {
-            ArticleTagEntity articleTagEntity = new ArticleTagEntity();
-            articleTagEntity.setTagId(Long.parseLong(id));
-
-            articleTagMapper.update(articleTagEntity, updateWrapper);
-        }
+        this.batchInsert(articleId, tagIds);
     }
 
     @Override
-    public Map<Long, List<TagVo>> selectByArticleIds(List<Long> articleIds) {
-        Map<Long, List<TagVo>> resultMap = new HashMap<>();
-
+    public Map<Long, List<ArticleTagPo>> selectByArticleIds(List<Long> articleIds) {
         List<ArticleTagPo> articleAuthorPoList = articleTagMapper.selectByArticleIds(articleIds);
 
-        for (Long id : articleIds) {
-            List<TagVo> authorVoList = new ArrayList<>();
-
-            for (ArticleTagPo articleTagPo : articleAuthorPoList) {
-                if(id.equals(articleTagPo.getArticleId())) {
-                    TagVo tagVo = BeanCopyUtils.copy(articleTagPo, TagVo.class);
-                    tagVo.setId(articleTagPo.getTagId());
-                    authorVoList.add(tagVo);
-                }
-            }
-            resultMap.put(id, authorVoList);
-        }
-
-        return resultMap;
+        return articleAuthorPoList.stream().collect(Collectors.groupingBy(ArticleTagPo::getArticleId));
     }
 }
 

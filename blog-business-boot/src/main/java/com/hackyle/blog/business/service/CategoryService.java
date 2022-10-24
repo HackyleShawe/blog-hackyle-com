@@ -17,7 +17,7 @@ public interface CategoryService {
 
     ApiResponse<String>  update(CategoryAddDto categoryAddDto);
 
-    CategoryVo fetch(long id);
+    CategoryVo fetch(String id);
 
     PageResponseDto<CategoryVo> fetchList(PageRequestDto<CategoryQo> pageRequestDto);
 

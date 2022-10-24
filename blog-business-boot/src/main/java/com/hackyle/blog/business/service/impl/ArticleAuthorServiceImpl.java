@@ -1,23 +1,18 @@
 package com.hackyle.blog.business.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hackyle.blog.business.entity.ArticleAuthorEntity;
 import com.hackyle.blog.business.entity.ArticleAuthorEntity;
 import com.hackyle.blog.business.mapper.ArticleAuthorMapper;
 import com.hackyle.blog.business.po.ArticleAuthorPo;
 import com.hackyle.blog.business.service.ArticleAuthorService;
-import com.hackyle.blog.business.util.BeanCopyUtils;
-import com.hackyle.blog.business.vo.AuthorVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleAuthorServiceImpl extends ServiceImpl<ArticleAuthorMapper, ArticleAuthorEntity>
@@ -26,19 +21,20 @@ public class ArticleAuthorServiceImpl extends ServiceImpl<ArticleAuthorMapper, A
     @Autowired
     private ArticleAuthorMapper articleAuthorMapper;
 
+    @Transactional
     @Override
-    public void batchInsert(long articleId, String authorIds) {
-        if(articleId < 0 || StringUtils.isBlank(authorIds)) {
+    public void batchInsert(long articleId, List<Long> authorIds) {
+        if(articleId < 0 || authorIds == null || authorIds.size() < 1) {
             return;
         }
 
-        int articleAuthorInserted = articleAuthorMapper.batchInsert(articleId, authorIds.split(","));
+        int articleAuthorInserted = articleAuthorMapper.batchInsert(articleId, authorIds);
         if(articleAuthorInserted < 1) {
             throw new RuntimeException("文章作者插入失败！");
         }
     }
 
-
+    @Transactional
     @Override
     public void batchDelByArticleIds(List<Long> articleIds) {
         if(articleIds.isEmpty()) {
@@ -48,58 +44,35 @@ public class ArticleAuthorServiceImpl extends ServiceImpl<ArticleAuthorMapper, A
     }
 
 
+    /**
+     * 更新操作：删除以前的关联，插入新的关联
+     */
+    @Transactional
     @Override
-    public void update(long articleId, String authorIds) {
-        if(articleId < 0 || StringUtils.isBlank(authorIds)) {
+    public void update(long articleId, List<Long> authorIds) {
+        if(articleId < 0 || authorIds == null || authorIds.size() < 1) {
             return;
         }
-
-        int articleAuthorInserted = articleAuthorMapper.batchInsert(articleId, authorIds.split(","));
-        if(articleAuthorInserted < 1) {
-            throw new RuntimeException("文章作者更新失败！");
-        }
-    }
-
-    @Override
-    public void batchUpdate(long articleId, String authorIds) {
-        if(articleId < 0 || StringUtils.isBlank(authorIds)) {
-            return;
-        }
-
-        String[] categoryIdArr = authorIds.split(",");
 
         UpdateWrapper<ArticleAuthorEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(ArticleAuthorEntity::getArticleId, articleId);
+        articleAuthorMapper.delete(updateWrapper);
 
-        for (String id : categoryIdArr) {
-            ArticleAuthorEntity articleAuthorEntity = new ArticleAuthorEntity();
-            articleAuthorEntity.setAuthorId(Long.parseLong(id));
 
-            articleAuthorMapper.update(articleAuthorEntity, updateWrapper);
-        }
+        this.batchInsert(articleId, authorIds);
     }
 
-
+    /**
+     * 获取多个文章的作者信息
+     * @param articleIds 多个文章
+     * @return Map<文章ID，作者信息LIst>
+     */
     @Override
-    public Map<Long, List<AuthorVo>> selectByArticleIds(List<Long> articleIds) {
-        Map<Long, List<AuthorVo>> resultMap = new HashMap<>();
+    public Map<Long, List<ArticleAuthorPo>> selectByArticleIds(List<Long> articleIds) {
 
         List<ArticleAuthorPo> articleAuthorPoList = articleAuthorMapper.selectByArticleIds(articleIds);
 
-        for (Long id : articleIds) {
-            List<AuthorVo> authorVoList = new ArrayList<>();
-
-            for (ArticleAuthorPo articleAuthorPo : articleAuthorPoList) {
-                if(id.equals(articleAuthorPo.getArticleId())) {
-                    AuthorVo authorVo = BeanCopyUtils.copy(articleAuthorPo, AuthorVo.class);
-                    authorVo.setId(articleAuthorPo.getAuthorId());
-                    authorVoList.add(authorVo);
-                }
-            }
-            resultMap.put(id, authorVoList);
-        }
-
-        return resultMap;
+        return articleAuthorPoList.stream().collect(Collectors.groupingBy(ArticleAuthorPo::getArticleId));
     }
 }
 

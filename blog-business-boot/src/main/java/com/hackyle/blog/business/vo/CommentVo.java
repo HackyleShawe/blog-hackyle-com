@@ -1,17 +1,15 @@
 package com.hackyle.blog.business.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-
 import java.util.Date;
 import java.util.List;
 
 public class CommentVo {
-    private Long id;
+    private String id;
 
     /**
      * 被评论主体(文章、页面、动态)的ID
      */
-    private Long targetId;
+    private String targetId;
 
     /**
      * 评论者名称
@@ -68,19 +66,19 @@ public class CommentVo {
      */
     private List<CommentVo> replyList;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public Long getTargetId() {
+    public String getTargetId() {
         return targetId;
     }
 
-    public void setTargetId(Long targetId) {
+    public void setTargetId(String targetId) {
         this.targetId = targetId;
     }
 

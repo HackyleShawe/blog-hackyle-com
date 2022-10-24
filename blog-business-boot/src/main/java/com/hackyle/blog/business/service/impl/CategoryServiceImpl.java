@@ -10,7 +10,6 @@ import com.hackyle.blog.business.dto.CategoryAddDto;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.entity.CategoryEntity;
-import com.hackyle.blog.business.entity.TagEntity;
 import com.hackyle.blog.business.mapper.CategoryMapper;
 import com.hackyle.blog.business.qo.CategoryQo;
 import com.hackyle.blog.business.service.CategoryService;
@@ -41,7 +40,8 @@ public class CategoryServiceImpl implements CategoryService {
 
         //检查是否已经插入：检查code
         QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(CategoryEntity::getCode, categoryAddDto.getCode());
+        queryWrapper.lambda().eq(CategoryEntity::getCode, categoryAddDto.getCode())
+                .eq(CategoryEntity::getDeleted, 0);
         Integer count = categoryMapper.selectCount(queryWrapper);
         if(count >= 1) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "文章分类已存在，请重新定义");
@@ -62,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(Long.parseLong(idStr));
+            idList.add(IDUtils.decryptByAES(idStr));
         }
         int deleted = categoryMapper.logicDeleteByIds(idList);
 
@@ -77,17 +77,19 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ApiResponse<String> update(CategoryAddDto categoryAddDto) {
         CategoryEntity categoryEntity = BeanCopyUtils.copy(categoryAddDto, CategoryEntity.class);
+        categoryEntity.setId(IDUtils.decryptByAES(categoryAddDto.getId()));
 
         //Code重复性检查
         QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(CategoryEntity::getCode, categoryEntity.getCode());
+        queryWrapper.lambda().eq(CategoryEntity::getCode, categoryEntity.getCode())
+                .eq(CategoryEntity::getDeleted, 0);
         CategoryEntity checkCategoryEntity = categoryMapper.selectOne(queryWrapper);
         if(checkCategoryEntity != null && !categoryEntity.getId().equals(checkCategoryEntity.getId())) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Code已存在，请重新的定义");
         }
 
         UpdateWrapper<CategoryEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().eq(CategoryEntity::getId, categoryAddDto.getId());
+        updateWrapper.lambda().eq(CategoryEntity::getId, categoryEntity.getId());
         int updated = categoryMapper.update(categoryEntity, updateWrapper);
 
         if(updated == 1) {
@@ -99,8 +101,10 @@ public class CategoryServiceImpl implements CategoryService {
 
 
     @Override
-    public CategoryVo fetch(long id) {
-        CategoryEntity categoryEntity = categoryMapper.selectById(id);
+    public CategoryVo fetch(String id) {
+        long idd = IDUtils.decryptByAES(id);
+
+        CategoryEntity categoryEntity = categoryMapper.selectById(idd);
         return BeanCopyUtils.copy(categoryEntity, CategoryVo.class);
     }
 
@@ -126,7 +130,10 @@ public class CategoryServiceImpl implements CategoryService {
         LOGGER.info("条件查询分类-入参-pageRequestDto={},出参-resultPage.getRecords()={}",
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
-        return PaginationUtils.IPage2PageResponse(resultPage, CategoryVo.class);
+        PageResponseDto<CategoryVo> categoryVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, CategoryVo.class);
+        IDUtils.batchEncrypt(resultPage.getRecords(), categoryVoPageResponseDto.getRows());
+
+        return categoryVoPageResponseDto;
     }
 
     @Override
@@ -136,6 +143,9 @@ public class CategoryServiceImpl implements CategoryService {
         List<CategoryEntity> articleCategoryEntityList = categoryMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 
-        return BeanCopyUtils.copyList(articleCategoryEntityList, CategoryVo.class);
+        List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryEntityList, CategoryVo.class);
+        IDUtils.batchEncrypt(articleCategoryEntityList, categoryVos);
+
+        return categoryVos;
     }
 }

@@ -3,7 +3,6 @@ package com.hackyle.blog.business.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.dto.ArticleAddDto;
-import com.hackyle.blog.business.entity.ArticleCategoryEntity;
 import com.hackyle.blog.business.entity.ArticleEntity;
 import com.hackyle.blog.business.qo.ArticleQo;
 import com.hackyle.blog.business.dto.PageRequestDto;
@@ -21,7 +20,7 @@ public interface ArticleService extends IService<ArticleEntity> {
 
     ApiResponse<String> update(ArticleAddDto articleUpdateDto);
 
-    ArticleVo fetch(long idd);
+    ArticleVo fetch(String id);
 
     PageResponseDto<ArticleVo> fetchList(PageRequestDto<ArticleQo> pageRequestDto);
 }

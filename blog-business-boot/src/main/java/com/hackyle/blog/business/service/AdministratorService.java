@@ -11,4 +11,5 @@ public interface AdministratorService {
     AdministratorVo signIn(AdminSignInDto adminSignInDto);
 
     AdministratorVo info(String token);
+
 }

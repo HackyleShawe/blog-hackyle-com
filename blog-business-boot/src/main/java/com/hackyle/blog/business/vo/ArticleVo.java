@@ -7,11 +7,14 @@ import java.util.List;
  * Article View Object
  */
 public class ArticleVo {
-    private Long id;
+    private String id;
     /**
      * 标题
      */
     private String title;
+
+    private String uri;
+
     /**
      * 总结概要
      */
@@ -59,11 +62,11 @@ public class ArticleVo {
      */
     private Date updateTime;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -73,6 +76,14 @@ public class ArticleVo {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getUri() {
+        return uri;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
     public String getSummary() {

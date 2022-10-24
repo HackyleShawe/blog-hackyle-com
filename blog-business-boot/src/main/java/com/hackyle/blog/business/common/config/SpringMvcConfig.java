@@ -1,7 +1,6 @@
 package com.hackyle.blog.business.common.config;
 
 import com.hackyle.blog.business.common.interceptor.AccessInterceptor;
-import com.hackyle.blog.business.common.interceptor.EncryptDecryptInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -13,8 +12,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 
     @Autowired
     private AccessInterceptor accessInterceptor;
-    @Autowired
-    private EncryptDecryptInterceptor encryptDecryptInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -31,10 +28,6 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                 "/admin/sign-in/",
                 "/error"
         );
-
-        //请求数据的加密解密拦截器
-        registry.addInterceptor(encryptDecryptInterceptor)
-                .addPathPatterns("/**");
     }
 
 }

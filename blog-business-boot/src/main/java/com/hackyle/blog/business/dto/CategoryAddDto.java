@@ -1,7 +1,7 @@
 package com.hackyle.blog.business.dto;
 
 public class CategoryAddDto {
-    private Long id;
+    private String id;
 
     /**
      * 分类名称
@@ -24,11 +24,11 @@ public class CategoryAddDto {
     private String iconUrl;
 
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

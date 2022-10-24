@@ -4,20 +4,18 @@ import com.alibaba.fastjson2.JSON;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiRequest;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
-import com.hackyle.blog.business.dto.TagAddDto;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
+import com.hackyle.blog.business.dto.TagAddDto;
 import com.hackyle.blog.business.qo.TagQo;
 import com.hackyle.blog.business.service.TagService;
 import com.hackyle.blog.business.vo.TagVo;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.annotations.Param;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -33,16 +31,15 @@ public class TagController {
      */
     @PostMapping("/add")
     public ApiResponse<String> add(@RequestBody ApiRequest<TagAddDto> apiRequest) {
-        LOGGER.info("新增文章标签-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         TagAddDto tagAddDto = apiRequest.getData();
+        LOGGER.info("新增文章标签-Controller层入参-tagAddDto={}", JSON.toJSONString(tagAddDto));
+
         if(tagAddDto == null || StringUtils.isBlank(tagAddDto.getName()) || StringUtils.isBlank(tagAddDto.getCode())) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
             return tagService.add(tagAddDto);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("新增文章标签-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -53,8 +50,7 @@ public class TagController {
      * 删除文章标签
      */
     @DeleteMapping("/del")
-    public ApiResponse<String> del(HttpServletRequest request) {
-        String ids = (String) request.getAttribute("ids");
+    public ApiResponse<String> del(@RequestParam("ids")String ids) {
         LOGGER.info("删除文章标签-Controller层入参-ids={}", ids);
 
         if(ids == null || StringUtils.isBlank(ids)) {
@@ -63,7 +59,6 @@ public class TagController {
 
         try {
             return tagService.del(ids);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("删除文章标签-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -75,16 +70,15 @@ public class TagController {
      */
     @PutMapping("/update")
     public ApiResponse<String> update(@RequestBody ApiRequest<TagAddDto> apiRequest) {
-        LOGGER.info("修改文章标签-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         TagAddDto addDto = apiRequest.getData();
+        LOGGER.info("修改文章标签-Controller层入参-addDto={}", JSON.toJSONString(addDto));
+
         if(addDto == null || null == addDto.getId()) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
             return tagService.update(addDto);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("修改文章标签-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -96,9 +90,7 @@ public class TagController {
      * 获取文章标签详情
      */
     @GetMapping("/fetch")
-    public ApiResponse<TagVo> fetch(HttpServletRequest request) {
-        //URL中的queryString中的id，经过拦截器后，统一放在Request域中
-        String id = String.valueOf(request.getAttribute("id"));
+    public ApiResponse<TagVo> fetch(@RequestParam("id") String id) {
         LOGGER.info("获取文章标签详情-Controller层入参-id={}", id);
 
         if(id == null || StringUtils.isBlank(id)) {
@@ -106,9 +98,7 @@ public class TagController {
         }
 
         try {
-            long idd = Long.parseLong(id);
-
-            TagVo tagVo = tagService.fetch(idd);
+            TagVo tagVo = tagService.fetch(id);
             LOGGER.info("获取文章标签详情-Controller层出参-articleTagVo={}", JSON.toJSONString(tagVo));
 
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), tagVo);

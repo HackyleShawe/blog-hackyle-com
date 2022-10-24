@@ -2,18 +2,18 @@ package com.hackyle.blog.business.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hackyle.blog.business.entity.ArticleCategoryEntity;
-import com.hackyle.blog.business.vo.CategoryVo;
+import com.hackyle.blog.business.po.ArticleCategoryPo;
 
 import java.util.List;
 import java.util.Map;
 
 public interface ArticleCategoryService extends IService<ArticleCategoryEntity> {
-    void batchInsert(long articleId, String categoryIds);
+    void batchInsert(long articleId, List<Long> categoryIds);
 
-    void batchDelByArticleIds(List<Long> idList);
+    void batchDelByArticleIds(List<Long> articleIds);
 
-    void batchUpdate(long articleId, String categoryIds);
+    void update(long articleId, List<Long> categoryIds);
 
-    Map<Long, List<CategoryVo>> selectByArticleIds(List<Long> articleIds);
+    Map<Long, List<ArticleCategoryPo>> selectByArticleIds(List<Long> articleIds);
 
 }

@@ -62,7 +62,6 @@ public class AdministratorController {
     public ApiResponse<AdministratorVo> signIn(@RequestBody AdminSignInDto adminSignInDto, HttpServletResponse response) {
         LOGGER.info("登录-Controller层入参-adminSignInDto={}", JSON.toJSONString(adminSignInDto));
 
-        //AdminSignInDto adminSignInDto = apiRequest.getData();
         if(adminSignInDto == null || StringUtils.isBlank(adminSignInDto.getUsername()) || StringUtils.isBlank(adminSignInDto.getPassword())) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
@@ -75,7 +74,7 @@ public class AdministratorController {
                 response.setHeader("Authorization", administratorVo.getToken());
                 return ApiResponse.success(ResponseEnum.SIGN_IN_OK.getCode(), ResponseEnum.SIGN_IN_OK.getMessage(), administratorVo);
             } else {
-                return ApiResponse.error(ResponseEnum.SIGN_IN_FAIL.getCode(), ResponseEnum.SIGN_IN_FAIL.getMessage());
+                return ApiResponse.error(ResponseEnum.SIGN_IN_FAIL.getCode(), "登录失败：用户名或密码错误");
             }
 
         } catch (Exception e) {
@@ -99,7 +98,7 @@ public class AdministratorController {
         try {
             AdministratorVo administratorVo = administratorService.info(token);
 
-            LOGGER.info("获取登录者的信息-Controller层出参-administratorDto={}", JSON.toJSONString(administratorVo));
+            LOGGER.info("获取登录者的信息-Controller层出参-administratorVo={}", JSON.toJSONString(administratorVo));
 
             if(administratorVo != null) {
                 response.setHeader("Authorization", administratorVo.getToken());
@@ -116,20 +115,16 @@ public class AdministratorController {
 
     /**
      * 管理员注销
+     * 1.清除header中的token
+     * 2.清空缓存
      */
     @GetMapping("/logout")
     public ApiResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
-        //String username = request.getParameter("username");
-        //if(username == null || "".equals(username.trim())) {
-        //    return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
-        //}
-
         try {
-            //清除签发的Token
             response.setHeader("Authorization", "");
             response.setHeader("X-Token", "");
-
             return ApiResponse.success(ResponseEnum.LOG_OUT_OK.getCode(), ResponseEnum.LOG_OUT_OK.getMessage());
+
         } catch (Exception e) {
             LOGGER.error("注销失败：", e);
             return ApiResponse.error(ResponseEnum.LOG_OUT_FAIL.getCode(), ResponseEnum.LOG_OUT_FAIL.getMessage());

@@ -10,7 +10,6 @@ import com.hackyle.blog.business.dto.AuthorAddDto;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.entity.AuthorEntity;
-import com.hackyle.blog.business.entity.TagEntity;
 import com.hackyle.blog.business.mapper.AuthorMapper;
 import com.hackyle.blog.business.service.AuthorService;
 import com.hackyle.blog.business.util.BeanCopyUtils;
@@ -41,7 +40,8 @@ public class AuthorServiceImpl implements AuthorService {
 
         //nick name存在性检查
         QueryWrapper<AuthorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(AuthorEntity::getNickName, addDto.getNickName());
+        queryWrapper.lambda().eq(AuthorEntity::getNickName, addDto.getNickName())
+                .eq(AuthorEntity::getDeleted, 0);
         Integer count = authorMapper.selectCount(queryWrapper);
         if(count >= 1) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Nick Name已存在，请重新的定义");
@@ -63,7 +63,7 @@ public class AuthorServiceImpl implements AuthorService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(Long.parseLong(idStr));
+            idList.add(IDUtils.decryptByAES(idStr));
         }
         int deleted = authorMapper.logicDeleteByIds(idList);
         if(deleted == idSplit.length) {
@@ -77,17 +77,19 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public ApiResponse<String> update(AuthorAddDto updateDto) {
         AuthorEntity authorEntity = BeanCopyUtils.copy(updateDto, AuthorEntity.class);
+        authorEntity.setId(IDUtils.decryptByAES(updateDto.getId()));
 
         //nick name存在性检查
         QueryWrapper<AuthorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(AuthorEntity::getNickName, authorEntity.getNickName());
+        queryWrapper.lambda().eq(AuthorEntity::getNickName, authorEntity.getNickName())
+                .eq(AuthorEntity::getDeleted, 0);
         AuthorEntity checkAuthorEntity = authorMapper.selectOne(queryWrapper);
         if(checkAuthorEntity != null && !authorEntity.getId().equals(checkAuthorEntity.getId())) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Nick Name已存在，请重新的定义");
         }
 
         UpdateWrapper<AuthorEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().eq(AuthorEntity::getId, updateDto.getId());
+        updateWrapper.lambda().eq(AuthorEntity::getId, authorEntity.getId());
         int updated = authorMapper.update(authorEntity, updateWrapper);
 
         if(updated == 1) {
@@ -124,16 +126,23 @@ public class AuthorServiceImpl implements AuthorService {
         LOGGER.info("条件查询分类-入参-pageRequestDto={},出参-resultPage.getRecords()={}",
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
-        return PaginationUtils.IPage2PageResponse(resultPage, AuthorVo.class);
+        PageResponseDto<AuthorVo> authorVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, AuthorVo.class);
+        IDUtils.batchEncrypt(resultPage.getRecords(), authorVoPageResponseDto.getRows());
+
+        return authorVoPageResponseDto;
     }
 
     @Override
-    public AuthorVo fetch(long idd) {
+    public AuthorVo fetch(String id) {
+        long idd = IDUtils.decryptByAES(id);
+
         AuthorEntity authorEntity = authorMapper.selectById(idd);
         LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(authorEntity));
 
         AuthorVo articleVo = new AuthorVo();
         BeanUtils.copyProperties(authorEntity, articleVo);
+        articleVo.setId(IDUtils.encryptByAES(authorEntity.getId()));
+
         return articleVo;
     }
 
@@ -144,6 +153,9 @@ public class AuthorServiceImpl implements AuthorService {
         List<AuthorEntity> authorEntityList = authorMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(authorEntityList));
 
-        return BeanCopyUtils.copyList(authorEntityList, AuthorVo.class);
+        List<AuthorVo> authorVoList = BeanCopyUtils.copyList(authorEntityList, AuthorVo.class);
+        IDUtils.batchEncrypt(authorEntityList, authorVoList);
+
+        return authorVoList;
     }
 }

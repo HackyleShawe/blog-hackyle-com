@@ -11,13 +11,13 @@ import java.util.List;
 @Mapper
 public interface ArticleAuthorMapper extends BaseMapper<ArticleAuthorEntity> {
 
-    int batchInsert(@Param("articleId") long articleId, @Param("authorIdArr") String[] authorIdArr);
+    int batchInsert(@Param("articleId") long articleId, @Param("authorIds") List<Long> authorIds);
 
     int batchDelByArticleIds(@Param("articleIds") List<Long> articleIds);
 
     int batchDelByAuthorIds(@Param("authorIds") List<Long> authorIds);
 
-    List<ArticleAuthorPo> selectByArticleIds(@Param("idList")List<Long> idList);
+    List<ArticleAuthorPo> selectByArticleIds(@Param("articleIds")List<Long> articleIds);
 }
 
 

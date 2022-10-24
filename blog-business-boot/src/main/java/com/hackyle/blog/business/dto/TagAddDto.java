@@ -1,7 +1,7 @@
 package com.hackyle.blog.business.dto;
 
 public class TagAddDto {
-    private Long id;
+    private String id;
 
     /**
      * 标签名称
@@ -23,11 +23,11 @@ public class TagAddDto {
      */
     private String description;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

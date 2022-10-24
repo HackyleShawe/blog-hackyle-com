@@ -43,7 +43,8 @@ public class TagServiceImpl implements TagService {
 
         //Code重复性检查
         QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(TagEntity::getCode, tagEntity.getCode());
+        queryWrapper.lambda().eq(TagEntity::getCode, tagEntity.getCode())
+                .eq(TagEntity::getDeleted, 0);
         Integer count = tagMapper.selectCount(queryWrapper);
         if(count >= 1) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Code已存在，请重新的定义");
@@ -65,7 +66,7 @@ public class TagServiceImpl implements TagService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(Long.parseLong(idStr));
+            idList.add(IDUtils.decryptByAES(idStr));
         }
         int deleted = tagMapper.logicDeleteByIds(idList);
         if(deleted == idSplit.length) {
@@ -79,17 +80,19 @@ public class TagServiceImpl implements TagService {
     @Override
     public ApiResponse<String>  update(TagAddDto addDto) {
         TagEntity tagEntity = BeanCopyUtils.copy(addDto, TagEntity.class);
+        tagEntity.setId(IDUtils.decryptByAES(addDto.getId()));
 
         //Code重复性检查
         QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(TagEntity::getCode, tagEntity.getCode());
+        queryWrapper.lambda().eq(TagEntity::getCode, tagEntity.getCode())
+                .eq(TagEntity::getDeleted, 0);
         TagEntity checkTagEntity = tagMapper.selectOne(queryWrapper);
         if(checkTagEntity != null && !tagEntity.getId().equals(checkTagEntity.getId())) {
             return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Code已存在，请重新的定义");
         }
 
         UpdateWrapper<TagEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().eq(TagEntity::getId, addDto.getId());
+        updateWrapper.lambda().eq(TagEntity::getId, tagEntity.getId());
         int updated = tagMapper.update(tagEntity, updateWrapper);
 
         if(updated == 1) {
@@ -101,8 +104,10 @@ public class TagServiceImpl implements TagService {
 
 
     @Override
-    public TagVo fetch(long id) {
-        TagEntity tagEntity = tagMapper.selectById(id);
+    public TagVo fetch(String id) {
+        long idd = IDUtils.decryptByAES(id);
+
+        TagEntity tagEntity = tagMapper.selectById(idd);
         return BeanCopyUtils.copy(tagEntity, TagVo.class);
     }
 
@@ -128,7 +133,10 @@ public class TagServiceImpl implements TagService {
         LOGGER.info("条件查询分类-入参-pageRequestDto={},出参-resultPage.getRecords()={}",
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
-        return PaginationUtils.IPage2PageResponse(resultPage, TagVo.class);
+        PageResponseDto<TagVo> tagVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, TagVo.class);
+        IDUtils.batchEncrypt(resultPage.getRecords(), tagVoPageResponseDto.getRows());
+
+        return tagVoPageResponseDto;
     }
 
     @Override
@@ -138,7 +146,10 @@ public class TagServiceImpl implements TagService {
         List<TagEntity> articleCategoryEntityList = tagMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 
-        return BeanCopyUtils.copyList(articleCategoryEntityList, TagVo.class);
+        List<TagVo> tagVos = BeanCopyUtils.copyList(articleCategoryEntityList, TagVo.class);
+        IDUtils.batchEncrypt(articleCategoryEntityList, tagVos);
+
+        return tagVos;
     }
 
 }

@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @RestController
@@ -25,7 +24,6 @@ public class AuthorController {
 
     @Autowired
     private AuthorService authorService;
-
 
     /**
      * 新增作者
@@ -41,7 +39,6 @@ public class AuthorController {
 
         try {
             return authorService.add(addDto);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("新增作者-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -52,8 +49,7 @@ public class AuthorController {
      * 删除作者
      */
     @DeleteMapping("/del")
-    public ApiResponse<String> del(HttpServletRequest request) {
-        String ids = (String) request.getAttribute("ids");
+    public ApiResponse<String> del(@RequestParam("ids") String ids) {
         LOGGER.info("删除作者-Controller层入参-ids={}", ids);
 
         if(StringUtils.isBlank(ids)) {
@@ -62,7 +58,6 @@ public class AuthorController {
 
         try {
             return authorService.del(ids);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("删除作者-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -74,16 +69,15 @@ public class AuthorController {
      */
     @PutMapping("/update")
     public ApiResponse<String> update(@RequestBody ApiRequest<AuthorAddDto> apiRequest) {
-        LOGGER.info("修改作者-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         AuthorAddDto addDto = apiRequest.getData();
+        LOGGER.info("修改作者-Controller层入参-addDto={}", JSON.toJSONString(addDto));
+
         if(addDto == null || null == addDto.getId()) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
             return authorService.update(addDto);
-            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
         } catch (Exception e) {
             LOGGER.error("修改作者-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -94,8 +88,7 @@ public class AuthorController {
      * 作者详情
      */
     @GetMapping("/fetch")
-    public ApiResponse<AuthorVo> fetch(HttpServletRequest request) {
-        String id = String.valueOf(request.getAttribute("id"));
+    public ApiResponse<AuthorVo> fetch(@RequestParam("id") String id) {
         LOGGER.info("获取作者详情-controller层入参-id={}", id);
 
         if(StringUtils.isBlank(id)) {
@@ -103,8 +96,7 @@ public class AuthorController {
         }
 
         try {
-            long idd = Long.parseLong(id);
-            AuthorVo authorVo = authorService.fetch(idd);
+            AuthorVo authorVo = authorService.fetch(id);
 
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), authorVo);
         } catch (Exception e) {

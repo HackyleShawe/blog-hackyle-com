@@ -18,7 +18,7 @@ public interface TagService {
 
     ApiResponse<String>  update(TagAddDto addDto);
 
-    TagVo fetch(long id);
+    TagVo fetch(String id);
 
     PageResponseDto<TagVo> fetchList(PageRequestDto<TagQo> pageRequestDto);
 

@@ -1,7 +1,7 @@
 package com.hackyle.blog.business.dto;
 
 public class ArticleAddDto {
-    private Long id;
+    private String id;
 
     /**
      * 标题
@@ -56,11 +56,11 @@ public class ArticleAddDto {
     /** 是否删除 */
     private Boolean deleted;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

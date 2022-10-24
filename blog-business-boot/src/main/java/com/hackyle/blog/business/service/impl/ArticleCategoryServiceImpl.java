@@ -6,16 +6,13 @@ import com.hackyle.blog.business.entity.ArticleCategoryEntity;
 import com.hackyle.blog.business.mapper.ArticleCategoryMapper;
 import com.hackyle.blog.business.po.ArticleCategoryPo;
 import com.hackyle.blog.business.service.ArticleCategoryService;
-import com.hackyle.blog.business.util.BeanCopyUtils;
-import com.hackyle.blog.business.vo.CategoryVo;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMapper, ArticleCategoryEntity>
@@ -24,20 +21,20 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     @Autowired
     private ArticleCategoryMapper articleCategoryMapper;
 
+    @Transactional
     @Override
-    public void batchInsert(long articleId, String categoryIds) {
-        if(articleId < 0 || StringUtils.isBlank(categoryIds)) {
+    public void batchInsert(long articleId, List<Long> categoryIds) {
+        if(articleId < 0 || categoryIds == null || categoryIds.size() < 1) {
             return;
         }
 
-        String[] categoryIdArr = categoryIds.split(",");
-        int articleCategoryInserted = articleCategoryMapper.batchInsert(articleId, categoryIdArr);
+        int articleCategoryInserted = articleCategoryMapper.batchInsert(articleId, categoryIds);
         if(articleCategoryInserted < 1) {
             throw new RuntimeException("文章分类插入失败！");
         }
     }
 
-
+    @Transactional
     @Override
     public void batchDelByArticleIds(List<Long> articleIds) {
         if(articleIds.isEmpty()) {
@@ -46,45 +43,26 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         articleCategoryMapper.batchDelByArticleIds(articleIds);
     }
 
+    @Transactional
     @Override
-    public void batchUpdate(long articleId, String categoryIds) {
-        if(articleId < 0 || StringUtils.isBlank(categoryIds)) {
+    public void update(long articleId, List<Long> categoryIds) {
+        if(articleId < 0 || categoryIds == null || categoryIds.size() < 1) {
             return;
         }
 
-        String[] categoryIdArr = categoryIds.split(",");
-
         UpdateWrapper<ArticleCategoryEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(ArticleCategoryEntity::getArticleId, articleId);
+        articleCategoryMapper.delete(updateWrapper);
 
-        for (String id : categoryIdArr) {
-            ArticleCategoryEntity articleCategoryEntity = new ArticleCategoryEntity();
-            articleCategoryEntity.setCategoryId(Long.parseLong(id));
 
-            articleCategoryMapper.update(articleCategoryEntity, updateWrapper);
-        }
+        this.batchInsert(articleId, categoryIds);
     }
 
     @Override
-    public Map<Long, List<CategoryVo>> selectByArticleIds(List<Long> articleIds) {
-        Map<Long, List<CategoryVo>> resultMap = new HashMap<>();
-
+    public Map<Long, List<ArticleCategoryPo>> selectByArticleIds(List<Long> articleIds) {
         List<ArticleCategoryPo> articleAuthorPoList = articleCategoryMapper.selectByArticleIds(articleIds);
 
-        for (Long id : articleIds) {
-            List<CategoryVo> authorVoList = new ArrayList<>();
-
-            for (ArticleCategoryPo articleCategoryPo : articleAuthorPoList) {
-                if(id.equals(articleCategoryPo.getArticleId())) {
-                    CategoryVo categoryVo = BeanCopyUtils.copy(articleCategoryPo, CategoryVo.class);
-                    categoryVo.setId(articleCategoryPo.getCategoryId());
-                    authorVoList.add(categoryVo);
-                }
-            }
-            resultMap.put(id, authorVoList);
-        }
-
-        return resultMap;
+        return articleAuthorPoList.stream().collect(Collectors.groupingBy(ArticleCategoryPo::getArticleId));
     }
 }
 

@@ -17,7 +17,7 @@ public interface AuthorService {
 
     PageResponseDto<AuthorVo> fetchList(PageRequestDto<String> pageRequestDto);
 
-    AuthorVo fetch(long idd);
+    AuthorVo fetch(String id);
 
     List<AuthorVo> fetchAll();
 }

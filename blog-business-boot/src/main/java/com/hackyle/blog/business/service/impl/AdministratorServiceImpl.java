@@ -5,17 +5,16 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.common.pojo.JwtPayload;
-import com.hackyle.blog.business.util.HashUtils;
-import com.hackyle.blog.business.util.JwtUtils;
-import com.hackyle.blog.business.vo.AdministratorVo;
 import com.hackyle.blog.business.dto.AdminSignInDto;
 import com.hackyle.blog.business.dto.AdminSignUpDto;
 import com.hackyle.blog.business.entity.AdministratorEntity;
 import com.hackyle.blog.business.mapper.AdministratorMapper;
 import com.hackyle.blog.business.service.AdministratorService;
 import com.hackyle.blog.business.util.BeanCopyUtils;
+import com.hackyle.blog.business.util.HashUtils;
 import com.hackyle.blog.business.util.IDUtils;
-import okhttp3.Response;
+import com.hackyle.blog.business.util.JwtUtils;
+import com.hackyle.blog.business.vo.AdministratorVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,8 @@ public class AdministratorServiceImpl implements AdministratorService {
 
         //查询是否有相同用户名的用户
         QueryWrapper<AdministratorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(AdministratorEntity::getUsername, adminSignUpDto.getUsername());
+        queryWrapper.lambda().eq(AdministratorEntity::getUsername, adminSignUpDto.getUsername())
+                .eq(AdministratorEntity::getDeleted, 0);
         Integer count = administratorMapper.selectCount(queryWrapper);
         if(count != 0) {
             return ApiResponse.error(ResponseEnum.SIGN_UP_FAIL.getCode(), ResponseEnum.SIGN_UP_FAIL.getMessage());
@@ -55,11 +55,16 @@ public class AdministratorServiceImpl implements AdministratorService {
     public AdministratorVo signIn(AdminSignInDto adminSignInDto) {
         QueryWrapper<AdministratorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", adminSignInDto.getUsername())
-                .eq("password", HashUtils.sha256(adminSignInDto.getPassword()));
+                .eq("password", HashUtils.sha256(adminSignInDto.getPassword()))
+                .eq("is_deleted", 0);
         AdministratorEntity administratorEntity = administratorMapper.selectOne(queryWrapper);
 
         LOGGER.info("管理员登录查库-入参adminSignInDto={}，出参administratorEntity={}", JSON.toJSONString(adminSignInDto), JSON.toJSONString(administratorEntity));
         AdministratorVo administratorVo = BeanCopyUtils.copy(administratorEntity, AdministratorVo.class);
+        if(administratorVo == null) {
+            return null;
+        }
+        administratorVo.setId(IDUtils.encryptByAES(administratorEntity.getId()));
 
         //签发Token
         JwtPayload jwtPayload = new JwtPayload(String.valueOf(administratorVo.getId()), administratorVo.getUsername(), administratorVo.getUsername());
@@ -78,11 +83,14 @@ public class AdministratorServiceImpl implements AdministratorService {
         JwtPayload jwtPayload = JwtUtils.parseJWT(token);
 
         QueryWrapper<AdministratorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", Long.parseLong(jwtPayload.getId()))
-            .eq("username", jwtPayload.getIssuer());
+        queryWrapper.eq("id", IDUtils.decryptByAES(jwtPayload.getId()))
+                .eq("username", jwtPayload.getIssuer())
+                .eq("is_deleted", 0);
         AdministratorEntity administratorEntity = administratorMapper.selectOne(queryWrapper);
+        AdministratorVo administratorVo = BeanCopyUtils.copy(administratorEntity, AdministratorVo.class);
+        administratorVo.setId(IDUtils.encryptByAES(administratorEntity.getId()));
 
-        return BeanCopyUtils.copy(administratorEntity, AdministratorVo.class);
+        return administratorVo;
     }
 
 }

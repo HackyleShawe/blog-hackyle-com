@@ -3,7 +3,7 @@ package com.hackyle.blog.business.dto;
 import java.util.Date;
 
 public class AuthorAddDto {
-    private Long id;
+    private String id;
 
     /**
      * 昵称
@@ -50,11 +50,11 @@ public class AuthorAddDto {
      */
     private String avatar;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
