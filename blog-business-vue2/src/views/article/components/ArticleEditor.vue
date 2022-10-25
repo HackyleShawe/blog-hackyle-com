@@ -31,12 +31,17 @@
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="Author" prop="cate">
-              <select-authors :initAuthors="articleDataForm.authors" @chooseAuthor="chooseAuthorHandler"/>
+            <el-form-item label="Authors" prop="authorList">
+              <!--<select-authors :initAuthors="articleDataForm.authors" @chooseAuthor="chooseAuthorHandler"/>-->
+              <el-select v-model="articleDataForm.authors" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+                         :filterable="true" :multiple="true"
+                         style="width: 100%;" value-key="id">
+                <el-option :label="author.nickName" :value="author" v-for="author in authorListOptions" :key="author.id"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="URI" prop="cate">
+            <el-form-item label="URI" prop="uri">
               <el-input v-model="articleDataForm.uri" :rows="1" type="input"
                         class="article-textarea" autosize placeholder="Please enter the article URI (https://domain.com/category-code/uri)" />
             </el-form-item>
@@ -45,13 +50,25 @@
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="Categories" prop="cate">
-              <select-categories :initCategories="articleDataForm.categories" @chooseCategory="chooseCategoryHandler" />
+            <el-form-item label="Categories" prop="categoryList">
+              <!--<select-categories :initCategories="articleDataForm.categories" @chooseCategory="chooseCategoryHandler" />-->
+              <el-select v-model="articleDataForm.categories" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+                         :filterable="true" :multiple="true"
+                         style="width: 100%;" value-key="id">
+                <el-option :label="category.name" :value="category" v-for="category in categoryListOptions" :key="category.id"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="Tags" prop="tagList">
-              <select-tags :initTags="articleDataForm.tags" @chooseTag="chooseTagHandler"/>
+              <!--<select-tags :initTags="articleDataForm.tags" @chooseTags="chooseTagHandler"/>-->
+              <el-select v-model="articleDataForm.tags" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+                         :filterable="true" :multiple="true"
+                         style="width: 100%;" value-key="id">
+                <!--NOTICE：v-model绑定的是一个对象，option里面也要绑定一个对象--->
+                <!--https://segmentfault.com/q/1010000019113355-->
+                <el-option :label="tag.name" :value="tag" v-for="tag in tagListOptions" :key="tag.id"></el-option>
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -81,18 +98,21 @@ import Sticky from '@/components/Sticky' //Header黏贴组件：当页面滚动�
 //导入子组件
 import IsComment from './IsComment'
 import IsRelease from './IsRelease'
-import IsNewVersion from './IsNewVersion'
-import SelectCategories from "./SelectCategories"
-import SelectTags from "./SelectTags"
-import SelectAuthors from './SelectAuthors'
+//import IsNewVersion from './IsNewVersion'
+//import SelectCategories from "./SelectCategories"
+//import SelectTags from "./SelectTags"
+//import SelectAuthors from './SelectAuthors'
 
 //导入JS
 import { isExternal } from '@/utils/validate'
 import articleApi from '@/api/article/article'
+import categoryApi from "@/api/article/category";
+import tagApi from "@/api/article/tag";
+import authorApi from "@/api/article/author";
 
 export default {
   name: 'ArticleEditor',
-  components: {Tinymce, Upload, Sticky, IsRelease, IsComment, IsNewVersion,SelectCategories, SelectTags, SelectAuthors},
+  components: {Tinymce, Upload, Sticky, IsRelease, IsComment},
   props: {
     isEdit: {
       type: Boolean,
@@ -143,7 +163,9 @@ export default {
       },
       loading: false,
       //submitted: false, //是否已提交，用于防止多次发送新增文章请求。不设置这个限定条件，方便随时保存
-      authorListOptions: [], //作者名字选项
+      categoryListOptions: [], //所有的分类
+      authorListOptions: [], //所有的作者
+      tagListOptions: [], //所有的标签
       rules: {
         //image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
@@ -181,6 +203,11 @@ export default {
       this.fetchArticleData(id)
     }
 
+    //获取选项栏的所有数据
+    this.getAllCategory()
+    this.getAllTag()
+    this.getAllAuthor()
+
     // Why need to make a copy of this.$route here?
     // Because if you enter this page and quickly switch tag, may be in the execution of the setTagsViewTitle function, this.$route is no longer pointing to the current page
     // https://github.com/PanJiaChen/vue-element-admin/issues/1221
@@ -190,6 +217,7 @@ export default {
     fetchArticleData(id) {
       articleApi.fetch(id).then(response => {
         this.articleDataForm = response.data
+        //console.log("this.articleDataForm:", this.articleDataForm)
 
         this.setTagsViewTitle() // set tagsview title
         this.setPageTitle() // set page title
@@ -208,36 +236,49 @@ export default {
       document.title = `${title} - ${this.articleDataForm.id}`
     },
 
-    //选择了那些文章分类
-    chooseCategoryHandler(selectedCategory) { //通过形参，接收子组件传递过来的值
-      this.articleDataForm.categories = selectedCategory
-      //console.log("categories:",this.articleDataForm.categories)
+    getAllCategory() {
+      categoryApi.fetchAll().then(resp => {
+        this.categoryListOptions = []
+        this.categoryListOptions = resp.data;
+      }).catch(err => {
+        console.log(err)
+      })
     },
-    //选择了那些文章标签
-    chooseTagHandler(selectedTag) {
-      this.articleDataForm.tags = selectedTag
-      //console.log("tags:", this.articleDataForm.tags)
+    getAllTag() {
+      tagApi.fetchAll().then(resp => {
+        this.tagListOptions = []
+        this.tagListOptions = resp.data;
+      }).catch(err => {
+        console.log(err)
+      })
     },
-    //有那些作者参与了本篇文章
-    chooseAuthorHandler(selectedAuthor) {
-      this.articleDataForm.authors = selectedAuthor
-      //console.log("authors:", this.articleDataForm.authors)
+    getAllAuthor() {
+      authorApi.fetchAll().then(resp => {
+        this.authorListOptions = []
+        this.authorListOptions = resp.data;
+      }).catch(err => {
+        console.log(err)
+      })
     },
 
-
+    //表单提交
     submitForm() {
       let authorIds = "";
       let categoryIds = "";
       let tagIds = "";
 
+      console.log("this.articleDataForm.categories: ", this.articleDataForm.categories)
+      console.log("this.articleDataForm.authors: ", this.articleDataForm.authors)
+      console.log("this.articleDataForm.tags: ", this.articleDataForm.tags)
+
       this.articleDataForm.categories.forEach(ele => {
-        categoryIds += ele + ","
+        categoryIds += ele.id + ","
       })
       this.articleDataForm.authors.forEach(ele => {
-        authorIds += ele + ","
+        authorIds += ele.id + ","
       })
       this.articleDataForm.tags.forEach(ele => {
-        tagIds += ele + ","
+        tagIds += ele.id + ","
       })
 
       //准备请求参数

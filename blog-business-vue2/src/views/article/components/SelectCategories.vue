@@ -1,9 +1,12 @@
 <!--
   文章分类选择组件
+  暂时弃用：需要解决子、父组件之间，即时传递数据的问题。
+  其他两个SelectAuthors和SelectTags组件也存在同样的问题
 -->
 <template>
   <el-select v-model="selectedCategory" placeholder="Please Select Categories"
-             style="width: 100%;" :multiple="true" default-first-option @change="selectedCategoryHandler">
+             :filterable="true" :multiple="true" default-first-option
+             style="width: 100%;" @change="selectedCategoryHandler">
     <el-option :label="item.name" :value="item.id" v-for="item in categoryListOptions" :key="item.id"></el-option>
   </el-select>
 </template>
@@ -13,6 +16,7 @@ import categoryApi from "@/api/article/category";
 
 export default {
   name: "SelectCategory",
+  //存在问题：页面刷新后，就无法从父组件传递initCategories数据过来
   props: ['initCategories'],
   data() {
     return {
@@ -24,23 +28,26 @@ export default {
   },
   emits: ['chooseCategory'], //自定义事件，向父组件传递数据
   created() {
-    this.getCategories();
+    this.getAllCategories();
   },
   beforeUpdate() {
+    //存在问题：每次选中和反选中，initCategories的数据反而会变化
     if(this.initCategories.length > 0) {
       this.selectedCategory = this.initCategories
     }
   },
   methods: {
     //获取所有文章分类
-    getCategories() {
+    getAllCategories() {
       categoryApi.fetchAll().then(resp => {
+        this.categoryListOptions = []
         this.categoryListOptions = resp.data;
       }).catch(err => {
         console.log(err)
       })
     },
     selectedCategoryHandler() {
+      //存在问题：如何一有变化，就把数据即时传递出去
       //向父组件传递已经选择了的分类信息
       this.$emit('chooseCategory', this.selectedCategory);
     }
