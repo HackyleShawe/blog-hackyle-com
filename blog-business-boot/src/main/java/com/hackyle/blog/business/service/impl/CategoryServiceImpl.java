@@ -37,6 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ApiResponse<String> add(CategoryAddDto categoryAddDto) {
         CategoryEntity categoryEntity = BeanCopyUtils.copy(categoryAddDto, CategoryEntity.class);
+        categoryEntity.setCode(categoryEntity.getCode().toLowerCase());
 
         //检查是否已经插入：检查code
         QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();
@@ -78,6 +79,7 @@ public class CategoryServiceImpl implements CategoryService {
     public ApiResponse<String> update(CategoryAddDto categoryAddDto) {
         CategoryEntity categoryEntity = BeanCopyUtils.copy(categoryAddDto, CategoryEntity.class);
         categoryEntity.setId(IDUtils.decryptByAES(categoryAddDto.getId()));
+        categoryEntity.setCode(categoryEntity.getCode().toLowerCase());
 
         //Code重复性检查
         QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();

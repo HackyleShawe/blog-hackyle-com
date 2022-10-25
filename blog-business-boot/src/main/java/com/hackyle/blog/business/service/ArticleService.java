@@ -8,6 +8,11 @@ import com.hackyle.blog.business.qo.ArticleQo;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.vo.ArticleVo;
+import com.hackyle.blog.business.vo.AuthorVo;
+import com.hackyle.blog.business.vo.CategoryVo;
+import com.hackyle.blog.business.vo.TagVo;
+
+import java.util.List;
 
 
 public interface ArticleService extends IService<ArticleEntity> {
@@ -23,4 +28,10 @@ public interface ArticleService extends IService<ArticleEntity> {
     ArticleVo fetch(String id);
 
     PageResponseDto<ArticleVo> fetchList(PageRequestDto<ArticleQo> pageRequestDto);
+
+    List<AuthorVo> fetchAuthor(String articleId);
+
+    List<CategoryVo> fetchCategory(String articleId);
+
+    List<TagVo> fetchTag(String articleId);
 }

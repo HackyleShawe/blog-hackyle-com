@@ -40,6 +40,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public ApiResponse<String> add(TagAddDto tagAddDto) {
         TagEntity tagEntity = BeanCopyUtils.copy(tagAddDto, TagEntity.class);
+        tagEntity.setCode(tagEntity.getCode().toLowerCase()); //Code全部转换为小写
 
         //Code重复性检查
         QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();
@@ -81,6 +82,7 @@ public class TagServiceImpl implements TagService {
     public ApiResponse<String>  update(TagAddDto addDto) {
         TagEntity tagEntity = BeanCopyUtils.copy(addDto, TagEntity.class);
         tagEntity.setId(IDUtils.decryptByAES(addDto.getId()));
+        tagEntity.setCode(tagEntity.getCode().toLowerCase()); //Code全部转换为小写
 
         //Code重复性检查
         QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();

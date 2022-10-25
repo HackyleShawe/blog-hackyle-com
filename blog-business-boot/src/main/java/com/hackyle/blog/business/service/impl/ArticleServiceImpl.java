@@ -32,7 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,7 +46,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         implements ArticleService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);
     private static final Pattern patternRUI = Pattern.compile(RegexVerificationCons.URI);
-
 
     @Autowired
     private ArticleMapper articleMapper;
@@ -191,19 +193,19 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
         List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
         List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
-        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
         articleVo.setAuthors(authorVos);
 
         Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
         List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
         List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
-        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
         articleVo.setCategories(categoryVos);
 
         Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
         List<ArticleTagPo> articleTagPos = tagMap.get(idd);
         List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
-        IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+        IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
         articleVo.setTags(tagVos);
 
         return articleVo;
@@ -261,22 +263,68 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
             List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
             List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
-            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
             articleVo.setAuthors(authorVos);
 
             List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
             List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
-            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
             articleVo.setCategories(categoryVos);
 
             List<ArticleTagPo> articleTagPos = tagMap.get(idd);
             List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
-            IDUtils.batchEncrypt(articleAuthorPos, "articleId", authorVos, "setId");
+            IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
             articleVo.setTags(tagVos);
         }
         articleVoPageResponseDto.setRows(articleVoList);
 
         return articleVoPageResponseDto;
+    }
+
+    @Override
+    public List<AuthorVo> fetchAuthor(String articleId) {
+        long idd = IDUtils.decryptByAES(articleId);
+
+        List<Long> articleIds = new ArrayList<>();
+        articleIds.add(idd);
+
+        Map<Long, List<ArticleAuthorPo>> articleMap = articleAuthorService.selectByArticleIds(articleIds);
+
+        List<ArticleAuthorPo> articleAuthorPos = articleMap.get(idd);
+        List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
+        IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
+
+        return authorVos;
+    }
+
+    @Override
+    public List<CategoryVo> fetchCategory(String articleId) {
+        long idd = IDUtils.decryptByAES(articleId);
+
+        List<Long> articleIds = new ArrayList<>();
+        articleIds.add(idd);
+
+        Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
+        List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
+        List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
+        IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
+
+        return categoryVos;
+    }
+
+    @Override
+    public List<TagVo> fetchTag(String articleId) {
+        long idd = IDUtils.decryptByAES(articleId);
+
+        List<Long> articleIds = new ArrayList<>();
+        articleIds.add(idd);
+
+        Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
+        List<ArticleTagPo> articleTagPos = tagMap.get(idd);
+        List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
+        IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
+
+        return tagVos;
     }
 
     /**
