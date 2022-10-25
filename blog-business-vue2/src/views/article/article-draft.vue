@@ -105,19 +105,19 @@ export default {
         tmpArticleList.forEach(article => {
           let tmpAuthors = ''
           article.authors.forEach(ele => {
-            tmpAuthors += ele.nickName
+            tmpAuthors += ele.nickName + " "
           })
           article.authors = tmpAuthors
 
           let tmpCategories = ''
           article.categories.forEach(ele => {
-            tmpCategories += ele.name
+            tmpCategories += ele.name + " "
           })
           article.categories = tmpCategories
 
           let tmpTags = ''
           article.tags.forEach(ele => {
-            tmpTags += ele.name
+            tmpTags += ele.name + " "
           })
           article.tags = tmpTags
         })

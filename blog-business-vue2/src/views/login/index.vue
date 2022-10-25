@@ -45,10 +45,10 @@
         Login
       </el-button>
 
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
+      <!--<div class="tips">-->
+      <!--  <span style="margin-right:20px;">username: admin</span>-->
+      <!--  <span> password: kyleshawe</span>-->
+      <!--</div>-->
 
     </el-form>
   </div>
@@ -77,10 +77,10 @@ export default {
     return {
       loginForm: {
         username: 'blog_hackyle_admin',
-        password: 'hackyle.1997.blog'
+        password: 'kyleshawe'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', }], //validator: validateUsername }],
+        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,

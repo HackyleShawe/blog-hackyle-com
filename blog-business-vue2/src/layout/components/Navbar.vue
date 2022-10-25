@@ -22,23 +22,24 @@
       <el-dropdown class="avatar-container" trigger="click">
         <!--头像-->
         <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <img :src="avatar" class="user-avatar">
           <i class="el-icon-caret-bottom" />
         </div>
 
         <!--头像下面的下拉框-->
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
-            <el-dropdown-item>
-              Home
-            </el-dropdown-item>
-          </router-link>
-          <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
+          <!--<router-link to="/">-->
+          <!--  <el-dropdown-item>-->
+          <!--    Home-->
+          <!--  </el-dropdown-item>-->
+          <!--</router-link>-->
+          <a target="_blank" href="https://hackyle.com">
+            <el-dropdown-item>Home</el-dropdown-item>
+          </a>
+          <a target="_blank" href="https://github.com/HackyleShawe">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
-          <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
-            <el-dropdown-item>Docs</el-dropdown-item>
-          </a>
+
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
