@@ -12,7 +12,9 @@ import com.hackyle.blog.business.dto.ArticleAddDto;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.entity.ArticleEntity;
+import com.hackyle.blog.business.entity.CategoryEntity;
 import com.hackyle.blog.business.mapper.ArticleMapper;
+import com.hackyle.blog.business.mapper.CategoryMapper;
 import com.hackyle.blog.business.po.ArticleAuthorPo;
 import com.hackyle.blog.business.po.ArticleCategoryPo;
 import com.hackyle.blog.business.po.ArticleTagPo;
@@ -57,12 +59,15 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
     private ArticleTagService articleTagService;
 
     @Autowired
+    private CategoryMapper categoryMapper;
+
+    @Autowired
     private CommentService commentService;
 
     @Transactional
     @Override
     public ApiResponse<String> add(ArticleAddDto articleAddDto) throws Exception {
-        adjustUri(articleAddDto);
+        checkAndAdjustURI(articleAddDto);
 
         ArticleEntity articleEntity = BeanCopyUtils.copy(articleAddDto, ArticleEntity.class);
 
@@ -147,7 +152,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
     @Transactional
     @Override
     public ApiResponse<String> update(ArticleAddDto articleUpdateDto) {
-        adjustUri(articleUpdateDto);
+        adjustURI(articleUpdateDto);
 
         ArticleEntity articleEntity = BeanCopyUtils.copy(articleUpdateDto, ArticleEntity.class);
         IDUtils.decrypt(articleUpdateDto, articleEntity);
@@ -331,8 +336,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
      * 调整URI的格式
      * 1.全部小写
      * 2.只能含有的特殊字符：下换线，分割线
+     * 3.如果有分类，则在URI前面加上分类Code
      */
-    private void adjustUri(ArticleAddDto articleAddDto) {
+    private void checkAndAdjustURI(ArticleAddDto articleAddDto) {
         String uri = articleAddDto.getUri();
 
         if(StringUtils.isBlank(uri)) {
@@ -351,7 +357,46 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             uri = "/" + uri;
         }
 
+        //在URI前拼接文章分类的编码
+        String categoryIds = articleAddDto.getCategoryIds();
+        if(StringUtils.isNotBlank(categoryIds) && categoryIds.split(",").length > 1) {
+            String[] categoryIdArr = categoryIds.split(",");
+
+            long decryptedCategoryId = IDUtils.decryptByAES(categoryIdArr[0]);
+            CategoryEntity categoryEntity = categoryMapper.selectById(decryptedCategoryId);
+            if(categoryEntity != null && StringUtils.isNotBlank(categoryEntity.getCode())) {
+                uri = "/" + categoryEntity.getCode().toLowerCase() + uri;
+            }
+        }
+
         articleAddDto.setUri(uri);
     }
+
+    /**
+     * 调整URI的格式
+     * 1.全部小写
+     * 2.只能含有的特殊字符：下换线，分割线
+     */
+    private void adjustURI(ArticleAddDto articleAddDto) {
+        if(StringUtils.isBlank(articleAddDto.getUri())) {
+            return;
+        }
+
+        String uri = articleAddDto.getUri();
+        uri = uri.toLowerCase();
+
+        //不合法字符检查
+        Matcher matcher = patternRUI.matcher(uri);
+        if(!matcher.find()) {
+            throw new RuntimeException("URI不合法");
+        }
+
+        if(!uri.startsWith("/")) {
+            uri = "/" + uri;
+        }
+
+        articleAddDto.setUri(uri);
+    }
+
 
 }

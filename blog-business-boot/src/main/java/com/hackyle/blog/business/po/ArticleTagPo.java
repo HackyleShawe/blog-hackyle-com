@@ -6,6 +6,10 @@ public class ArticleTagPo {
 
     private Long tagId;
 
+    /**
+     * 标签编码
+     */
+    private String code;
 
     /**
      * 标签名称
@@ -31,6 +35,14 @@ public class ArticleTagPo {
 
     public void setTagId(Long tagId) {
         this.tagId = tagId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getName() {
