@@ -48,4 +48,28 @@ function fetch(id) {
   })
 }
 
-export default {add, del, delReal, update, fetchList, fetch}
+function fetchAuthor(articleId) {
+  return request({
+    url: '/article/fetchAuthor',
+    method: 'get',
+    params: { articleId }
+  })
+}
+
+function fetchCategory(articleId) {
+  return request({
+    url: '/article/fetchCategory',
+    method: 'get',
+    params: { articleId }
+  })
+}
+
+function fetchTag(articleId) {
+  return request({
+    url: '/article/fetchTag',
+    method: 'get',
+    params: { articleId }
+  })
+}
+
+export default {add, del, delReal, update, fetchList, fetch, fetchAuthor, fetchCategory, fetchTag}

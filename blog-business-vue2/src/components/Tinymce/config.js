@@ -11,7 +11,7 @@ const toolbar = 'undo redo | bold italic underline strikethrough forecolor backc
     ' alignleft aligncenter alignright alignjustify outdent indent numlist bullist | ' +
     ' pagebreak nonbreaking hr ltr rtl visualblocks visualchars | ' +
     ' charmap emoticons link unlink openlink | fullscreen code preview save print | ' +
-    ' insertfile image editimage imageoptions media template link anchor | '
+    ' insertfile image editimage imageoptions media template link anchor toc | '
 
 /*
  * 选中一段文本后弹出来的快捷文本控制
@@ -25,6 +25,8 @@ const codeSampleLanguages = [
   {text: 'Java', value: 'java line-numbers'},
   {text: 'JavaScript', value: 'javascript line-numbers'},
   {text: 'JSON', value: 'json line-numbers'},
+  {text: 'CSS', value: 'css line-numbers'},
+  {text: 'HTML', value: 'html line-numbers'},
   {text: 'C', value: 'c line-numbers'},
   {text: 'C++', value: 'cpp line-numbers'},
   {text: 'LaTeX', value: 'LaTeX line-numbers'},

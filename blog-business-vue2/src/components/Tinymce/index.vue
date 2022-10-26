@@ -171,8 +171,8 @@ export default {
         smart_paste: true,
 
         //toc目录
-        //toc_depth: 6, //目录深度
-        //toc_header: 'div', //生成标题，默认情况下会用H2标签标记；改为div
+        toc_depth: 6, //目录深度
+        toc_header: 'div', //生成标题，默认情况下会用H2标签标记；改为div
 
         end_container_on_empty_block: true,
         advlist_bullet_styles: 'square',

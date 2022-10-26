@@ -267,9 +267,9 @@ export default {
       let categoryIds = "";
       let tagIds = "";
 
-      console.log("this.articleDataForm.categories: ", this.articleDataForm.categories)
-      console.log("this.articleDataForm.authors: ", this.articleDataForm.authors)
-      console.log("this.articleDataForm.tags: ", this.articleDataForm.tags)
+      //console.log("this.articleDataForm.categories: ", this.articleDataForm.categories)
+      //console.log("this.articleDataForm.authors: ", this.articleDataForm.authors)
+      //console.log("this.articleDataForm.tags: ", this.articleDataForm.tags)
 
       this.articleDataForm.categories.forEach(ele => {
         categoryIds += ele.id + ","
