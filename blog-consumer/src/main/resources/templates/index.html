@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="rebot" content="all">
+
+  <meta name="author" content="Hackyle; Kyle Shawe">
+  <meta name="reply-to" content="kyleshawe@outlook.com;1617358182@qq.com">
+  <meta name="generator" content="Sublime Text 3; VSCode">
+  <meta name="copyright" content="Copy Right: 2022 HACKYLE. All rights reserved">
+
+  <!--<meta name="keywords" th:content="${articleVoList.metaVo.keywords}">-->
+  <!--<meta name="description" th:content="${articleVoList.metaVo.description}">-->
+
+  <!-- 给网站设置图标 -->
+  <link rel="icon" href="/img/favicon.ico">
+
+  <!--<title th:replace="${articleVoList.metaVo.title}">博客详情</title>-->
+  <!--<title><th:block th:text="${articleVoList.metaVo.title}"></th:block></title>-->
+  <title>demo</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/index.css">
+
+  <!-- JS -->
+  <!--<script src="/plugin/jquery-1.12.4.min.js"></script>-->
+
+</head>
+
+<body>
+  <!--顶部导航栏-->
+  <div th:replace="components/nav"></div>
+
+  <!--Banner与Pic展示-->
+  <div class="hero">
+    <div class="container">
+      <h1>极客 - 多重人格递归</h1>
+      <p>技术 = 组成组件 + 数据结构 + 性质 + 应用场景，以及更好地解决问题</p>
+    </div>
+  </div>
+
+  <!--文章列表-->
+  <main class="face">
+    <!-- section1:文章列表 -->
+    <section class="sec-container">
+
+      <!--scroll-animation-->
+      <div class="box" th:each="articleVo : ${pageResponseDto.getRows()}">
+        <!--<div class="article-pic">-->
+        <!--  <img src="http://127.0.0.1:9000/blog/2022/10/9da51ce4c8df47c6bbe326462baa24f8.png"/>-->
+        <!--</div>-->
+        <div class="article-abstract">
+          <a th:href="${'/article' + articleVo.uri}" target="_blank">
+            <p class="title"><h1><span th:text="${articleVo.title}">title</span> </h1>
+            <p class="summary"><span th:text="${articleVo.summary}">summary</span></p>
+            <p class="meta">
+              Category: <span th:text="${articleVo.categories}">category</span>
+              Update Time: <span th:text="${articleVo.updateTime}">UpdateTime</span>
+            </p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!--section2:文章推荐 -->
+    <section>
+    </section>
+  </main>
+
+  <div class="face page">
+    <a th:href="'/article/page/' + ${pageResponseDto.getCurrentPage() - 1}">上一页</a>
+    &emsp;&emsp;&emsp;&emsp;
+    当前页：<span th:text="${pageResponseDto.getCurrentPage()}">0</span> / <span th:text="${pageResponseDto.getPages()}">1</span>
+    &emsp;&emsp;&emsp;&emsp;
+    <a th:href="'/article/page/' + ${pageResponseDto.getCurrentPage()+1 > pageResponseDto.getPages() ? pageResponseDto.getPages():pageResponseDto.getCurrentPage()+1}">下一页</a>
+
+  </div>
+
+  <!--回到顶部-->
+  <!--<div class="backToTop"></div>-->
+
+  <!--底部-->
+  <div th:replace="components/footer"></div>
+</body>
+<script src="/js/index.js"></script>
+
+<script>
+
+</script>
+</html>

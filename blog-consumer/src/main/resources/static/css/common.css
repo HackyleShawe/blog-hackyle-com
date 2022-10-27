@@ -1,0 +1,132 @@
+/**
+属性顺序规范
+1.	Positioning 布局定位属性：display/position/float/clear/visibility/overflow（建议 display 第一个写，毕竟关系到模式）
+2.	Box model 盒模型：width/height/margin/padding/border/background
+3.	Typographic 排版：color/font/text-decoration/text-align/vertical-align/white- space/break-word
+4.	Visual 外观：content/cursor/border-radius/box-shadow/text-shadow/background:linear-gradient …
+5.	其他：animation, transition
+ */
+
+html, body, div, span, applet, object, iframe,
+/*h1, h2, h3, h4, h5, h6,*/
+p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video, input {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-weight: normal;
+  vertical-align: baseline;
+}
+
+/* HTML5 display-role reset for older browsers */
+article, aside, main, details, figcaption, figure,
+footer, header, menu, nav, section {
+  display: block;
+}
+
+/*版心*/
+.face {
+  width: 1000px;
+  margin: 0 auto;
+}
+
+/*------------------------------navigator start------------------------------*/
+nav {
+  /*永远在最上层*/
+  z-index: 99;
+  position: fixed;
+  background-color: #222;
+  top: 0;
+  left: 0;
+  right: 0;
+  transition: all 0.3s ease-in-out;
+}
+
+nav .nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 0;
+  transition: all 0.3s ease-in-out;
+}
+
+nav .nav-container .logo {
+  font-weight: bold;
+  font-size: larger;
+}
+
+nav ul {
+  display: flex;
+  list-style-type: none;
+  align-items: center;
+  justify-content: center;
+}
+
+nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 7px 15px;
+  transition: all 0.3s ease-in-out;
+}
+nav.active {
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+nav.active a {
+  color: #000;
+}
+nav.active .container {
+  padding: 10px 0;
+}
+nav a.current,
+nav a:hover {
+  color: #c0392b;
+  font-weight: bold;
+}
+/*------------------------------navigator end------------------------------*/
+
+
+/*------------------------------back to top start------------------------------*/
+.backToTop {
+  height: 20px;
+  width: 20px;
+
+  position: fixed; /*表明使用固定定位*/
+  top: 85%; /*距离顶部400px*/
+  right: 5%; /*距离右边50px*/
+
+  background-color: yellow;
+  border: solid 2px midnightblue;
+}
+/*------------------------------back to top end------------------------------*/
+
+
+/*------------------------------footer start------------------------------*/
+.footer-container {
+  clear: both;
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 20px;
+  text-align: center;
+  background-color: #ec7fff;
+}
+
+.footer-container .desc {
+  font-size: large;
+  /*行间距*/
+  line-height: 25px;
+}
+/*------------------------------footer end------------------------------*/

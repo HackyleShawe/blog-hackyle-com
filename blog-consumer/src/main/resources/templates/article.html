@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="rebot" content="all">
+
+  <meta name="author" content="Hackyle; Kyle Shawe">
+  <meta name="reply-to" content="kyleshawe@outlook.com;1617358182@qq.com">
+  <meta name="generator" content="Sublime Text 3; VSCode">
+  <meta name="copyright" content="Copy Right: 2022 HACKYLE. All rights reserved">
+
+  <meta name="keywords" th:content="${metaVo.keywords}">
+  <meta name="description" th:content="${metaVo.description}">
+
+  <!-- 给网站设置图标 -->
+  <link rel="icon" href="/img/favicon.ico">
+
+  <!--<title th:replace="${articleListVo.meteVo.title}">博客详情</title>-->
+  <title><th:block th:text="${metaVo.title}">博客详情</th:block></title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/article.css">
+
+  <!-- JS -->
+  <script src="/plugin/jquery-1.12.4.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.5.0/tocbot.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocbot/4.5.0/tocbot.css">
+
+  <script src="/plugin/prism.js"></script>
+  <link rel="stylesheet" href="/plugin/prism.css">
+
+  <!--图片点击放大CSS-->
+  <!--Reference：https://aqingya.cn/articl/df045814.html-->
+  <style>
+    .imgPreview {
+      display: none;
+      top: 0;
+
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .imgPreview img {
+      z-index: 100;
+      margin-top: 50px;
+      width: 90%;
+      height: auto;
+      position: fixed;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      left: 50%;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div th:replace="components/nav"></div>
+
+  <div class="face article-meta-container">
+    <h1 th:text="${articleVo.title}">title</h1>
+
+    <p>
+      <i>文章分类：</i> <i><span th:text="${articleVo.categories}">Algorithm</span>;</i>
+      <i>标签：</i> <i><span th:text="${articleVo.tags}">new bee, 666, sb</span>;</i>
+      <i>作者：</i> <i><span th:text="${articleVo.authors}">Hackyle, Alice</span>;</i> <br/>
+    </p>
+    <p>
+      <i>更新时间：</i> <i><span th:text="${articleVo.updateTime}">2022-01-12 12:00:00</span>;</i>
+    </p>
+
+  </div>
+
+  <div class="face">
+    <!--左侧导航栏-->
+    <aside>
+    </aside>
+
+    <!--文章主体-->
+    <main>
+      <article th:utext="${articleVo.content}">
+        文章正文
+      </article>
+
+      <p>
+        <!--需要增加文章类型的判断-->
+        <br/><span>————————————————</span> <br/>
+        版权声明：本文为原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。<br/>
+        原文链接：https://blog.hackyle.com/article/<span th:text="${articleVo.uri}"></span><br/><br/>
+      </p>
+    </main>
+
+  </div>
+
+  <!-- 图片点击放大的蒙版层 -->
+  <div class="imgPreview">
+    <img src="#" alt="" id="imgPreview">
+  </div>
+
+  <div th:replace="components/footer"></div>
+</body>
+
+<script>
+  <!--图片点击放大-->
+  $('img').on('click', function () {
+    var src = $(this).attr('src');
+    $('.imgPreview img').attr('src', src);
+    $('.imgPreview').show()
+  });
+  $('.imgPreview').on('click', function () {
+    $('.imgPreview').hide()
+  });
+</script>
+
+<script>
+  tocbot.init({
+    // 构建目录的容器
+    tocSelector: 'aside',
+    // 文章容器
+    contentSelector: 'article',
+    // 需要解析的标题
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    //hasInnerContainers: true,
+    // isCollapsedClass: 'is-collapsed',
+
+    //跳转偏移
+    scrollSmooth: true,
+    scrollSmoothOffset: -80,
+    headingsOffset: -500,
+
+    //滚动跟随
+    //positionFixedSelector: '.toc',
+    //positionFixedClass: 'is-position-fixed',
+    //fixedSidebarOffset: 'auto',
+
+    collapseDepth: 6, //折叠深度
+  });
+
+  //tocbot.refresh();
+  //tocbot.destroy();
+</script>
+</html>
