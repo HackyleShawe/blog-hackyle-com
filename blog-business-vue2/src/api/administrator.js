@@ -22,3 +22,10 @@ export function logout() {
     method: 'get'
   })
 }
+
+export function code() {
+  return request({
+    url: '/admin/verificationCode',
+    method: 'get'
+  })
+}

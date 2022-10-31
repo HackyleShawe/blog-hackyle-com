@@ -41,6 +41,28 @@
         </span>
       </el-form-item>
 
+      <el-form-item prop="code">
+        <span class="svg-container">
+          <i class="el-icon-aim" />
+        </span>
+
+        <el-input
+          ref="code"
+          v-model="loginForm.code"
+          name="code"
+          type="text"
+          tabindex="1"
+        />
+
+        <!--
+          验证码
+          1. @click="changeCode"：给img标签设置一个单击事件，调用changeCode方法，获取验证码
+          2. :src="codeUrl"：img标签显示的内容来自这里
+          3. Vue组件一挂载，就调用changeCode方法
+         -->
+        <img :src="codeUrl" @click="changeCode" class="codeUrl" v-if="codeUrl" />
+      </el-form-item>
+
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">
         Login
       </el-button>
@@ -56,6 +78,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { code } from "@/api/administrator";
 
 export default {
   name: 'Login',
@@ -74,19 +97,36 @@ export default {
         callback()
       }
     }
+    const validateCode = (rule, value, callback) => {
+      console.log("rule: ", rule, "  value: ", value)
+      if (value.length < 1) {
+        callback(new Error('You must type the validate code'))
+      } else {
+        callback()
+      }
+    }
+
     return {
       loginForm: {
         username: 'blog_hackyle_admin',
-        password: 'kyleshawe'
+        password: 'kyleshawe',
+        code: '', //验证码
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        code: [{ required: true, trigger: 'blur', validator: validateCode}],
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      //验证码相关
+      codeUrl: '',
+      uuid: '',
     }
+  },
+  created() {
+    this.changeCode()
   },
   watch: {
     $route: {
@@ -110,6 +150,8 @@ export default {
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          //添加UUID，方便后端获取UUID从Redis中获取验证码
+          this.loginForm.uuid = this.uuid
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
             this.$router.push({ path: this.redirect || '/' })
@@ -122,7 +164,13 @@ export default {
           return false
         }
       })
-    }
+    },
+    // 获取验证码
+    async changeCode() {
+      let resp = await code();
+      this.codeUrl = resp.data.code;
+      this.uuid = resp.data.uuid;
+    },
   }
 }
 </script>
@@ -234,6 +282,18 @@ $light_gray:#eee;
     color: $dark_gray;
     cursor: pointer;
     user-select: none;
+  }
+
+  .codeUrl {
+    height: 80%;
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    right: 24px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
   }
 }
 </style>
