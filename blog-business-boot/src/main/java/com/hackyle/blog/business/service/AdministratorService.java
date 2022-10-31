@@ -4,6 +4,7 @@ import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.vo.AdministratorVo;
 import com.hackyle.blog.business.dto.AdminSignInDto;
 import com.hackyle.blog.business.dto.AdminSignUpDto;
+import com.hackyle.blog.business.vo.KaptchaVO;
 
 public interface AdministratorService {
     ApiResponse<String> singUp(AdminSignUpDto adminSignUpDto);
@@ -11,5 +12,7 @@ public interface AdministratorService {
     AdministratorVo signIn(AdminSignInDto adminSignInDto);
 
     AdministratorVo info(String token);
+
+    KaptchaVO verificationCode();
 
 }

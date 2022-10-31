@@ -8,6 +8,7 @@ import com.hackyle.blog.business.vo.AdministratorVo;
 import com.hackyle.blog.business.dto.AdminSignInDto;
 import com.hackyle.blog.business.dto.AdminSignUpDto;
 import com.hackyle.blog.business.service.AdministratorService;
+import com.hackyle.blog.business.vo.KaptchaVO;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +75,7 @@ public class AdministratorController {
                 response.setHeader("Authorization", administratorVo.getToken());
                 return ApiResponse.success(ResponseEnum.SIGN_IN_OK.getCode(), ResponseEnum.SIGN_IN_OK.getMessage(), administratorVo);
             } else {
-                return ApiResponse.error(ResponseEnum.SIGN_IN_FAIL.getCode(), "登录失败：用户名或密码错误");
+                return ApiResponse.error(ResponseEnum.SIGN_IN_FAIL.getCode(), "登录失败：用户名或密码或验证码错误");
             }
 
         } catch (Exception e) {
@@ -82,6 +83,21 @@ public class AdministratorController {
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
         }
     }
+
+    /**
+     * 获取验证码
+     */
+    @GetMapping("/verificationCode")
+    public ApiResponse<KaptchaVO> verificationCode() {
+        KaptchaVO kaptchaVO = administratorService.verificationCode();
+
+        if(kaptchaVO == null || StringUtils.isBlank(kaptchaVO.getCode()) || StringUtils.isBlank(kaptchaVO.getUuid())) {
+            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+        } else {
+            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), kaptchaVO);
+        }
+    }
+
 
     /**
      * 获取登录者的信息

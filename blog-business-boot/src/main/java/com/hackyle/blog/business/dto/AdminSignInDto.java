@@ -10,6 +10,17 @@ public class AdminSignInDto {
      */
     private String password;
 
+    /**
+     * 验证码
+     */
+    private String code;
+
+    /**
+     * UUID
+     */
+    private String uuid;
+
+
     public AdminSignInDto(String username, String password) {
         this.username = username;
         this.password = password;
@@ -29,5 +40,21 @@ public class AdminSignInDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 }

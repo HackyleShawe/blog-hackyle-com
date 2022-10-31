@@ -26,6 +26,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
                 "/admin/register",
                 "/admin/login",
                 "/admin/sign-in/",
+                "/admin/verificationCode",
                 "/error"
         );
     }
