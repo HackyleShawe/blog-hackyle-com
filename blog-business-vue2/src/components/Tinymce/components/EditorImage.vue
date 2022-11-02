@@ -49,7 +49,7 @@ export default {
   },
   data() {
     return {
-      postLocation: process.env.BACKEND_API + "file/upload",
+      postLocation: process.env.VUE_APP_BACKEND_API + "file/upload",
       dialogVisible: false,
       tmpFileList: [], //暂存文件的上传列表
       //listObj: {}, //文件对象

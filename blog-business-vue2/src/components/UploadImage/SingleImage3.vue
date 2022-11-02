@@ -48,7 +48,7 @@ export default {
   },
   data() {
     return {
-      postLocation: process.env.BACKEND_API + "file/upload",
+      postLocation: process.env.VUE_APP_BACKEND_API + "file/upload",
       //tempUrl: '',
       dataObj: { token: '', key: '' }
     }
