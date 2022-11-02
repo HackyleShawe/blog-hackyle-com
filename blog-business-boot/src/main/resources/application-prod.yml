@@ -1,7 +1,7 @@
 #生产的项目配置文件
 
 server:
-  port: 9010
+  port: 6100
   servlet:
     context-path: /
 
