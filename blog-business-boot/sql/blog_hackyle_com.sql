@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS blog_hackyle_com;
-CREATE DATABASE blog_hackyle_com DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
-USE blog_hackyle_com;
+DROP DATABASE IF EXISTS blog_hackyle_com_dev;
+CREATE DATABASE blog_hackyle_com_dev DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE blog_hackyle_com_dev;
 
 DROP TABLE IF EXISTS tb_administrator;
 CREATE TABLE tb_administrator (
@@ -28,6 +28,10 @@ CREATE TABLE tb_administrator (
     PRIMARY KEY (id),
     INDEX idx_user_pw (username, password)
 ) ENGINE=InnoDB COMMENT '用户(管理员)信息';
+--插入默认数据：密码=kyleshawe
+INSERT INTO tb_administrator (id, username, password, nick_name, real_name, description, email, phone, address, birthday, gender, avatar)
+VALUES (11111, 'blog_hackyle_admin', 'Mo6f7utOcua1B3Id8EsAabzVfKbvRxGWUIW2tsr+CFU=', 'Hackyle', 'Kyle Shawe', 'I am Kyle Shawe, super admin', '1617358182@qq.com', '15797953262', 'SH CN', '1997-01-06 20:00:00', 1, 'https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif');
+
 
 # 文章主体
 DROP TABLE IF EXISTS tb_article;
