@@ -1,7 +1,6 @@
 package com.hackyle.blog.business.service.impl;
 
 import com.hackyle.blog.business.common.config.MinioConfig;
-import com.hackyle.blog.business.common.constant.BucketNameEnum;
 import com.hackyle.blog.business.common.pojo.MinioBucket;
 import com.hackyle.blog.business.common.pojo.MinioFile;
 import com.hackyle.blog.business.service.MinioService;
@@ -22,7 +21,7 @@ public class MinioServiceImpl implements MinioService {
     private MinioConfig minioConfig;
 
     public List<String> fileUpload(MultipartFile[] multipartFiles) throws Exception {
-        MinioBucket minioBucket = new MinioBucket(minioConfig.minioClient(), BucketNameEnum.BLOG_HACKYLE_COM.getBucketName());
+        MinioBucket minioBucket = new MinioBucket(minioConfig.minioClient(), minioConfig.getBucketName());
         MinioClientUtils.createBucket(minioBucket);
 
         List<String> fileObjects = new ArrayList<>();
@@ -41,7 +40,7 @@ public class MinioServiceImpl implements MinioService {
             minioFile.setInputStream(inputStream);
 
             MinioClientUtils.createFileObject(minioBucket, minioFile);
-            String url = minioConfig.getEndpoint() + BucketNameEnum.BLOG_HACKYLE_COM.getBucketName() + minioFile.getFilePath();
+            String url = minioConfig.getEndpoint() + minioConfig.getBucketName() + minioFile.getFilePath();
             fileObjects.add(url);
         }
 
@@ -73,7 +72,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public boolean fileDelete(String fileName) throws Exception{
-        MinioBucket minioBucket = new MinioBucket(minioConfig.minioClient(), BucketNameEnum.BLOG_HACKYLE_COM.getBucketName());
+        MinioBucket minioBucket = new MinioBucket(minioConfig.minioClient(), minioConfig.getBucketName());
 
         boolean delFlag = MinioClientUtils.deleteFileObject(minioBucket, fileName);
         return delFlag;

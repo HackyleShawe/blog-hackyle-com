@@ -34,6 +34,7 @@ mybatis-plus:
 #MinIO对象存储，文件服务器
 minio:
   endpoint: http://127.0.0.1:9000/  # 外网(主要要使用API的URL，不能使用Console的URL)
-  accessKey: kyle-minio
-  secretKey: hackyle-minio
-  endpointIn: http://127.0.0.1:9000/  # 内网(主要要使用API的URL，不能使用Console的URL)
+  access-key: kyle-minio
+  secret-key: hackyle-minio
+  endpoint-in: http://127.0.0.1:9000/  # 内网(主要要使用API的URL，不能使用Console的URL)
+  bucket-name: blog #本个项目所用的桶名

@@ -17,16 +17,20 @@ public class MinioConfig {
     private String endpoint;
 
     /** 内网MinIO URL */
-    @Value("${minio.endpointIn}")
+    @Value("${minio.endpoint-in}")
     private String endpointIn;
 
     /** MinIO用户名 */
-    @Value("${minio.accessKey}")
+    @Value("${minio.access-key}")
     private String accessKey;
 
     /** MinIO密码 */
-    @Value("${minio.secretKey}")
+    @Value("${minio.secret-key}")
     private String secretKey;
+
+    /** 本个项目所用的桶名 */
+    @Value("${minio.bucket-name}")
+    private String bucketName;
 
     /**
      * 把MinioClient交给Spring管理
@@ -67,5 +71,13 @@ public class MinioConfig {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+    public String getBucketName() {
+        return bucketName;
+    }
+
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
     }
 }
