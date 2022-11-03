@@ -55,19 +55,26 @@ public class ArticleServiceImpl implements ArticleService {
         articleIds.add(articleId);
 
         Map<Long, List<ArticleCategoryPo>> articleCategoryMap = articleCategoryService.selectByArticleIds(articleIds);
-        List<ArticleCategoryPo> articleCategoryPoList = articleCategoryMap.get(articleId);
-        String categories = articleCategoryPoList.stream().map(ArticleCategoryPo::getName).collect(Collectors.joining(", "));;
-        articleVo.setCategories(categories);
+        if(articleCategoryMap != null && articleCategoryMap.containsKey(articleId)) {
+            List<ArticleCategoryPo> articleCategoryPoList = articleCategoryMap.get(articleId);
+            String categories = articleCategoryPoList.stream().map(ArticleCategoryPo::getName).collect(Collectors.joining(", "));;
+            articleVo.setCategories(categories);
+        }
+
 
         Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
-        List<ArticleTagPo> articleTagPoList = tagMap.get(articleId);
-        String tags = articleTagPoList.stream().map(ArticleTagPo::getName).collect(Collectors.joining(", "));;
-        articleVo.setTags(tags);
+        if(tagMap != null && tagMap.containsKey(articleId)) {
+            List<ArticleTagPo> articleTagPoList = tagMap.get(articleId);
+            String tags = articleTagPoList.stream().map(ArticleTagPo::getName).collect(Collectors.joining(", "));;
+            articleVo.setTags(tags);
+        }
 
         Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
-        List<ArticleAuthorPo> articleAuthorPoList = authorMap.get(articleId);
-        String authors = articleAuthorPoList.stream().map(ArticleAuthorPo::getNickName).collect(Collectors.joining(", "));;
-        articleVo.setAuthors(authors);
+        if(authorMap != null && authorMap.containsKey(articleId)) {
+            List<ArticleAuthorPo> articleAuthorPoList = authorMap.get(articleId);
+            String authors = articleAuthorPoList.stream().map(ArticleAuthorPo::getNickName).collect(Collectors.joining(", "));;
+            articleVo.setAuthors(authors);
+        }
 
         return articleVo;
     }
