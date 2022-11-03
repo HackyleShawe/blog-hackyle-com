@@ -100,16 +100,17 @@ nav a:hover {
 
 
 /*------------------------------back to top start------------------------------*/
-.backToTop {
-  height: 20px;
-  width: 20px;
-
-  position: fixed; /*表明使用固定定位*/
-  top: 85%; /*距离顶部400px*/
-  right: 5%; /*距离右边50px*/
-
-  background-color: yellow;
-  border: solid 2px midnightblue;
+#backToTopBtn {
+  width: 40px;
+  background-repeat: no-repeat;
+  background-position:center;
+  position: fixed;
+  bottom: 5%;
+  right: 2%;
+  cursor: pointer;
+  display: none;
+  color: red;
+  font-size: larger;
 }
 /*------------------------------back to top end------------------------------*/
 
