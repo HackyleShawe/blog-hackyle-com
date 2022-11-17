@@ -10,6 +10,7 @@ import com.hackyle.blog.business.mapper.CategoryMapper;
 import com.hackyle.blog.business.mapper.CommentMapper;
 import com.hackyle.blog.business.mapper.TagMapper;
 import com.hackyle.blog.business.service.StatisticsService;
+import com.hackyle.blog.business.vo.StatisticsCountNumberVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,32 +31,30 @@ public class StatisticsServiceImpl implements StatisticsService {
     private CommentMapper commentMapper;
 
     @Override
-    public Integer countArticles() {
-        QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0);
-        return articleMapper.selectCount(queryWrapper);
-    }
+    public StatisticsCountNumberVo countNumber() {
+        QueryWrapper<ArticleEntity> queryArticle = new QueryWrapper<>();
+        queryArticle.lambda().eq(ArticleEntity::getDeleted, 0);
+        Integer articles = articleMapper.selectCount(queryArticle);
 
-    @Override
-    public Integer countCategories() {
-        QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(CategoryEntity::getDeleted, 0);
-        return categoryMapper.selectCount(queryWrapper);
-    }
+        QueryWrapper<CategoryEntity> queryCategory = new QueryWrapper<>();
+        queryCategory.lambda().eq(CategoryEntity::getDeleted, 0);
+        Integer categories = categoryMapper.selectCount(queryCategory);
 
-    @Override
-    public Integer countTags() {
-        QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(TagEntity::getDeleted, 0);
-        return tagMapper.selectCount(queryWrapper);
-    }
+        QueryWrapper<TagEntity> queryTag = new QueryWrapper<>();
+        queryTag.lambda().eq(TagEntity::getDeleted, 0);
+        Integer tags = tagMapper.selectCount(queryTag);
 
-    @Override
-    public Integer countComments() {
-        QueryWrapper<CommentEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(CommentEntity::getDeleted, 0);
-        return commentMapper.selectCount(queryWrapper);
-    }
+        QueryWrapper<CommentEntity> queryComment = new QueryWrapper<>();
+        queryComment.lambda().eq(CommentEntity::getDeleted, 0);
+        Integer comments = commentMapper.selectCount(queryComment);
 
+        StatisticsCountNumberVo numberVo = new StatisticsCountNumberVo();
+        numberVo.setArticles(articles);
+        numberVo.setCategories(categories);
+        numberVo.setTags(tags);
+        numberVo.setComments(comments);
+
+        return numberVo;
+    }
 
 }
