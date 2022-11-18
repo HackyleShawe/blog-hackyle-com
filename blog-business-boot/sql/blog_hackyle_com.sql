@@ -161,3 +161,31 @@ CREATE TABLE tr_article_author (
     INDEX author_id_idx (author_id),
     INDEX article_id_idx (article_id)
 ) ENGINE=InnoDB COMMENT '文章-作者关联';
+
+# 评论信息
+DROP TABLE IF EXISTS tb_comment;
+CREATE TABLE tb_comment (
+	id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
+	`target_id` BIGINT NOT NULL COMMENT '被评论主体(文章、页面、动态)的ID',
+
+	# 评论者
+	`name` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '评论者名称',
+	`email` VARCHAR(100) NOT NULL DEFAULT '' COMMENT '评论者的邮箱',
+	`link` VARCHAR(50) NOT NULL DEFAULT '' COMMENT '评论者的拓展链接，如个人网站地址',
+	`ip` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '评论者的ip地址',
+
+	# 被评论者
+	`reply_who` VARCHAR(20) NOT NULL DEFAULT '' COMMENT '被评论者的名称',
+
+	`content` VARCHAR(2048) NOT NULL DEFAULT '' COMMENT '评论内容',
+
+	`parent_id` BIGINT NOT NULL DEFAULT -1 COMMENT '父评论，如果为-1表示没有父评论',
+
+	`is_released` BIT DEFAULT 0 COMMENT '是否发布评论：0-未审核，1-审核通过',
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id),
+	INDEX idx_tid (target_id),
+	INDEX idx_pid (parent_id)
+) ENGINE=InnoDB COMMENT '评论信息';

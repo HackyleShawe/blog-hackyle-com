@@ -28,6 +28,37 @@
         is_deleted
     </sql>
 
+    <delete id="realDelByIds">
+        DELETE FROM tb_comment
+        <where>
+            id IN
+            <foreach collection="idList" item="id" separator=","
+                     open="(" close=")" >
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+    <delete id="realDelByParentIds">
+        DELETE FROM tb_comment
+        <where>
+            parent_id IN
+            <foreach collection="parentIdList" item="id" separator=","
+                     open="(" close=")" >
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+    <delete id="realDelByTargetIds">
+        DELETE FROM tb_comment
+        <where>
+            target_id IN
+            <foreach collection="targetIdList" item="id" separator=","
+                     open="(" close=")" >
+                #{id}
+            </foreach>
+        </where>
+    </delete>
+
     <update id="logicDeleteByIds">
         update tb_comment set is_deleted = 1
         <where>
@@ -57,7 +88,7 @@
             <!-- separator：每个元素之间的分割符 -->
             <!-- open：遍历出的所有结果拼接一个开始字符 -->
             <!-- close：遍历出的所有结果拼接一个结束符 -->
-            <foreach collection="idList" item="i" separator=","
+            <foreach collection="parentIdList" item="i" separator=","
                      open="(" close=")" >
                 <!-- #{i}: 取出元素 -->
                 #{i}
@@ -69,14 +100,14 @@
     <update id="logicDeleteByTargetIds">
         update tb_comment set is_deleted = 1
         <where>
-            id in
+            target_id in
             <!-- foreach标签：遍历集合 -->
             <!-- collection：指定要遍历的集合 -->
             <!-- item：临时保存当前遍历出的元素，类似于for(int i=0; i<10; i++)中的i -->
             <!-- separator：每个元素之间的分割符 -->
             <!-- open：遍历出的所有结果拼接一个开始字符 -->
             <!-- close：遍历出的所有结果拼接一个结束符 -->
-            <foreach collection="idList" item="i" separator=","
+            <foreach collection="targetIdList" item="i" separator=","
                      open="(" close=")" >
                 <!-- #{i}: 取出元素 -->
                 #{i}
@@ -85,7 +116,6 @@
     </update>
 
 
-    <!--List<CommentEntity> selectByParentIds(@Param("parentIdList") List<Long> parentIdList);-->
     <select id="selectByParentIds" resultMap="BaseResultMap">
         SELECT id, target_id, name, email, link, ip, reply_who, content, parent_id, is_released, create_time, update_time, is_deleted
         FROM tb_comment

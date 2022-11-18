@@ -30,16 +30,15 @@ public class CommentController {
      */
     @PostMapping("/add")
     public ApiResponse<String> add(@RequestBody ApiRequest<CommentAddDto> apiRequest) {
-        LOGGER.info("新增文章评论-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
-        CommentAddDto addDto = apiRequest.getData();
-        if(addDto == null || StringUtils.isBlank(addDto.getContent())) {
+        CommentAddDto commentAddDto = apiRequest.getData();
+        LOGGER.info("新增文章评论-Controller层入参-commentAddDto={}", JSON.toJSONString(commentAddDto));
+        if(commentAddDto == null || StringUtils.isBlank(commentAddDto.getName()) || StringUtils.isBlank(commentAddDto.getEmail())
+                || StringUtils.isBlank(commentAddDto.getContent())) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
-            commentService.add(addDto);
-            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+            return commentService.add(commentAddDto);
         } catch (Exception e) {
             LOGGER.error("新增文章评论-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -53,16 +52,33 @@ public class CommentController {
     public ApiResponse<String> del(@RequestParam("ids")String ids) {
         LOGGER.info("删除文章评论-Controller层入参-ids={}", ids);
 
-        if(ids == null || StringUtils.isBlank(ids)) {
+        if(StringUtils.isBlank(ids)) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
-            commentService.del(ids);
-            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-
+            return commentService.del(ids);
         } catch (Exception e) {
             LOGGER.error("删除文章评论-出现异常：", e);
+            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
+        }
+    }
+
+    /**
+     * 删除文章评论(物理删除)
+     */
+    @DeleteMapping("/delReal")
+    public ApiResponse<String> delReal(@RequestParam("ids")String ids) {
+        LOGGER.info("删除文章评论(物理删除)-Controller层入参-ids={}", ids);
+
+        if(StringUtils.isBlank(ids)) {
+            return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
+        }
+
+        try {
+            return commentService.delReal(ids);
+        } catch (Exception e) {
+            LOGGER.error("删除文章评论(物理删除)-出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
         }
     }
@@ -72,17 +88,14 @@ public class CommentController {
      */
     @PutMapping("/update")
     public ApiResponse<String> update(@RequestBody ApiRequest<CommentAddDto> apiRequest) {
-        LOGGER.info("修改文章评论-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         CommentAddDto updateDto = apiRequest.getData();
+        LOGGER.info("修改文章评论-Controller层入参-updateDto={}", JSON.toJSONString(updateDto));
         if(updateDto == null || null == updateDto.getId()) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 
         try {
-            commentService.update(updateDto);
-
-            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+            return commentService.update(updateDto);
 
         } catch (Exception e) {
             LOGGER.error("修改文章评论-出现异常：", e);
@@ -90,17 +103,15 @@ public class CommentController {
         }
     }
 
-
     /**
      * 分页获取层级评论（父评论中包含着子评论）
      */
     @PostMapping("/fetchListByHierarchy")
     public ApiResponse<PageResponseDto<CommentVo>> fetchListByHierarchy(@RequestBody ApiRequest<PageRequestDto<CommentQo>> apiRequest) {
-        LOGGER.info("分页获取层级评论-Controller层入参-apiRequest={}", JSON.toJSONString(apiRequest));
-
         PageRequestDto<CommentQo> pageRequestDto = apiRequest.getData();
+        LOGGER.info("分页获取层级评论-Controller层入参-pageRequestDto={}", JSON.toJSONString(pageRequestDto));
+
         if(pageRequestDto == null) {
-            //return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
             pageRequestDto = new PageRequestDto<>();
             pageRequestDto.setCurrentPage(1);
             pageRequestDto.setPageSize(10);
@@ -159,31 +170,4 @@ public class CommentController {
         }
     }
 
-
-    /**
-     * 获取评论
-     */
-    @PostMapping("/fetchByTargetId")
-    public ApiResponse<String> fetchByTargetId(@RequestParam("targetId")String targetId) {
-        LOGGER.info("获取评论-Controller层入参-targetId={}", JSON.toJSONString(targetId));
-
-        if(targetId == null || StringUtils.isBlank(targetId)) {
-            return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
-        }
-
-        try {
-            //boolean signUpFlag = commentService.allArticle(data);
-            boolean signUpFlag = true;
-            LOGGER.info("获取评论-Controller层出参-signUpFlag={}", signUpFlag);
-
-            if(signUpFlag) {
-                return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-            } else {
-                return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
-            }
-        } catch (Exception e) {
-            LOGGER.error("获取评论-出现异常：", e);
-            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
-        }
-    }
 }

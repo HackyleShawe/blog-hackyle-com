@@ -9,11 +9,14 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper extends BaseMapper<CommentEntity> {
+
+    int realDelByIds(@Param("idList") List<Long> idList);
+    int realDelByParentIds(@Param("parentIdList")List<Long> parentIdList);
+    int realDelByTargetIds(@Param("targetIdList")List<Long> targetIdList);
+
     int logicDeleteByIds(@Param("idList") List<Long> idList);
-
-    int logicDeleteByParentIds(@Param("idList")List<Long> idList);
-
-    int logicDeleteByTargetIds(@Param("idList")List<Long> idList);
+    int logicDeleteByParentIds(@Param("parentIdList")List<Long> parentIdList);
+    int logicDeleteByTargetIds(@Param("targetIdList")List<Long> targetIdList);
 
     List<CommentEntity> selectByParentIds(@Param("parentIdList") List<Long> parentIdList);
 }

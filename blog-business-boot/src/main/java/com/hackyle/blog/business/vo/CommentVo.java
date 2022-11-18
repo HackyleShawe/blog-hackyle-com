@@ -4,12 +4,12 @@ import java.util.Date;
 import java.util.List;
 
 public class CommentVo {
-    private String id;
+    private Long id;
 
     /**
      * 被评论主体(文章、页面、动态)的ID
      */
-    private String targetId;
+    private Long targetId;
 
     /**
      * 评论者名称
@@ -66,19 +66,19 @@ public class CommentVo {
      */
     private List<CommentVo> replyList;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getTargetId() {
+    public Long getTargetId() {
         return targetId;
     }
 
-    public void setTargetId(String targetId) {
+    public void setTargetId(Long targetId) {
         this.targetId = targetId;
     }
 

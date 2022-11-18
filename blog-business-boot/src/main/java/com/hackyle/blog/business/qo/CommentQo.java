@@ -1,10 +1,7 @@
 package com.hackyle.blog.business.qo;
 
 public class CommentQo {
-    /**
-     * 评论实体ID
-     */
-    private Long id;
+    private String id;
 
     /**
      * 被评论主体(文章、页面、动态)的ID
@@ -41,11 +38,11 @@ public class CommentQo {
     private Boolean deleted;
 
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
