@@ -6,7 +6,10 @@ import java.util.Date;
  * Article View Object
  */
 public class ArticleVo {
-    //private String id;
+    /**
+     * 经过加密后的ID
+     */
+    private String id;
 
     /**
      * 标题
@@ -53,6 +56,14 @@ public class ArticleVo {
      * 更新时间
      */
     private Date updateTime;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

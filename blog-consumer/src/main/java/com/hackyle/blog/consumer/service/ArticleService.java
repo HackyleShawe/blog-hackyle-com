@@ -6,7 +6,7 @@ import com.hackyle.blog.consumer.vo.ArticleVo;
 
 public interface ArticleService {
 
-    ArticleVo articleDetail(String uri);
-
     PageResponseDto<ArticleVo> pageByNum(Integer pageNum);
+
+    ArticleVo articleDetail(String uri);
 }

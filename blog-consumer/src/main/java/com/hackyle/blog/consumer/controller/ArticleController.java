@@ -2,9 +2,14 @@ package com.hackyle.blog.consumer.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hackyle.blog.consumer.common.exception.NotFoundException;
+import com.hackyle.blog.consumer.dto.PageRequestDto;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
+import com.hackyle.blog.consumer.qo.CommentQo;
 import com.hackyle.blog.consumer.service.ArticleService;
+import com.hackyle.blog.consumer.service.CommentService;
+import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
+import com.hackyle.blog.consumer.vo.CommentVo;
 import com.hackyle.blog.consumer.vo.MetaVo;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -14,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/article")
 public class ArticleController {
@@ -21,6 +28,8 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private CommentService commentService;
 
     /**
      * 分页获取所有文章
@@ -65,6 +74,9 @@ public class ArticleController {
         modelAndView.addObject("articleVo", articleVo);
         modelAndView.addObject("metaVo", metaVo);
 
+        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
+        modelAndView.addObject("commentVos", commentVos);
+
         modelAndView.setViewName("article");
         return modelAndView;
     }
@@ -80,14 +92,16 @@ public class ArticleController {
         uri = "/" + uri;
 
         ArticleVo articleVo = articleService.articleDetail(uri);
+        modelAndView.addObject("articleVo", articleVo);
 
         MetaVo metaVo = new MetaVo();
         metaVo.setTitle(articleVo.getTitle());
         metaVo.setDescription(articleVo.getSummary());
         metaVo.setKeywords(articleVo.getTags());
-
-        modelAndView.addObject("articleVo", articleVo);
         modelAndView.addObject("metaVo", metaVo);
+
+        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
+        modelAndView.addObject("commentVos", commentVos);
 
         modelAndView.setViewName("article");
         return modelAndView;

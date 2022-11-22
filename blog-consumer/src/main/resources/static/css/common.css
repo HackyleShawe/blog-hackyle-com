@@ -41,6 +41,25 @@ footer, header, menu, nav, section {
   margin: 0 auto;
 }
 
+/*通用样式*/
+.form-input {
+  /*将输入框变成下划线*/
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #000000;
+}
+.from-btn {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  /*border-radius: 30px;*/
+}
+
 /*------------------------------navigator start------------------------------*/
 nav {
   /*永远在最上层*/

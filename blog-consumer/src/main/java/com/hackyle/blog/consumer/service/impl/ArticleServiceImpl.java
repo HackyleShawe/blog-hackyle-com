@@ -15,6 +15,7 @@ import com.hackyle.blog.consumer.service.ArticleCategoryService;
 import com.hackyle.blog.consumer.service.ArticleService;
 import com.hackyle.blog.consumer.service.ArticleTagService;
 import com.hackyle.blog.consumer.util.BeanCopyUtils;
+import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.util.PaginationUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
 import org.slf4j.Logger;
@@ -40,44 +41,6 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleTagService articleTagService;
     @Autowired
     private ArticleAuthorService articleAuthorService;
-
-    @Override
-    public ArticleVo articleDetail(String uri) {
-        QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
-                    .eq(ArticleEntity::getUri, uri);
-        ArticleEntity articleEntity = articleMapper.selectOne(queryWrapper);
-
-        ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
-
-        Long articleId = articleEntity.getId();
-        List<Long> articleIds = new ArrayList<>();
-        articleIds.add(articleId);
-
-        Map<Long, List<ArticleCategoryPo>> articleCategoryMap = articleCategoryService.selectByArticleIds(articleIds);
-        if(articleCategoryMap != null && articleCategoryMap.containsKey(articleId)) {
-            List<ArticleCategoryPo> articleCategoryPoList = articleCategoryMap.get(articleId);
-            String categories = articleCategoryPoList.stream().map(ArticleCategoryPo::getName).collect(Collectors.joining(", "));;
-            articleVo.setCategories(categories);
-        }
-
-
-        Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
-        if(tagMap != null && tagMap.containsKey(articleId)) {
-            List<ArticleTagPo> articleTagPoList = tagMap.get(articleId);
-            String tags = articleTagPoList.stream().map(ArticleTagPo::getName).collect(Collectors.joining(", "));;
-            articleVo.setTags(tags);
-        }
-
-        Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
-        if(authorMap != null && authorMap.containsKey(articleId)) {
-            List<ArticleAuthorPo> articleAuthorPoList = authorMap.get(articleId);
-            String authors = articleAuthorPoList.stream().map(ArticleAuthorPo::getNickName).collect(Collectors.joining(", "));;
-            articleVo.setAuthors(authors);
-        }
-
-        return articleVo;
-    }
 
     @Override
     public PageResponseDto<ArticleVo> pageByNum(Integer pageNum) {
@@ -118,4 +81,45 @@ public class ArticleServiceImpl implements ArticleService {
 
         return articleVoPageResponseDto;
     }
+
+    @Override
+    public ArticleVo articleDetail(String uri) {
+        QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
+                    .eq(ArticleEntity::getUri, uri);
+        ArticleEntity articleEntity = articleMapper.selectOne(queryWrapper);
+
+        ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
+        //加密ID
+        articleVo.setId(IDUtils.encryptByAES(articleEntity.getId()));
+
+        Long articleId = articleEntity.getId();
+        List<Long> articleIds = new ArrayList<>();
+        articleIds.add(articleId);
+
+        Map<Long, List<ArticleCategoryPo>> articleCategoryMap = articleCategoryService.selectByArticleIds(articleIds);
+        if(articleCategoryMap != null && articleCategoryMap.containsKey(articleId)) {
+            List<ArticleCategoryPo> articleCategoryPoList = articleCategoryMap.get(articleId);
+            String categories = articleCategoryPoList.stream().map(ArticleCategoryPo::getName).collect(Collectors.joining(", "));;
+            articleVo.setCategories(categories);
+        }
+
+
+        Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
+        if(tagMap != null && tagMap.containsKey(articleId)) {
+            List<ArticleTagPo> articleTagPoList = tagMap.get(articleId);
+            String tags = articleTagPoList.stream().map(ArticleTagPo::getName).collect(Collectors.joining(", "));;
+            articleVo.setTags(tags);
+        }
+
+        Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
+        if(authorMap != null && authorMap.containsKey(articleId)) {
+            List<ArticleAuthorPo> articleAuthorPoList = authorMap.get(articleId);
+            String authors = articleAuthorPoList.stream().map(ArticleAuthorPo::getNickName).collect(Collectors.joining(", "));;
+            articleVo.setAuthors(authors);
+        }
+
+        return articleVo;
+    }
+
 }
