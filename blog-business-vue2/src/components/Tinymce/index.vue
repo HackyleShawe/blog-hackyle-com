@@ -153,7 +153,7 @@ export default {
         image_title: true, //鼠标悬在图片上显示说明
         //image_uploadtab: true, //显示图片上传对话框
         image_advtab: true, //图像编辑的高级操作
-        images_upload_url: 'http://localhost:9010/file/uploadImgTinyMCE?token='+getToken(), //图片上传URL
+        images_upload_url: process.env.VUE_APP_BACKEND_API + 'file/uploadImgTinyMCE?token='+getToken(), //图片上传URL
         //自定义图片上传逻辑
         //images_upload_handler: function (blobInfo, success, failure){
         //  let formData = new FormData();
