@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -69,6 +70,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentEntity
                 .eq(CommentEntity::getDeleted, 0)
                 .eq(CommentEntity::getReleased, 1);
         List<CommentEntity> comments = commentMapper.selectList(queryWrapper);
+
+        if(CollectionUtils.isEmpty(comments)) {
+            return null;
+        }
 
         //Map：父评论ID，父评论对应的子评论
         Map<Long, List<CommentEntity>> groupByParentIdMap = comments.stream().collect(Collectors.groupingBy(CommentEntity::getParentId));
