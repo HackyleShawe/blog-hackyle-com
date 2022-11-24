@@ -30,7 +30,6 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: com.hackyle.blog.business.entity
 
-
 #MinIO对象存储，文件服务器
 minio:
   endpoint: http://127.0.0.1:9000/  # 外网(主要要使用API的URL，不能使用Console的URL)
