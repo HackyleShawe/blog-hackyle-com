@@ -26,8 +26,7 @@ public class BaseController {
     public ModelAndView index(ModelAndView modelAndView) {
 
         PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(1);
-
-        LOGGER.info("分页获取所有文章-pageResponseDto={}", JSON.toJSONString(pageResponseDto));
+        LOGGER.info("首页获取所有文章-pageResponseDto={}", JSON.toJSONString(pageResponseDto));
 
         modelAndView.addObject("pageResponseDto", pageResponseDto);
 

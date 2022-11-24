@@ -12,14 +12,16 @@
   <meta name="copyright" content="Copy Right: 2022 HACKYLE. All rights reserved">
 
   <!--<meta name="keywords" th:content="${articleVoList.metaVo.keywords}">-->
-  <!--<meta name="description" th:content="${articleVoList.metaVo.description}">-->
+  <meta name="keywords" content="Hackyle Shawe; Kyle; hackyle.com; blog.hackyle.com">
+  <meta name="description" content="你好，欢迎来到我的技术博客。我是一名Java后端开发工程师，主要技术栈是Spring生态、RocketMQ与Kafka、MySQL和Redis、Docker、Nginx。此外，对前端的一些技术也略知一二。本站点记录我学习和工作过程中的一些基础技术。">
+  <meta name="copyright" content="Copy Right: 2022 HACKYLE. All rights reserved">
 
   <!-- 给网站设置图标 -->
   <link rel="icon" href="/img/favicon.ico">
 
   <!--<title th:replace="${articleVoList.metaVo.title}">博客详情</title>-->
   <!--<title><th:block th:text="${articleVoList.metaVo.title}"></th:block></title>-->
-  <title>demo</title>
+  <title>Home - Hackyle</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/common.css">
@@ -73,7 +75,7 @@
   <div class="face page">
     <a th:href="'/article/page/' + ${pageResponseDto.getCurrentPage() - 1}">上一页</a>
     &emsp;&emsp;&emsp;&emsp;
-    当前页：<span th:text="${pageResponseDto.getCurrentPage()}">0</span> / <span th:text="${pageResponseDto.getPages()}">1</span>
+    当前页：<span th:text="${pageResponseDto.getCurrentPage()}">1</span> / <span th:text="${pageResponseDto.getPages()}">1</span>
     &emsp;&emsp;&emsp;&emsp;
     <a th:href="'/article/page/' + ${pageResponseDto.getCurrentPage()+1 > pageResponseDto.getPages() ? pageResponseDto.getPages():pageResponseDto.getCurrentPage()+1}">下一页</a>
 

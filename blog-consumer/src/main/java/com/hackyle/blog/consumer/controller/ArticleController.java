@@ -43,7 +43,7 @@ public class ArticleController {
 
         PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(pageNum);
 
-        LOGGER.info("分页获取所有文章-pageResponseDto={}", JSON.toJSONString(pageResponseDto));
+        LOGGER.info("分页获取所有文章-pageNum={}-pageResponseDto={}", pageNum, JSON.toJSONString(pageResponseDto));
 
         modelAndView.addObject("pageResponseDto", pageResponseDto);
         modelAndView.setViewName("index");
@@ -77,6 +77,9 @@ public class ArticleController {
         List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
 
+        LOGGER.info("获取文章详情-/{}/{}-controller层出参-articleVo={}, commentVos={}", code, link,
+                JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
+
         modelAndView.setViewName("article");
         return modelAndView;
     }
@@ -102,6 +105,7 @@ public class ArticleController {
 
         List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
+        LOGGER.info("获取文章详情-/uri={}-controller层出参-articleVo={}, commentVos={}", uri, JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
 
         modelAndView.setViewName("article");
         return modelAndView;

@@ -4,8 +4,6 @@ package com.hackyle.blog.business.common.constant;
  * 状态码以及状态描述枚举类
  */
 public enum ResponseEnum {
-    OK(2000, "请求响应成功"),
-
     OP_OK(2000, "操作成功"),
     OP_FAIL(5000, "操作失败"),
 
