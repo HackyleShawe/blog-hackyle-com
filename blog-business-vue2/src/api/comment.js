@@ -3,7 +3,7 @@ import axios from '@/utils/request'
 function add(data) {
   return axios({
     url: 'comment/add',
-    method: 'PUT',
+    method: 'POST',
     params: {
       ...data
     }

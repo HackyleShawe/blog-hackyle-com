@@ -14,13 +14,13 @@ export default {
       path: 'released',
       name: 'Comment Released',
       component: () => import('@/views/comment/comment-released.vue'),
-      meta: { title: 'Released', icon: 'el-icon-s-comment' }
+      meta: { title: 'Released', icon: 'el-icon-circle-check' }
     },
     {
       path: 'unchecked',
       name: 'Comment Unchecked',
       component: () => import('@/views/comment/comment-unchecked.vue'),
-      meta: { title: 'Unchecked', icon: 'el-icon-s-comment' }
+      meta: { title: 'Unchecked', icon: 'el-icon-s-check' }
     },
     {
       path: 'deleted',
@@ -28,7 +28,7 @@ export default {
       //Duplicate named routes definition: { name: "Deleted", path: "/comment/delete" }
       name: 'Comment Deleted',
       component: () => import('@/views/comment/comment-deleted.vue'),
-      meta: { title: 'Deleted', icon: 'el-icon-s-comment' }
+      meta: { title: 'Deleted', icon: 'el-icon-delete-solid' }
     }
   ]
 }
