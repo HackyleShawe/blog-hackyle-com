@@ -25,8 +25,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <!--排除logback-->
+                <exclusion>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
 
         <!--
             Web
@@ -34,7 +40,15 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <!--排除logback-->
+                <exclusion>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                    <groupId>org.springframework.boot</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
@@ -50,9 +64,8 @@
             <version>2.3.2</version>
         </dependency>
 
-
         <!--
-            Service：模块A
+            Service
         -->
         <dependency>
             <groupId>io.minio</groupId>
@@ -64,11 +77,15 @@
             <artifactId>okhttp</artifactId>
             <version>4.9.0</version>
         </dependency>
-
-        <!--
-            Service：模块B
-        -->
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>2.0.5</version>
+        </dependency>
 
         <!--
             Persistent
@@ -94,15 +111,6 @@
         </dependency>
 
         <!--
-            Infrastructure
-        -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <version>2.0.5</version>
-        </dependency>
-
-        <!--
             Utils
         -->
         <dependency>
@@ -110,7 +118,6 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.12.0</version>
         </dependency>
-
 
         <!--
             Dev Tools
