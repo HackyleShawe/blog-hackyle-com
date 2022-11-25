@@ -9,6 +9,7 @@ import Layout from '@/layout'
 import article from "./article";
 import comment from "./comment";
 import configuration from "./configuration";
+import content from "@/router/content";
 
 
 /**
@@ -62,6 +63,7 @@ export const constantRoutes = [
 
   article,
   comment,
+  content,
   configuration,
 
   // 404 page must be placed at the end !!!

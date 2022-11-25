@@ -31,18 +31,16 @@
           <el-button type="primary" @click="search">Query</el-button>
         </el-form-item>
 
-        <div style="margin-bottom: 10px;">
-          已删除：
+        <el-form-item label="Deleted">
           <el-radio v-model="queryInfo.deleted" :label="true">YES</el-radio>
           <el-radio v-model="queryInfo.deleted" :label="false">NO</el-radio>
           <el-radio v-model="queryInfo.deleted" :label="undefined">UnSelected</el-radio>
-
-          已审查发布：
+        </el-form-item>
+        <el-form-item label="Released">
           <el-radio v-model="queryInfo.released" :label="true">YES</el-radio>
           <el-radio v-model="queryInfo.released" :label="false">NO</el-radio>
           <el-radio v-model="queryInfo.released" :label="undefined">UnSelected</el-radio>
-
-        </div>
+        </el-form-item>
       </el-form>
     </div>
 
@@ -143,7 +141,7 @@
 </template>
 
 <script>
-import friendLinkApi from '@/api/configuration/friendlink'
+import friendLinkApi from '@/api/content/friend-link'
 
 export default {
   name: "FriendLink",

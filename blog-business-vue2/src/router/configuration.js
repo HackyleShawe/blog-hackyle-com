@@ -16,12 +16,6 @@ export default {
       component: () => import('@/views/configuration/admin-info'),
       meta: { title: 'Admin Info', icon: 'el-icon-user' }
     },
-    {
-      path: 'friend-link',
-      name: 'Friend Link',
-      component: () => import('@/views/configuration/friend-link'),
-      meta: { title: 'Friend Link', icon: 'el-icon-link' }
-    },
 
   ]
 }

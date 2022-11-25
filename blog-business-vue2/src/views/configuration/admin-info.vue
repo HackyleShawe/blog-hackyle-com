@@ -47,7 +47,7 @@
       <el-form-item label="Gender">
         <el-radio v-model="adminData.gender" :label="0">Woman</el-radio>
         <el-radio v-model="adminData.gender" :label="1">Man</el-radio>
-        <el-radio v-model="adminData.gender" :label="3">Unknow</el-radio>
+        <el-radio v-model="adminData.gender" :label="3">Unknown</el-radio>
       </el-form-item>
 
       <el-form-item label="Lock">

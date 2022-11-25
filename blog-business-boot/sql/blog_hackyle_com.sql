@@ -206,3 +206,23 @@ CREATE TABLE tb_friend_link (
 	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB COMMENT '友情链接';
+
+# 留言和反馈
+DROP TABLE IF EXISTS tb_feedback_message;
+CREATE TABLE tb_feedback_message (
+	id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
+
+	name varchar(64) DEFAULT NULL COMMENT '留言者称呼',
+	email varchar(128) DEFAULT NULL COMMENT '留言者邮箱',
+	phone varchar(64) DEFAULT NULL COMMENT '留言者电话',
+	link varchar(1024) DEFAULT NULL COMMENT '留言者的链接（个人主页、博客页）',
+	ip varchar(40) DEFAULT NULL COMMENT '留言者IP（IPv4最多15个字符; IPv6-最多29个字符）',
+	content varchar(6000) DEFAULT NULL COMMENT '留言内容',
+
+	is_released BIT DEFAULT 0 COMMENT '是否展示（已审查）：0-不展示 1-展示',
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT '留言和反馈';
+
