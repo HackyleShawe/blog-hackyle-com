@@ -13,11 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -55,6 +51,26 @@ public class AdministratorController {
         }
     }
 
+    /**
+     * 更新信息
+     */
+    @PutMapping("/update")
+    public ApiResponse<String> update(@RequestBody ApiRequest<AdminSignUpDto> apiRequest) {
+        AdminSignUpDto adminSignUpDto = apiRequest.getData();
+        LOGGER.info("更新信息-Controller层入参-adminSignUpDto={}", JSON.toJSONString(adminSignUpDto));
+
+        if(adminSignUpDto == null || adminSignUpDto.getId() == null || StringUtils.isBlank(adminSignUpDto.getId())) {
+            return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
+        }
+
+        try {
+            return administratorService.update(adminSignUpDto);
+
+        } catch (Exception e) {
+            LOGGER.error("更新信息-出现异常：", e);
+            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
+        }
+    }
 
     /**
      * 管理员登录

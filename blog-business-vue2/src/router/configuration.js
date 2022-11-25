@@ -11,6 +11,12 @@ export default {
   meta: { title: 'Configuration', icon: 'el-icon-setting' },
   children: [
     {
+      path: 'admin-info',
+      name: 'Admin Info',
+      component: () => import('@/views/configuration/admin-info'),
+      meta: { title: 'Admin Info', icon: 'el-icon-user' }
+    },
+    {
       path: 'friend-link',
       name: 'Friend Link',
       component: () => import('@/views/configuration/friend-link'),

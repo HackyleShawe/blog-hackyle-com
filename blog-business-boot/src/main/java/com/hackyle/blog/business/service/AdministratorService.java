@@ -9,6 +9,8 @@ import com.hackyle.blog.business.vo.KaptchaVO;
 public interface AdministratorService {
     ApiResponse<String> singUp(AdminSignUpDto adminSignUpDto);
 
+    ApiResponse<String> update(AdminSignUpDto adminSignUpDto);
+
     AdministratorVo signIn(AdminSignInDto adminSignInDto);
 
     AdministratorVo info(String token);

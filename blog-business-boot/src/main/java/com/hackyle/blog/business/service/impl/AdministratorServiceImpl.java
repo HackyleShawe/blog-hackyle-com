@@ -2,6 +2,7 @@ package com.hackyle.blog.business.service.impl;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
@@ -64,6 +65,25 @@ public class AdministratorServiceImpl implements AdministratorService {
         } else {
             return ApiResponse.success(ResponseEnum.SIGN_UP_OK.getCode(), ResponseEnum.SIGN_UP_OK.getMessage());
         }
+    }
+
+    @Override
+    public ApiResponse<String> update(AdminSignUpDto adminSignUpDto) {
+        AdministratorEntity administratorEntity = BeanCopyUtils.copy(adminSignUpDto, AdministratorEntity.class);
+
+        if(StringUtils.isNotBlank(adminSignUpDto.getNewPassword())) {
+            administratorEntity.setPassword(HashUtils.sha256(adminSignUpDto.getNewPassword()));
+        }
+
+        UpdateWrapper<AdministratorEntity> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda().eq(AdministratorEntity::getId, IDUtils.decryptByAES(adminSignUpDto.getId()));
+
+        int update = administratorMapper.update(administratorEntity, updateWrapper);
+        if(update != 1) {
+            throw new RuntimeException("管理员信息更新失败");
+        }
+
+        return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
     }
 
     @Override

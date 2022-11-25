@@ -28,11 +28,11 @@
 
         <!--头像下面的下拉框-->
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <!--<router-link to="/">-->
-          <!--  <el-dropdown-item>-->
-          <!--    Home-->
-          <!--  </el-dropdown-item>-->
-          <!--</router-link>-->
+          <router-link to="/config/admin-info">
+            <el-dropdown-item>
+              My Info
+            </el-dropdown-item>
+          </router-link>
           <a target="_blank" href="https://hackyle.com">
             <el-dropdown-item>Home</el-dropdown-item>
           </a>

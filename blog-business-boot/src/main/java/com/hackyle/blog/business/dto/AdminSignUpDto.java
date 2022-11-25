@@ -3,18 +3,35 @@ package com.hackyle.blog.business.dto;
 import java.util.Date;
 
 public class AdminSignUpDto {
+    /**
+     * 加密过的ID
+     */
+    private String id;
+
     /** 用户名 */
     private String username;
-    /**
-     * 用户昵称
-     */
-    private String nickname;
     /**
      * 用户密码
      */
     private String password;
+
     /**
-     * U:未知; M-男; W-女
+     * 新密码：用于用户修改登录密码
+     */
+    private String newPassword;
+
+    /**
+     * 昵称
+     */
+    private String nickName;
+
+    /**
+     * 真实姓名
+     */
+    private String realName;
+
+    /**
+     * 性别：1-男, 0-女
      */
     private int gender;
     /**
@@ -42,6 +59,18 @@ public class AdminSignUpDto {
      */
     private String address;
 
+    /**
+     * 是否被锁定
+     */
+    private Boolean locked;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getUsername() {
         return username;
@@ -51,13 +80,6 @@ public class AdminSignUpDto {
         this.username = username;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
 
     public String getPassword() {
         return password;
@@ -65,6 +87,30 @@ public class AdminSignUpDto {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 
     public int getGender() {
@@ -121,5 +167,13 @@ public class AdminSignUpDto {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
     }
 }

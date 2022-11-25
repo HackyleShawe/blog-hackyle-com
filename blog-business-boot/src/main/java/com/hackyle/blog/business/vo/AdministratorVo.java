@@ -10,10 +10,15 @@ public class AdministratorVo {
      * 用户名
      */
     private String username;
+
     /**
-     * 用户昵称
+     * 昵称
      */
-    private String nickname;
+    private String nickName;
+    /**
+     * 真实姓名
+     */
+    private String realName;
     /**
      * 1-男; 0-女
      */
@@ -42,6 +47,12 @@ public class AdministratorVo {
      * 地址
      */
     private String address;
+    /**
+     * 是否被锁定
+     */
+    private Boolean locked;
+
+    private Date updateTime;
 
     public AdministratorVo() {
     }
@@ -70,12 +81,20 @@ public class AdministratorVo {
         this.username = username;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getRealName() {
+        return realName;
+    }
+
+    public void setRealName(String realName) {
+        this.realName = realName;
     }
 
     public int getGender() {
@@ -132,5 +151,21 @@ public class AdministratorVo {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(Boolean locked) {
+        this.locked = locked;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
     }
 }
