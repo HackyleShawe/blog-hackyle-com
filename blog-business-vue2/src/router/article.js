@@ -13,7 +13,7 @@ export default {
       path: 'released',
       name: 'Article Released',
       component: () => import('@/views/article/article-released.vue'),
-      meta: { title: 'Released', icon: 'el-icon-tickets'}
+      meta: { title: 'Released', icon: 'el-icon-document-checked'}
     },
     {
       path: 'write',
@@ -40,14 +40,14 @@ export default {
       path: 'deleted',
       name: 'Article Deleted',
       component: () => import('@/views/article/article-deleted.vue'),
-      meta: { title: 'Deleted', icon: 'el-icon-tickets'}
+      meta: { title: 'Deleted', icon: 'el-icon-document-delete'}
     },
 
     {
       path: 'author',
       name: 'Author',
       component: () => import('@/views/article/author.vue'),
-      meta: { title: 'Author', icon: 'el-icon-collection' }
+      meta: { title: 'Author', icon: 'el-icon-user-solid' }
     },
 
     {
