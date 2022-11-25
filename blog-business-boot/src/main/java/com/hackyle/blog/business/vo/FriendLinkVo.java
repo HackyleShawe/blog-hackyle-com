@@ -1,21 +1,8 @@
-package com.hackyle.blog.business.entity;
+package com.hackyle.blog.business.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.io.Serializable;
 import java.util.Date;
 
-/**
- * 友情链接
- */
-@TableName(value ="tb_friend_link")
-public class FriendLinkEntity implements Serializable {
-    /**
-     * ID：为了后续数据迁移，不使用自增主键，使用时间戳
-     */
-    @TableId
+public class FriendLinkVo {
     private Long id;
 
     /**
@@ -56,14 +43,9 @@ public class FriendLinkEntity implements Serializable {
     /**
      * 是否删除：0-false-未删除;1-true-已删除
      */
-    @TableField("is_deleted")
     private Boolean deleted;
 
-    @TableField("is_released")
     private Boolean released;
-
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
 
     public Long getId() {
         return id;

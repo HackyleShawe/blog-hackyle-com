@@ -2,7 +2,7 @@ import axios from '@/utils/request'
 
 function add(data) {
   return axios({
-    url: 'comment/add',
+    url: 'friendLink/add',
     method: 'POST',
     data: {
       ...data
@@ -12,7 +12,7 @@ function add(data) {
 
 function del(ids) {
   return axios({
-    url: 'comment/del',
+    url: 'friendLink/del',
     method: 'DELETE',
     params: {
       ids
@@ -22,7 +22,7 @@ function del(ids) {
 
 function update(data) {
   return axios({
-    url: 'comment/update',
+    url: 'friendLink/update',
     method: 'PUT',
     data: {
       ...data
@@ -32,7 +32,7 @@ function update(data) {
 
 function fetchList(data) {
   return axios({
-    url: 'comment/fetchList',
+    url: 'friendLink/fetchList',
     method: 'POST',
     data: {
       ...data
@@ -40,15 +40,5 @@ function fetchList(data) {
   })
 }
 
-//分页获取层级评论
-function fetchListByHierarchy(data) {
-  return axios({
-    url: 'comment/fetchListByHierarchy',
-    method: 'POST',
-    data: {
-      ...data
-    }
-  })
-}
 
-export default {add, del, update, fetchList, fetchListByHierarchy}
+export default {add, del, update, fetchList}

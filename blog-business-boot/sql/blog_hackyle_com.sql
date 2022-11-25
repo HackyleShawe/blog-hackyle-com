@@ -189,3 +189,20 @@ CREATE TABLE tb_comment (
 	INDEX idx_tid (target_id),
 	INDEX idx_pid (parent_id)
 ) ENGINE=InnoDB COMMENT '评论信息';
+
+DROP TABLE IF EXISTS tb_friend_link;
+CREATE TABLE tb_friend_link (
+	id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
+
+	name VARCHAR(128) NOT NULL COMMENT '友链名称',
+	link_url VARCHAR(256) NOT NULL COMMENT '链接',
+	description VARCHAR(1024) DEFAULT NULL COMMENT '链接描述',
+	link_avatar_url VARCHAR(256) DEFAULT NULL COMMENT '友链图片地址',
+	rank_weight INT DEFAULT 0 COMMENT '链接排序权重',
+
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_released BIT DEFAULT 0 COMMENT '是否发布：0-待审查 1-发布',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT '友情链接';
