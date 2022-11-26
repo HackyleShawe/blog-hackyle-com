@@ -17,5 +17,12 @@ export default {
       meta: { title: 'System Status', icon: 'el-icon-s-platform' }
     },
 
+    {
+      path: 'article-visit-log',
+      name: 'Article Log',
+      component: () => import('@/views/system/article-access-logger'),
+      meta: { title: 'Article Log', icon: 'el-icon-receiving' }
+    },
+
   ]
 }

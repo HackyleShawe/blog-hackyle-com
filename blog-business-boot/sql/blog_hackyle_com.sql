@@ -226,3 +226,23 @@ CREATE TABLE tb_feedback_message (
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB COMMENT '留言和反馈';
 
+
+# 文章访问日志
+DROP TABLE IF EXISTS tl_article_access;
+CREATE TABLE tl_article_access (
+	id BIGINT NOT NULL AUTO_INCREMENT,
+
+	-- 被访问者
+	article_uri VARCHAR(256) NOT NULL COMMENT '文章地址，tb_article中的uri字段',
+
+	-- 访问者信息
+	ip varchar(40) DEFAULT NULL COMMENT '留言者IP（IPv4最多15个字符; IPv6-最多29个字符）',
+	address VARCHAR(64) DEFAULT NULL COMMENT '地址',
+	browser VARCHAR(64) DEFAULT NULL COMMENT '浏览器类型',
+	time_use INT DEFAULT 0 COMMENT '请求耗时',
+
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	-- update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT '文章访问日志';
