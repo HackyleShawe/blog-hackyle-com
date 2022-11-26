@@ -10,6 +10,7 @@ import article from "./article";
 import comment from "./comment";
 import configuration from "./configuration";
 import content from "@/router/content";
+import system from "@/router/system";
 
 
 /**
@@ -65,6 +66,7 @@ export const constantRoutes = [
   comment,
   content,
   configuration,
+  system,
 
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
