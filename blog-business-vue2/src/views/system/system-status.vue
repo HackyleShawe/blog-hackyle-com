@@ -221,11 +221,11 @@ export default {
   },
   created() {
     this.init()
-    this.monitor = window.setInterval(() => {
-      setTimeout(() => {
-        this.init()
-      }, 60000)
-    }, 3500)
+    //this.monitor = window.setInterval(() => {
+    //  setTimeout(() => {
+    //    this.init()
+    //  }, 60000)
+    //}, 3500)
   },
   //activated() {
   //  console.log("this.$el", this.$refs.cpuInfo)
