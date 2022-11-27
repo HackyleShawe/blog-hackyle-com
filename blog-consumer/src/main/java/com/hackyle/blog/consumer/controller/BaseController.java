@@ -34,6 +34,13 @@ public class BaseController {
         return modelAndView;
     }
 
+
+    @RequestMapping(value = {"/feedback-message"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public ModelAndView feedbackMessage(ModelAndView modelAndView) {
+        modelAndView.setViewName("feedback-message");
+        return modelAndView;
+    }
+
     @RequestMapping(value = {"/about"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView about(ModelAndView modelAndView) {
         modelAndView.setViewName("about");
