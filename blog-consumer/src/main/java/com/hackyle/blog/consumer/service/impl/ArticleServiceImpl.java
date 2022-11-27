@@ -49,7 +49,8 @@ public class ArticleServiceImpl implements ArticleService {
         pageRequestDto.setPageSize(15);
 
         QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0);
+        queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
+                .eq(ArticleEntity::getReleased, 1);
 
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
         Page<ArticleEntity> resultPage = articleMapper.selectPage(paramPage, queryWrapper);
@@ -86,6 +87,7 @@ public class ArticleServiceImpl implements ArticleService {
     public ArticleVo articleDetail(String uri) {
         QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
+                    .eq(ArticleEntity::getReleased, 1)
                     .eq(ArticleEntity::getUri, uri);
         ArticleEntity articleEntity = articleMapper.selectOne(queryWrapper);
 

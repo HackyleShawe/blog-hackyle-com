@@ -101,6 +101,9 @@ public class ArticleController {
         return modelAndView;
     }
 
+    /**
+     * 如果文章没有category则走这里
+     */
     @RequestMapping(value = {"/{uri}"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView articleDetail(ModelAndView modelAndView, HttpServletRequest request,
                                       @PathVariable("uri") String uri) {
