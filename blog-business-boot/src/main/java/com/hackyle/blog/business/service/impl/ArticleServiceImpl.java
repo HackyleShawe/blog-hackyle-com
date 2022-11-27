@@ -359,7 +359,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         //在URI前拼接文章分类的编码
         String categoryIds = articleAddDto.getCategoryIds();
-        if(StringUtils.isNotBlank(categoryIds) && categoryIds.split(",").length > 1) {
+        if(StringUtils.isNotBlank(categoryIds) && categoryIds.split(",").length >= 1) {
             String[] categoryIdArr = categoryIds.split(",");
 
             long decryptedCategoryId = IDUtils.decryptByAES(categoryIdArr[0]);
