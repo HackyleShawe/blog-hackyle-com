@@ -2,12 +2,13 @@ package com.hackyle.blog.consumer.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.hackyle.blog.consumer.common.exception.NotFoundException;
-import com.hackyle.blog.consumer.dto.PageRequestDto;
+import com.hackyle.blog.consumer.dto.ArticleAccessLogDto;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
-import com.hackyle.blog.consumer.qo.CommentQo;
+import com.hackyle.blog.consumer.service.LoggerService;
 import com.hackyle.blog.consumer.service.ArticleService;
 import com.hackyle.blog.consumer.service.CommentService;
 import com.hackyle.blog.consumer.util.IDUtils;
+import com.hackyle.blog.consumer.util.IpUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
 import com.hackyle.blog.consumer.vo.CommentVo;
 import com.hackyle.blog.consumer.vo.MetaVo;
@@ -16,9 +17,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Controller
@@ -30,6 +34,9 @@ public class ArticleController {
     private ArticleService articleService;
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private LoggerService loggerService;
 
     /**
      * 分页获取所有文章
@@ -54,8 +61,10 @@ public class ArticleController {
      * 文章详情
      */
     @RequestMapping(value = {"/{code}/{link}"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView articleDetail(ModelAndView modelAndView, @PathVariable("code") String code, @PathVariable("link") String link) {
+    public ModelAndView articleDetail(ModelAndView modelAndView, HttpServletRequest request,
+                                      @PathVariable("code") String code, @PathVariable("link") String link) {
         LOGGER.info("获取文章详情-controller层入参-code={}, link={}", code, link);
+        long start = System.currentTimeMillis();
 
         if(StringUtils.isBlank(code)) {
             throw new NotFoundException();
@@ -81,12 +90,22 @@ public class ArticleController {
                 JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
 
         modelAndView.setViewName("article");
+
+        //记录日志
+        ArticleAccessLogDto logDto = new ArticleAccessLogDto();
+        logDto.setArticleUri(uri);
+        logDto.setIp(IpUtils.getIpAddress(request));
+        logDto.setTimeUse((int) (System.currentTimeMillis() - start));
+        loggerService.insertArticleAccessLog(logDto);
+
         return modelAndView;
     }
 
     @RequestMapping(value = {"/{uri}"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView articleDetail(ModelAndView modelAndView, @PathVariable("uri") String uri) {
+    public ModelAndView articleDetail(ModelAndView modelAndView, HttpServletRequest request,
+                                      @PathVariable("uri") String uri) {
         LOGGER.info("获取文章详情-controller层入参-uri={}", uri);
+        long start = System.currentTimeMillis();
 
         if(StringUtils.isBlank(uri)) {
             throw new NotFoundException();
@@ -108,6 +127,14 @@ public class ArticleController {
         LOGGER.info("获取文章详情-/uri={}-controller层出参-articleVo={}, commentVos={}", uri, JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
 
         modelAndView.setViewName("article");
+
+        //记录日志
+        ArticleAccessLogDto logDto = new ArticleAccessLogDto();
+        logDto.setArticleUri(uri);
+        logDto.setIp(IpUtils.getIpAddress(request));
+        logDto.setTimeUse((int) (System.currentTimeMillis() - start));
+        loggerService.insertArticleAccessLog(logDto);
+
         return modelAndView;
     }
 
