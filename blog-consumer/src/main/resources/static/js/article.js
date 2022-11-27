@@ -69,6 +69,21 @@ function postComment(name, email, link, content, parentId, replyWhoId) {
     alert("NAME或EMAIL或评论内容未填，请填入")
     return
   }
+  if(name.length < 2) {
+    alert("NAME的长度不能小于2")
+    return
+  }
+  if(email) {
+    let emailRegx = new RegExp(/^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/)
+    if(!emailRegx.test(email)) {
+      alert("EMAIL不合法")
+      return;
+    }
+  }
+  if(name.content < 1) {
+    alert("CONTENT的长度不能小于2")
+    return;
+  }
 
   if(parentId === undefined || parentId === '') {
     parentId = ''
@@ -91,13 +106,17 @@ function postComment(name, email, link, content, parentId, replyWhoId) {
   //提交评论
   $.post("/comment/add", paramData, function (resp) {
     console.log(resp)
-    $("#name").val('')
-    $("#email").val('')
-    $("#link").val('')
-    //tinyMCE.activeEditor.setContent('')
-    tinyMCE.get('commentTextarea').setContent('');
-
-    alert("提交成功！")
+    if(resp.state) {
+      //响应成功
+      $("#name").val('')
+      $("#email").val('')
+      $("#link").val('')
+      //tinyMCE.activeEditor.setContent('')
+      tinyMCE.get('commentTextarea').setContent('');
+      alert("提交成功！")
+    } else {
+      alert("提交失败，请重试！")
+    }
   }, 'json')
 }
 //---------------------------------------------顶级评论 END---------------------------------------------
