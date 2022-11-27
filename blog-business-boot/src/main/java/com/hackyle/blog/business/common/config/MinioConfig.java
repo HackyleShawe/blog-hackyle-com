@@ -32,6 +32,10 @@ public class MinioConfig {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
+    /** 文件对象对外提供的域 */
+    @Value("${minio.file-obj-domain}")
+    private String fileObjDomain;
+
     /**
      * 把MinioClient交给Spring管理
      */
@@ -79,5 +83,13 @@ public class MinioConfig {
 
     public void setBucketName(String bucketName) {
         this.bucketName = bucketName;
+    }
+
+    public String getFileObjDomain() {
+        return fileObjDomain;
+    }
+
+    public void setFileObjDomain(String fileObjDomain) {
+        this.fileObjDomain = fileObjDomain;
     }
 }

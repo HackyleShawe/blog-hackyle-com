@@ -40,7 +40,7 @@ public class MinioServiceImpl implements MinioService {
             minioFile.setInputStream(inputStream);
 
             MinioClientUtils.createFileObject(minioBucket, minioFile);
-            String url = minioConfig.getEndpoint() + minioConfig.getBucketName() + minioFile.getFilePath();
+            String url = minioConfig.getFileObjDomain() + minioConfig.getBucketName() + minioFile.getFilePath();
             fileObjects.add(url);
         }
 
