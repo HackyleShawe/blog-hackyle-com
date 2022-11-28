@@ -4,9 +4,9 @@
 
 **A Simple and Pure Blog System (Current version: 0.6.0-Alpha)**
 
-**后台管理端：**http://blog.hackyle.com:6199/business-front/
-**前台展示端：**http://blog.hackyle.com:6199/
-**OpenSource：**https://github.com/HackyleShawe/Blog
+**后台管理端：** http://blog.hackyle.com:6199/business-front/
+**前台展示端：** http://blog.hackyle.com:6199/
+**OpenSource：** https://github.com/HackyleShawe/Blog
 
 
 
@@ -95,7 +95,7 @@
 - Node：16.14.2
 - npm：8.5.0
 
-**Step2：**启动MySQL、Redis、Minio
+**Step2：启动MySQL、Redis、Minio**
 
 **step3：下载本仓库到本地**
 
@@ -130,7 +130,7 @@
 
 ## 阿里云服务器与域名
 
-**Step1：购买云服务器：基于以下服务所占用的内容，我购买的是2核2GB突发性实例（CentOS7.8-x64）**
+**Step1：购买云服务器** 基于以下服务所占用的内存，我购买的是2核2GB突发型实例（CentOS7.8-x64）
 
 minio：150MB
 
@@ -144,7 +144,7 @@ Redis：100MB
 
 **Step2：注册域名**
 
-**Step3：环境安装**。主要有JDK11、MySQL、Nginx、Redis、Minio
+**Step3：环境安装** 。主要有JDK11、MySQL、Nginx、Redis、Minio
 
 **Step4：项目部署**
 
@@ -158,7 +158,7 @@ Redis：100MB
 
 ## 配置HTTPS概述
 
-**Tutorial Reference：**https://www.cnblogs.com/eternalness/p/8321827.html
+**Tutorial Reference：** https://www.cnblogs.com/eternalness/p/8321827.html
 
 ![](./img/config-https.png)
 
@@ -282,15 +282,15 @@ server {
 
 ## 流程
 
-- 客户端（**http://blog.hackyle.com:6199/**）的请求进入云服务器时，打到Nginx，通过反向代理到本地运行的blog-consumer服务：http://localhost:6111
+- 客户端（http://blog.hackyle.com:6199/） 的请求进入云服务器时，打到Nginx，通过反向代理到本地运行的blog-consumer服务：http://localhost:6111
 
-- 管理端（http://blog.hackyle.com:6199/business-front/）的请求进入云服务器时，映射到/data/blog.hackyle.com/business-vue2-test/，其为前台Vue项目打包后的静态资源
-- 管理端前端对后端的请求（http://blog.hackyle.com:6199/business-back），经过Nginx解析到blog-business-boot服务上：http://localhost:6101/
+- 管理端（http://blog.hackyle.com:6199/business-front/） 的请求进入云服务器时，映射到/data/blog.hackyle.com/business-vue2-test/，其为前台Vue项目打包后的静态资源
+- 管理端前端对后端的请求（http://blog.hackyle.com:6199/business-back）， 经过Nginx解析到blog-business-boot服务上：http://localhost:6101/
 
 # QA
 
-**现阶段写博客的平台或解决方案：**https://juejin.cn/post/6844904146391433229
+**现阶段写博客的平台或解决方案：** https://juejin.cn/post/6844904146391433229
 
-**博客集成化框架：**https://www.10besty.com/best-free-blogging-platforms/
+**博客集成化框架：** https://www.10besty.com/best-free-blogging-platforms/
 
 

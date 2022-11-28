@@ -68,12 +68,14 @@
 }
 /*一组评论：父评论、子评论*/
 .article-comment-container .all-comment-container .comment-group {
-  margin: 5px 5px;
+  margin: 10px 5px;
   background-color: #e8e1e1
   /*border: solid 1px darkmagenta;*/
 }
 /*评论的主体内容*/
-.comment-group .comment-content-parent {
+.comment-group .comment-content-parent p {
+  margin: 0;
+  padding: 0;
   /*font-family: "Microsoft YaHei UI";*/
   /*font-size: large;*/
   /*border: dot-dash 1px deeppink;*/
@@ -83,6 +85,10 @@
   margin-left: 40px;
   font-family: "Microsoft YaHei UI";
   font-size: medium;
+}
+.comment-group .comment-content-sub p {
+  margin: 0;
+  padding: 0;
 }
 /*评论的回复*/
 .comment-group .comment-reply {

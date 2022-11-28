@@ -68,12 +68,12 @@
     <h1 th:text="${articleVo.title}">title</h1>
 
     <p>
-      <i>文章分类：<span th:text="${articleVo.categories}">Algorithm</span>；</i>
-      <i>标签：<span th:text="${articleVo.tags}">new bee, 666, sb</span>；</i>
-      <i>作者：<span th:text="${articleVo.authors}">Hackyle, Alice</span>；</i> <br/>
+      <i th:if="${articleVo.categories != null}">文章分类：<span th:text="${articleVo.categories}">Algorithm</span>；</i>
+      <i th:if="${articleVo.tags != null}">标签：<span th:text="${articleVo.tags}">new bee, 666, sb</span>；</i>
+      <i th:if="${articleVo.authors != null}">作者：<span th:text="${articleVo.authors}">Hackyle</span>；</i> <br/>
     </p>
     <p>
-      <i>更新时间：<span th:text="${articleVo.updateTime}">2022-01-12 12:00:00</span></i>
+      <i th:if="${articleVo.updateTime != null}">更新时间：<span th:text="${articleVo.updateTime}">2022-01-12 12:00:00</span></i>
     </p>
 
     <!--不显示的页面属性-->
@@ -93,32 +93,26 @@
       <article th:utext="${articleVo.content}">
         文章正文
       </article>
-
-      <p>
-        <!--需要增加文章类型的判断-->
-        <br/><span>————————————————</span> <br/>
-        版权声明：本文为原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。<br/>
-        原文链接：https://blog.hackyle.com/article<span th:text="${articleVo.uri}"></span><br/><br/>
-      </p>
     </main>
 
   </div>
 
+  <!--版权声明-->
+  <p class="face">
+    <span>————————————————</span> <br/>
+    版权声明：非明确标注皆为原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上本文链接及此声明。<br/>
+    原文链接：https://blog.hackyle.com/article<span th:text="${articleVo.uri}"></span><br/><br/>
+  </p>
+
   <!--评论区-->
   <div class="face article-comment-container">
     <!--评论-->
-    <div class="add-comment-container" th:onshow="${articleVo.commented != null && articleVo.commented}">
+    <div class="add-comment-container" th:if="${articleVo.commented != null && articleVo.commented}">
       <p style="text-align: center; font-size: x-large">留下你的评论</p>
       <div class="comment-input">
-        <p style="height: 30px">
-          Name:&emsp;<input type="text" id="name" placeholder="Input your name, please" size="80" class="form-input">
-        </p>
-        <p style="height: 30px">
-          Email:&emsp;<input type="text" id="email" placeholder="Input your email, please" size="80" class="form-input">
-        </p>
-        <p style="height: 30px">
-          Link:&emsp;<input type="text" id="link" placeholder="Input your link, please" size="80" class="form-input">
-        </p>
+        <p>Name:&emsp;<input type="text" id="name" placeholder="Input your name, please" size="80" class="form-input"></p>
+        <p>Email:&emsp;<input type="text" id="email" placeholder="Input your email, please" size="80" class="form-input"></p>
+        <p>Link:&emsp;<input type="text" id="link" placeholder="Input your link, please" size="80" class="form-input"></p>
       </div>
 
       <p>
@@ -139,7 +133,7 @@
           <!--父评论-->
           <div style="background-color: #cccccc" class="comment-content-parent">
             <div style="font-family: 'Microsoft YaHei UI';font-size: large;"> <span th:text="${comment.name}">Name</span>：</div>
-            <div th:utext="${comment.content}" style="margin-left: 20px">Comment content</div>
+            <div th:utext="${comment.content}" style="margin-left: 20px;">Comment content</div>
 
             <div class="comment-reply" style="margin-left: 20px">
               <span th:text="${comment.updateTime}">Update</span>

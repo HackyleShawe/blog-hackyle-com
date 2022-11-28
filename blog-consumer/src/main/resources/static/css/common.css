@@ -7,9 +7,8 @@
 5.	其他：animation, transition
  */
 
-/*html, body, div, span, applet, object, iframe,*/
-/*h1, h2, h3, h4, h5, h6,*/
-/*p, blockquote, pre,*/
+html, body, iframe
+/*p, blockquote, pre*/
 /*a, abbr, acronym, address, big, cite, code,*/
 /*del, dfn, em, img, ins, kbd, q, s, samp,*/
 /*small, strike, strong, sub, sup, tt, var,*/
@@ -21,20 +20,20 @@
 /*figure, figcaption, footer, header,*/
 /*menu, nav, output, ruby, section, summary,*/
 /*time, mark, audio, video, input*/
-/*{*/
-/*  margin: 0;*/
-/*  padding: 0;*/
-/*  border: 0;*/
-/*  font-size: 100%;*/
-/*  font-weight: normal;*/
-/*  vertical-align: baseline;*/
-/*}*/
+{
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font-weight: normal;
+  vertical-align: baseline;
+}
 
 /* HTML5 display-role reset for older browsers */
-/*article, aside, main, details, figcaption, figure,*/
-/*footer, header, menu, nav, section {*/
-/*  display: block;*/
-/*}*/
+article, aside, main, details, figcaption, figure,
+footer, header, menu, nav, section {
+  display: block;
+}
 
 /*版心*/
 .face {
@@ -140,6 +139,7 @@ nav a:hover {
 .footer-container {
   clear: both;
   width: 100%;
+
   padding-top: 10px;
   padding-bottom: 20px;
   text-align: center;
