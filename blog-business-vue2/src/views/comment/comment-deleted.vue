@@ -213,7 +213,7 @@ export default {
         type: 'warning',
         dangerouslyUseHTMLString: true
       }).then(() => {
-        commentApi.del(id).then(res => {
+        commentApi.delReal(id).then(res => {
           this.$message.success(res.message)
           this.getCommentList()
         })

@@ -20,6 +20,16 @@ function del(ids) {
   })
 }
 
+function delReal(ids) {
+  return axios({
+    url: 'comment/del',
+    method: 'DELETE',
+    params: {
+      ids
+    }
+  })
+}
+
 function update(data) {
   return axios({
     url: 'comment/update',
@@ -51,4 +61,4 @@ function fetchListByHierarchy(data) {
   })
 }
 
-export default {add, del, update, fetchList, fetchListByHierarchy}
+export default {add, del, delReal, update, fetchList, fetchListByHierarchy}
