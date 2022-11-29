@@ -166,7 +166,7 @@ public class SystemManageServiceImpl implements SystemManageService {
         // 系统信息
         systemInfo.put("os", os.toString());
         systemInfo.put("day", formatBetween);
-        systemInfo.put("ip", IpUtils.getLocalIp());
+        systemInfo.put("ip", IpUtils.getPublicIpv4());
         return systemInfo;
     }
 

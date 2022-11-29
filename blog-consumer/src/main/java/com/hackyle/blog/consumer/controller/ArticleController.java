@@ -99,7 +99,7 @@ public class ArticleController {
         //记录日志
         ArticleAccessLogDto logDto = new ArticleAccessLogDto();
         logDto.setArticleUri(uri);
-        logDto.setIp(IpUtils.getIpAddress(request));
+        logDto.setIp(IpUtils.getPublicIpv4(request));
         logDto.setTimeUse((int) (System.currentTimeMillis() - start));
         loggerService.insertArticleAccessLog(logDto);
 
@@ -142,7 +142,7 @@ public class ArticleController {
         //记录日志
         ArticleAccessLogDto logDto = new ArticleAccessLogDto();
         logDto.setArticleUri(uri);
-        logDto.setIp(IpUtils.getIpAddress(request));
+        logDto.setIp(IpUtils.getPublicIpv4(request));
         logDto.setTimeUse((int) (System.currentTimeMillis() - start));
         loggerService.insertArticleAccessLog(logDto);
 
