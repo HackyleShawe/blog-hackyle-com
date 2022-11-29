@@ -7,6 +7,7 @@ import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.service.LoggerService;
 import com.hackyle.blog.consumer.service.ArticleService;
 import com.hackyle.blog.consumer.service.CommentService;
+import com.hackyle.blog.consumer.util.BeanCopyUtils;
 import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.util.IpUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/article")
@@ -50,7 +52,9 @@ public class ArticleController {
 
         PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(pageNum);
 
-        LOGGER.info("分页获取所有文章-pageNum={}-pageResponseDto={}", pageNum, JSON.toJSONString(pageResponseDto));
+        //文章的Content打日志太大了，使用URI替换
+        String articleUris = pageResponseDto.getRows().stream().map(ArticleVo::getUri).collect(Collectors.joining(","));
+        LOGGER.info("分页获取所有文章-pageNum={}-articleUris={}", pageNum, articleUris);
 
         modelAndView.addObject("pageResponseDto", pageResponseDto);
         modelAndView.setViewName("index");
@@ -63,7 +67,6 @@ public class ArticleController {
     @RequestMapping(value = {"/{code}/{link}"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView articleDetail(ModelAndView modelAndView, HttpServletRequest request,
                                       @PathVariable("code") String code, @PathVariable("link") String link) {
-        LOGGER.info("获取文章详情-controller层入参-code={}, link={}", code, link);
         long start = System.currentTimeMillis();
 
         if(StringUtils.isBlank(code)) {
@@ -86,8 +89,10 @@ public class ArticleController {
         List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
 
-        LOGGER.info("获取文章详情-/{}/{}-controller层出参-articleVo={}, commentVos={}", code, link,
-                JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
+        ArticleVo articleVoLog = BeanCopyUtils.copy(articleVo, ArticleVo.class);
+        articleVoLog.setContent("文章内容长度：" + articleVoLog.getContent().length());
+        LOGGER.info("获取文章详情-controller层入参：{}-controller层出参-articleVo={}, commentVos={}", uri,
+                JSON.toJSONString(articleVoLog), JSON.toJSONString(commentVos));
 
         modelAndView.setViewName("article");
 
@@ -107,7 +112,6 @@ public class ArticleController {
     @RequestMapping(value = {"/{uri}"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView articleDetail(ModelAndView modelAndView, HttpServletRequest request,
                                       @PathVariable("uri") String uri) {
-        LOGGER.info("获取文章详情-controller层入参-uri={}", uri);
         long start = System.currentTimeMillis();
 
         if(StringUtils.isBlank(uri)) {
@@ -127,7 +131,11 @@ public class ArticleController {
 
         List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
-        LOGGER.info("获取文章详情-/uri={}-controller层出参-articleVo={}, commentVos={}", uri, JSON.toJSONString(articleVo), JSON.toJSONString(commentVos));
+
+        ArticleVo articleVoLog = BeanCopyUtils.copy(articleVo, ArticleVo.class);
+        articleVoLog.setContent("文章内容长度：" + articleVoLog.getContent().length());
+        LOGGER.info("获取文章详情-controller层入参：{}-controller层出参：articleVo={}, commentVos={}", uri,
+                JSON.toJSONString(articleVoLog), JSON.toJSONString(commentVos));
 
         modelAndView.setViewName("article");
 

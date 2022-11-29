@@ -1,6 +1,5 @@
 package com.hackyle.blog.consumer.controller;
 
-import com.alibaba.fastjson.JSON;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.service.ArticleService;
 import com.hackyle.blog.consumer.vo.ArticleVo;
@@ -11,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.stream.Collectors;
 
 /**
  * 放置通用地址映射器
@@ -26,7 +27,10 @@ public class BaseController {
     public ModelAndView index(ModelAndView modelAndView) {
 
         PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(1);
-        LOGGER.info("首页获取所有文章-pageResponseDto={}", JSON.toJSONString(pageResponseDto));
+
+        //文章的Content打日志太大了，使用URI替换
+        String articleUris = pageResponseDto.getRows().stream().map(ArticleVo::getUri).collect(Collectors.joining(","));
+        LOGGER.info("首页获取所有文章-articleUris={}", articleUris);
 
         modelAndView.addObject("pageResponseDto", pageResponseDto);
 
