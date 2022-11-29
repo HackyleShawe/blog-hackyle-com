@@ -7,6 +7,7 @@ import com.hackyle.blog.business.util.JwtUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -14,7 +15,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.charset.StandardCharsets;
-
+import java.util.UUID;
 
 /**
  * 访问拦截器
@@ -23,12 +24,19 @@ import java.nio.charset.StandardCharsets;
 public class AccessInterceptor implements HandlerInterceptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(AccessInterceptor.class);
 
+    /** 定义tranceId的字段名，必须与xml文件中定义的名字一直 */
+    private static final String TRACE_ID = "traceId";
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if ("OPTIONS".equals(request.getMethod())) {
             response.setStatus(HttpServletResponse.SC_OK);
             return true;
         }
+
+        //注意：不经过此拦截器的请求，日志中没有traceId
+        //向slf4j的MDC上下文容器中放置以一个K-V键值对，key必须与xml文件中定义的名字一直
+        MDC.put(TRACE_ID, UUID.randomUUID().toString().replaceAll("-", ""));
 
         request.setCharacterEncoding("utf-8");
         response.setCharacterEncoding("utf-8");
@@ -55,5 +63,10 @@ public class AccessInterceptor implements HandlerInterceptor {
             outputStream.flush();
             return false;
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        MDC.clear();
     }
 }

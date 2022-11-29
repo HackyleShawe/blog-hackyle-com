@@ -19,12 +19,13 @@
             %m或者%msg：日志具体的信息
             %n：换行
         -->
-        <Property name="outputPattern" value="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %c[%L] %M %m%n"/>
+        <!--%X{traceId}就是在引用MDC中的内容，{key}可以自己通过代码设置-->
+        <Property name="outputPattern" value="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [traceId=%X{traceId}] [%thread] %c[%L] %M %m%n"/>
 
         <!--指定日志的输出格式-->
         <!--"\"：以当前项目的为根目录。Windows下有时"\"会被解释为磁盘盘符所在根目录，则用".\"替换 -->
         <!--"/"：Linux下就是从根目录开始的路径，Windows下为项目所在磁盘盘符的根目录 -->
-        <Property name="logDirectory" value=".\blog-business-logs"/>
+        <Property name="logDirectory" value="./blog-business-logs"/>
 
         <!-- 日志文件的名字（可以根据业务进行命名） -->
         <Property name="logFileName" value="blog-business" />
