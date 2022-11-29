@@ -13,9 +13,6 @@
   position: relative;
   margin-bottom: 20px;
   z-index: -2;
-  /*让Banner图片充满整个浏览器页面*/
-  margin-right: -8px;
-  margin-left: -8px;
 }
 .hero::before {
   content: '';

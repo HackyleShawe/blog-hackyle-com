@@ -59,8 +59,8 @@
             <p class="title"><h1><span th:text="${articleVo.title}">title</span> </h1>
             <p class="summary"><span th:text="${articleVo.summary}">summary</span></p>
             <p class="meta">
-              Category: <span th:text="${articleVo.categories}">category</span>
-              Update Time: <span th:text="${articleVo.updateTime}">UpdateTime</span>
+              <span th:if="${articleVo.categories != null}">Category: <span th:text="${articleVo.categories}">category</span></span>
+              <span th:if="${articleVo.updateTime != null}">Update Time: <span th:text="${articleVo.updateTime}">UpdateTime</span></span>
             </p>
           </a>
         </div>
