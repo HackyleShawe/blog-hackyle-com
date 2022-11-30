@@ -187,7 +187,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         long idd = IDUtils.decryptByAES(id);
 
         ArticleEntity articleEntity = articleMapper.selectById(idd);
-        LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(articleEntity));
+
+        ArticleVo articleEntityLog = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
+        articleEntityLog.setContent("文章内容长度："+articleEntityLog.getContent().length());
+        LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(articleEntityLog));
 
         ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
         articleVo.setId(IDUtils.encryptByAES(articleEntity.getId()));
@@ -247,8 +250,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         //分页查询操作
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
         Page<ArticleEntity> resultPage = articleMapper.selectPage(paramPage, queryWrapper);
-        LOGGER.info("条件查询分类-入参-pageRequestDto={},出参-resultPage.getRecords()={}",
-                JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
+
+        //文章的Content打日志太大了，使用URI替换
+        String articleUris = resultPage.getRecords().stream().map(ArticleEntity::getUri).collect(Collectors.joining(","));
+        LOGGER.info("条件查询分类-入参-pageRequestDto={},出参-articleUris={}", JSON.toJSONString(pageRequestDto), articleUris);
 
         PageResponseDto<ArticleVo> articleVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, ArticleVo.class);
         List<ArticleEntity> articleEntityList = resultPage.getRecords();

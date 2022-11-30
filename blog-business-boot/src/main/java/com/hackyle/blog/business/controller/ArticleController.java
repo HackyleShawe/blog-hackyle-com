@@ -7,6 +7,7 @@ import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.dto.ArticleAddDto;
 import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
+import com.hackyle.blog.business.entity.ArticleEntity;
 import com.hackyle.blog.business.qo.ArticleQo;
 import com.hackyle.blog.business.service.ArticleService;
 import com.hackyle.blog.business.vo.ArticleVo;
@@ -20,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/article")
@@ -219,7 +221,10 @@ public class ArticleController {
 
         try {
             PageResponseDto<ArticleVo> pageResponseDto = articleService.fetchList(pageRequestDto);
-            LOGGER.info("获取所有文章-Controller层出参-pageResponseDto={}", JSON.toJSONString(pageResponseDto));
+
+            //文章的Content打日志太大了，使用URI替换
+            String articleUris = pageResponseDto.getRows().stream().map(ArticleVo::getUri).collect(Collectors.joining(","));
+            LOGGER.info("获取所有文章-Controller层出参-articleUris={}", articleUris);
 
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), pageResponseDto);
         } catch (Exception e) {
