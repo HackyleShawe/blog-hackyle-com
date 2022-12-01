@@ -33,7 +33,7 @@
           <el-col :span="12">
             <el-form-item label="Authors" prop="authorList">
               <!--<select-authors :initAuthors="articleDataForm.authors" @chooseAuthor="chooseAuthorHandler"/>-->
-              <el-select v-model="articleDataForm.authors" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+              <el-select v-model="articleDataForm.authors" placeholder="Please select authors"
                          :filterable="true" :multiple="true"
                          style="width: 100%;" value-key="id">
                 <el-option :label="author.nickName" :value="author" v-for="author in authorListOptions" :key="author.id"></el-option>
@@ -52,7 +52,7 @@
           <el-col :span="12">
             <el-form-item label="Categories" prop="categoryList">
               <!--<select-categories :initCategories="articleDataForm.categories" @chooseCategory="chooseCategoryHandler" />-->
-              <el-select v-model="articleDataForm.categories" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+              <el-select v-model="articleDataForm.categories" placeholder="Please select categories"
                          :filterable="true" :multiple="true"
                          style="width: 100%;" value-key="id">
                 <el-option :label="category.name" :value="category" v-for="category in categoryListOptions" :key="category.id"></el-option>
@@ -62,7 +62,7 @@
           <el-col :span="12">
             <el-form-item label="Tags" prop="tagList">
               <!--<select-tags :initTags="articleDataForm.tags" @chooseTags="chooseTagHandler"/>-->
-              <el-select v-model="articleDataForm.tags" placeholder="Please Select Tags (Input As New Add IF Not Exists)"
+              <el-select v-model="articleDataForm.tags" placeholder="Please Select Tags"
                          :filterable="true" :multiple="true"
                          style="width: 100%;" value-key="id">
                 <!--NOTICE：v-model绑定的是一个对象，option里面也要绑定一个对象--->

@@ -1,8 +1,6 @@
 package com.hackyle.blog.consumer.util;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class IpUtils {
     private static final String UNKNOWN = "unknown";

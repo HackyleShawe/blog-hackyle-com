@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,6 +80,10 @@ public class ArticleServiceImpl implements ArticleService {
                 articleVoList.get(i).setCategories(categories);
             }
         }
+
+        //对文章按照更新时间进行逆序排序
+        articleVoList = articleVoList.stream().sorted(Comparator.comparing(ArticleVo::getUpdateTime).reversed()).collect(Collectors.toList());
+        articleVoPageResponseDto.setRows(articleVoList);
 
         return articleVoPageResponseDto;
     }
