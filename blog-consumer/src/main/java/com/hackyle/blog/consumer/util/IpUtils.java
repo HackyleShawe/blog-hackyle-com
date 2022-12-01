@@ -7,15 +7,6 @@ import java.util.regex.Pattern;
 public class IpUtils {
     private static final String UNKNOWN = "unknown";
 
-    /** IPv4正则 */
-    private static final String IPv4_REGEX = "^(?:(?:\\\\d|[1-9]\\\\d|1\\\\d\\\\d|2[0-4]\\\\d|25[0-5])\\\\.){3}(?:\\\\d|[1-9]\\\\d|1\\\\d\\\\d|2[0-4]\\\\d|25[0-5])$";
-    /** 私网IPv4正则 */
-    private static final String IPv4_PRIVATE_REGEX = "^(127\\.0\\.0\\.1)|(localhost)|(10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})|(172\\.((1[6-9])|(2\\d)|(3[01]))\\.\\d{1,3}\\.\\d{1,3})|(192\\.168\\.\\d{1,3}\\.\\d{1,3})$";
-    /** 公网IPv4正则 */
-    private static final String IPv4_PUBLIC_REGEX = "^(((?!(127\\\\.0\\\\.0\\\\.1)|(localhost)|(10\\\\.\\\\d{1,3}\\\\.\\\\d{1,3}\\\\.\\\\d{1,3})|(172\\\\.((1[6-9])|(2\\\\d)|(3[01]))\\\\.\\\\d{1,3}\\\\.\\\\d{1,3})|(192\\\\.168\\\\.\\\\d{1,3}\\\\.\\\\d{1,3})).)*)(?:(?:\\\\d|[1-9]\\\\d|1\\\\d\\\\d|2[0-4]\\\\d|25[0-5])\\\\.){3}(?:\\\\d|[1-9]\\\\d|1\\\\d\\\\d|2[0-4]\\\\d|25[0-5])$";
-    private static final Pattern IPv4_PRIVATE_PATTERN = Pattern.compile(IPv4_PRIVATE_REGEX);
-    private static final Pattern IPv4_PUBLIC_PATTERN = Pattern.compile(IPv4_PUBLIC_REGEX);
-
     /**
      * 根据 HttpServletRequest 获取公网 IP
      */
@@ -72,8 +63,34 @@ public class IpUtils {
             return false;
         }
 
-        Matcher matcher = IPv4_PUBLIC_PATTERN.matcher(ip);
-        return matcher.find();
+        String[] ipSeg = ip.split("\\."); //IPv4是以小数点分割的，IPv6是以冒号分割的
+        if(ipSeg.length != 4) {
+            return false;
+        }
+
+        int ipSeg01;
+        int ipSeg02;
+
+        try {
+            ipSeg01 = Integer.parseInt(ipSeg[0]);
+            ipSeg02 = Integer.parseInt(ipSeg[1]);
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(ipSeg01 == 10) {
+            return false;
+        }
+
+        if(ipSeg01 == 172 && (ipSeg02 >= 16 && ipSeg02 <= 31)) {
+            return false;
+        }
+
+        if(ipSeg01 == 192 && ipSeg02 == 168) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -85,16 +102,40 @@ public class IpUtils {
         if(null == ip || "".equals(ip.trim())) {
             throw new IllegalArgumentException("The parameter can't be null!");
         }
-        Matcher matcher = IPv4_PRIVATE_PATTERN.matcher(ip);
-        return matcher.find();
+        String[] ipSeg = ip.split("\\."); //IPv4是以小数点分割的，IPv6是以冒号分割的
+        if(ipSeg.length != 4) {
+            return false;
+        }
+
+        int ipSeg01;
+        int ipSeg02;
+
+        try {
+            ipSeg01 = Integer.parseInt(ipSeg[0]);
+            ipSeg02 = Integer.parseInt(ipSeg[1]);
+        } catch (Exception e) {
+            return false;
+        }
+
+        if(ipSeg01 == 10) {
+            return true;
+        }
+
+        if(ipSeg01 == 172 && (ipSeg02 >= 16 && ipSeg02 <= 31)) {
+            return true;
+        }
+
+        if(ipSeg01 == 192 && ipSeg02 == 168) {
+            return true;
+        }
+
+        return false;
     }
 
-    /**
-     * 检查IP是否为空或者UNKNOWN
-     * @return true:是空的；false:不是空的
-     */
-    private static boolean checkEmptyIp(String ip) {
-        return ip == null || "".equals(ip.trim()) || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip);
+    public static void main(String[] args) {
+        String ip = "203.0.113.0";
+
+        System.out.println(checkPublicIpv4(ip));
     }
 
 }
