@@ -1,5 +1,33 @@
+// ------------------------------------获取浏览器的信息，标识浏览器的唯一性 START ------------------------------------
+//生成一个GUID来唯一标识此浏览器，存放于localStorage
+//将GUID放于Cookie，每次请求都带上
+function browserUniId() {
+  let browserId = localStorage.getItem("browserId")
+  if(browserId == null || browserId === '') {
+    let uid = guid()
+    //let userAgent = navigator.userAgent
+    //userAgent = userAgent.replaceAll(" ", "")
+    browserId = uid
+    localStorage.setItem("browserId", uid)
+  }
 
-//回到顶部
+  //放入Guid到Cookie
+  document.cookie="browserId="+browserId;
+
+  return browserId
+}
+
+// Generate four random hex digits.
+function S4() {
+  return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+}
+// Generate a pseudo-GUID by concatenating random hexadecimal.
+function guid() {
+  return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
+}
+// ------------------------------------获取浏览器的信息，标识浏览器的唯一性 NED ------------------------------------
+
+// ------------------------------------回到顶部 START ------------------------------------
 function scrollFunction() {
   if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
     document.getElementById("backToTopBtn").style.display = "block";
@@ -12,3 +40,4 @@ function topFunction() {
   document.body.scrollTop = 0;
   document.documentElement.scrollTop = 0;
 }
+// ------------------------------------回到顶部 NED ------------------------------------
