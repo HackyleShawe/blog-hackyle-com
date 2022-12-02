@@ -27,6 +27,22 @@ function guid() {
 }
 // ------------------------------------获取浏览器的信息，标识浏览器的唯一性 NED ------------------------------------
 
+//-----------------------------------文章搜索 START----------------------------------
+$("#searchBtn").click(function () {
+  let uri = "/article/page/1"
+
+  let keys = $("#search").val()
+  if(keys.trim().length !== 0) {
+    keys = keys.replaceAll(" ", ",") //替换为英文状态下的逗号
+    uri += "?query="+keys
+  }
+
+  location.assign(location.protocol + "//" + location.host + uri) //跳转到该页
+})
+
+//-----------------------------------文章搜索 END-----------------------------------
+
+
 // ------------------------------------回到顶部 START ------------------------------------
 function scrollFunction() {
   if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
