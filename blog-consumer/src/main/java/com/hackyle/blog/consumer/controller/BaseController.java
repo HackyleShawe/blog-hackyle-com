@@ -1,5 +1,6 @@
 package com.hackyle.blog.consumer.controller;
 
+import com.hackyle.blog.consumer.dto.PageRequestDto;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.service.ArticleService;
 import com.hackyle.blog.consumer.vo.ArticleVo;
@@ -25,8 +26,11 @@ public class BaseController {
 
     @RequestMapping(value = {"/"}, method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView index(ModelAndView modelAndView) {
+        PageRequestDto<String> pageRequestDto = new PageRequestDto<>();
+        pageRequestDto.setCurrentPage(1);
+        pageRequestDto.setPageSize(15);
 
-        PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(1);
+        PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(pageRequestDto);
 
         //文章的Content打日志太大了，使用URI替换
         String articleUris = pageResponseDto.getRows().stream().map(ArticleVo::getUri).collect(Collectors.joining(","));

@@ -9,6 +9,11 @@ public class ArticleQo {
     private String id;
 
     /**
+     * 文章搜索关键字：先搜标题、再搜URL、才搜description，尽量不要搜content
+     */
+    private String queryKeywords;
+
+    /**
      * 标题
      */
     private String title;
@@ -52,6 +57,14 @@ public class ArticleQo {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getQueryKeywords() {
+        return queryKeywords;
+    }
+
+    public void setQueryKeywords(String queryKeywords) {
+        this.queryKeywords = queryKeywords;
     }
 
     public String getTitle() {

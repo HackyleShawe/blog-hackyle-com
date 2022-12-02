@@ -106,8 +106,8 @@
 
 /*上一页、下一页*/
 .page {
-  height: 40px;
-  /*margin: 5px auto;*/
+  height: 49px;
+  margin: 10px auto;
   text-align: center;
   font-size: x-large;
 }

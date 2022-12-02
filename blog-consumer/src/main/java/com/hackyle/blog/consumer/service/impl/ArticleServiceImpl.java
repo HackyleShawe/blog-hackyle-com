@@ -9,7 +9,6 @@ import com.hackyle.blog.consumer.mapper.ArticleMapper;
 import com.hackyle.blog.consumer.po.ArticleAuthorPo;
 import com.hackyle.blog.consumer.po.ArticleCategoryPo;
 import com.hackyle.blog.consumer.po.ArticleTagPo;
-import com.hackyle.blog.consumer.qo.ArticleQo;
 import com.hackyle.blog.consumer.service.ArticleAuthorService;
 import com.hackyle.blog.consumer.service.ArticleCategoryService;
 import com.hackyle.blog.consumer.service.ArticleService;
@@ -18,6 +17,7 @@ import com.hackyle.blog.consumer.util.BeanCopyUtils;
 import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.util.PaginationUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,14 +44,30 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleAuthorService articleAuthorService;
 
     @Override
-    public PageResponseDto<ArticleVo> pageByNum(Integer pageNum) {
-        PageRequestDto<ArticleQo> pageRequestDto = new PageRequestDto<>();
-        pageRequestDto.setCurrentPage(pageNum);
-        pageRequestDto.setPageSize(15);
-
+    public PageResponseDto<ArticleVo> pageByNum(PageRequestDto<String> pageRequestDto) {
         QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
                 .eq(ArticleEntity::getReleased, 1);
+
+        String keywords = pageRequestDto.getCondition();
+        if(StringUtils.isNotBlank(keywords)) {
+            String[] keywordArr = keywords.split(",");
+
+            //文章搜索关键字：先搜标题、再搜URL、才搜description，尽量不要搜content
+            for (String key : keywordArr) {
+                if(StringUtils.isBlank(key)) {
+                    continue;
+                }
+
+                queryWrapper.lambda().and(
+                        ele -> ele.like(ArticleEntity::getTitle, key)
+                                .or()
+                                .like(ArticleEntity::getUri, key)
+                                .or()
+                                .like(ArticleEntity::getSummary, key)
+                );
+            }
+        }
 
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
         Page<ArticleEntity> resultPage = articleMapper.selectPage(paramPage, queryWrapper);

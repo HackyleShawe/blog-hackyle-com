@@ -3,6 +3,7 @@ package com.hackyle.blog.consumer.controller;
 import com.alibaba.fastjson.JSON;
 import com.hackyle.blog.consumer.common.exception.NotFoundException;
 import com.hackyle.blog.consumer.dto.ArticleAccessLogDto;
+import com.hackyle.blog.consumer.dto.PageRequestDto;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.service.LoggerService;
 import com.hackyle.blog.consumer.service.ArticleService;
@@ -44,17 +45,34 @@ public class ArticleController {
      * 分页获取所有文章
      */
     @RequestMapping(value = {"/page/{pageNum}"}, method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView pageByNum(ModelAndView modelAndView, @PathVariable("pageNum") Integer pageNum) {
+    public ModelAndView pageByNum(ModelAndView modelAndView, @PathVariable("pageNum") Integer pageNum, HttpServletRequest request) {
+        PageRequestDto<String> pageRequestDto = new PageRequestDto<>();
+
         //纠正不合法数据
         if(pageNum == null || pageNum < 1) {
             pageNum = 1;
         }
+        pageRequestDto.setCurrentPage(pageNum);
 
-        PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(pageNum);
+        String pageSize = request.getParameter("pageSize");
+        if(StringUtils.isBlank(pageSize)) {
+            pageRequestDto.setPageSize(15);
+        } else {
+            pageRequestDto.setPageSize(Integer.parseInt(pageSize));
+        }
+
+        //多个关键字，使用逗号分割
+        String queryKeywords = request.getParameter("query");
+        if(StringUtils.isNotBlank(queryKeywords)) {
+            pageRequestDto.setCondition(queryKeywords);
+            modelAndView.addObject("queryKeywords", queryKeywords);
+        }
+
+        PageResponseDto<ArticleVo> pageResponseDto = articleService.pageByNum(pageRequestDto);
 
         //文章的Content打日志太大了，使用URI替换
         String articleUris = pageResponseDto.getRows().stream().map(ArticleVo::getUri).collect(Collectors.joining(","));
-        LOGGER.info("分页获取所有文章-pageNum={}-articleUris={}", pageNum, articleUris);
+        LOGGER.info("分页获取所有文章-pageRequestDto={}-articleUris={}", JSON.toJSONString(pageRequestDto), articleUris);
 
         modelAndView.addObject("pageResponseDto", pageResponseDto);
         modelAndView.setViewName("index");

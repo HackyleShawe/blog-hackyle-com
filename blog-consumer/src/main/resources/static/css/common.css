@@ -116,6 +116,25 @@ nav a:hover {
   color: #c0392b;
   font-weight: bold;
 }
+/*搜索框*/
+nav .search-box .search-input {
+  height: 24px;
+  /*将输入框变成下划线*/
+  outline: none;
+  border: none;
+  border-radius: 10px;
+}
+nav .search-box .search-btn {
+  background-color: #3270e2;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 15px;
+}
 /*------------------------------navigator end------------------------------*/
 
 
