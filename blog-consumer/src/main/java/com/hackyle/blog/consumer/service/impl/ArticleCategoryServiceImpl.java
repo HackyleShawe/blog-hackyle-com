@@ -19,7 +19,6 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     @Autowired
     private ArticleCategoryMapper articleCategoryMapper;
 
-
     @Override
     public Map<Long, List<ArticleCategoryPo>> selectByArticleIds(List<Long> articleIds) {
         List<ArticleCategoryPo> articleAuthorPoList = articleCategoryMapper.selectByArticleIds(articleIds);

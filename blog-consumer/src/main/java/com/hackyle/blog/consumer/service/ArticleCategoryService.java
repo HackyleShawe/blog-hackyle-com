@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ArticleCategoryService extends IService<ArticleCategoryEntity> {
+
     Map<Long, List<ArticleCategoryPo>> selectByArticleIds(List<Long> articleIds);
 
 }

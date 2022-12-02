@@ -16,7 +16,7 @@ public class SystemManageController {
     @Autowired
     private SystemManageService systemManageService;
 
-    @GetMapping("/system-status")
+    @GetMapping("/systemStatus")
     public ApiResponse<Map<String, Object>> systemStatus() {
         Map<String, Object> systemStatusMap = systemManageService.systemStatus();
 

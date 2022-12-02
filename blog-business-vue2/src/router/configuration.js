@@ -6,7 +6,7 @@ import Layout from '@/layout'
 export default {
   path: '/config',
   component: Layout,
-  redirect: '/config/friend-link',
+  redirect: '/config/admin-info',
   name: 'Configuration',
   meta: { title: 'Configuration', icon: 'el-icon-setting' },
   children: [
