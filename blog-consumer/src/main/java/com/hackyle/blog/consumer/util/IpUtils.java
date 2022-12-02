@@ -76,6 +76,11 @@ public class IpUtils {
             return false;
         }
 
+        // 回环地址：127.0.0.0 - 127.255.255.255
+        if(ipSeg01 == 127) {
+            return false;
+        }
+
         if(ipSeg01 == 10) {
             return false;
         }
@@ -112,6 +117,11 @@ public class IpUtils {
             ipSeg01 = Integer.parseInt(ipSeg[0]);
             ipSeg02 = Integer.parseInt(ipSeg[1]);
         } catch (Exception e) {
+            return false;
+        }
+
+        // 回环地址：127.0.0.0 - 127.255.255.255
+        if(ipSeg01 == 127) {
             return false;
         }
 
