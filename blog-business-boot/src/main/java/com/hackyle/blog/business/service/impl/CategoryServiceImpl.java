@@ -125,6 +125,7 @@ public class CategoryServiceImpl implements CategoryService {
                 queryWrapper.like("code", categoryQo.getCode());
             }
         }
+        queryWrapper.lambda().orderByDesc(CategoryEntity::getUpdateTime);
 
         //分页操作
         Page<CategoryEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, CategoryEntity.class);
@@ -142,6 +143,8 @@ public class CategoryServiceImpl implements CategoryService {
     public List<CategoryVo> fetchAll() {
         QueryWrapper<CategoryEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("is_deleted", 0);
+        queryWrapper.lambda().orderByDesc(CategoryEntity::getUpdateTime);
+
         List<CategoryEntity> articleCategoryEntityList = categoryMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 

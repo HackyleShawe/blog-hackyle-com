@@ -68,6 +68,7 @@ public class ArticleServiceImpl implements ArticleService {
                 );
             }
         }
+        queryWrapper.lambda().orderByDesc(ArticleEntity::getUpdateTime);
 
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
         Page<ArticleEntity> resultPage = articleMapper.selectPage(paramPage, queryWrapper);
@@ -96,10 +97,6 @@ public class ArticleServiceImpl implements ArticleService {
                 articleVoList.get(i).setCategories(categories);
             }
         }
-
-        //对文章按照更新时间进行逆序排序
-        articleVoList = articleVoList.stream().sorted(Comparator.comparing(ArticleVo::getUpdateTime).reversed()).collect(Collectors.toList());
-        articleVoPageResponseDto.setRows(articleVoList);
 
         return articleVoPageResponseDto;
     }

@@ -122,6 +122,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
                 queryWrapper.lambda().like(FriendLinkEntity::getDescription, friendLinkQo.getDescription());
             }
         }
+        queryWrapper.lambda().orderByDesc(FriendLinkEntity::getUpdateTime);
 
         //分页查询操作
         Page<FriendLinkEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, FriendLinkEntity.class);

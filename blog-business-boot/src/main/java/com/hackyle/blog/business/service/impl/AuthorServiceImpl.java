@@ -119,6 +119,7 @@ public class AuthorServiceImpl implements AuthorService {
         //        queryWrapper.like("short_name", articleCategoryQo.getShortName());
         //    }
         //}
+        queryWrapper.lambda().orderByDesc(AuthorEntity::getUpdateTime);
 
         //分页操作
         Page<AuthorEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, AuthorEntity.class);
@@ -150,6 +151,8 @@ public class AuthorServiceImpl implements AuthorService {
     public List<AuthorVo> fetchAll() {
         QueryWrapper<AuthorEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("is_deleted", 0);
+        queryWrapper.lambda().orderByDesc(AuthorEntity::getUpdateTime);
+
         List<AuthorEntity> authorEntityList = authorMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(authorEntityList));
 

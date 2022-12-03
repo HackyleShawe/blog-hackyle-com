@@ -119,6 +119,7 @@ public class FeedbackMessageServiceImpl extends ServiceImpl<FeedbackMessageMappe
                 queryWrapper.lambda().like(FeedbackMessageEntity::getContent, feedbackMessageQo.getContent());
             }
         }
+        queryWrapper.lambda().orderByDesc(FeedbackMessageEntity::getUpdateTime);
 
         //分页查询操作
         Page<FeedbackMessageEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, FeedbackMessageEntity.class);

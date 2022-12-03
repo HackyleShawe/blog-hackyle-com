@@ -128,6 +128,7 @@ public class TagServiceImpl implements TagService {
                 queryWrapper.like("code", articleCategoryQo.getCode());
             }
         }
+        queryWrapper.lambda().orderByDesc(TagEntity::getUpdateTime);
 
         //分页操作
         Page<TagEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, TagEntity.class);
@@ -145,6 +146,8 @@ public class TagServiceImpl implements TagService {
     public List<TagVo> fetchAll() {
         QueryWrapper<TagEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("is_deleted", 0);
+        queryWrapper.lambda().orderByDesc(TagEntity::getUpdateTime);
+
         List<TagEntity> articleCategoryEntityList = tagMapper.selectList(queryWrapper);
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 

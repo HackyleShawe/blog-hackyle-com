@@ -55,6 +55,7 @@ public class LoggerServiceImpl implements LoggerService {
                 //queryWrapper.lambda().le(ArticleAccessEntity::getCreateTime, timePicker[1]);
             }
         }
+        queryWrapper.lambda().orderByDesc(ArticleAccessEntity::getCreateTime);
 
         //分页操作
         Page<ArticleAccessEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleAccessEntity.class);

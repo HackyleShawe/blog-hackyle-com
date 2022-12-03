@@ -246,6 +246,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
                 queryWrapper.lambda().like(ArticleEntity::getSummary, articleQo.getSummary());
             }
         }
+        queryWrapper.lambda().orderByDesc(ArticleEntity::getUpdateTime);
 
         //分页查询操作
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
