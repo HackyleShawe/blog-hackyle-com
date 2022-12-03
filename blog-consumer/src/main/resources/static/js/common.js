@@ -57,3 +57,17 @@ function topFunction() {
   document.documentElement.scrollTop = 0;
 }
 // ------------------------------------回到顶部 NED ------------------------------------
+
+// ------------------------------------检查客户端的类型 NED ------------------------------------
+function clientType() {
+  if (/(iPhone|iPad|iPod|iOS)/i.test(navigator.userAgent)) {
+    //alert("iPhone")
+    return "iPhone"
+  } else if (/(Android)/i.test(navigator.userAgent)) {
+    //alert("Android")
+    return "Android"
+  } else {
+    return "PC"
+  }
+}
+// ------------------------------------检查客户端的类型 NED ------------------------------------

@@ -64,7 +64,7 @@
 <body>
   <div th:replace="components/nav"></div>
 
-  <div class="face article-meta-container">
+  <div class="face article-meta-container" id="articleMetaDiv">
     <h1 th:text="${articleVo.title}">title</h1>
 
     <p>
@@ -83,7 +83,7 @@
     </div>
   </div>
 
-  <div class="face">
+  <div class="face" id="articleMainDiv">
     <!--左侧导航栏-->
     <aside>
     </aside>
@@ -105,7 +105,7 @@
   </div>
 
   <!--评论区-->
-  <div class="face article-comment-container">
+  <div class="face article-comment-container" id="articleCommentDiv">
     <!--评论-->
     <div class="add-comment-container" th:if="${articleVo.commented != null && articleVo.commented}">
       <p style="text-align: center; font-size: x-large">留下你的评论</p>
@@ -192,6 +192,16 @@
 <script src="/js/common.js"></script>
 <script>
   $(function () {
+    //检查浏览器类型，移除仅在PC端才会显示的元素
+    let type = clientType()
+    if("PC" !== type) {
+      $("#articleMetaDiv").removeClass("face")
+      $("#articleMainDiv").removeClass("face")
+      $("#articleCommentDiv").removeClass("face")
+
+      $("aside").remove()
+    }
+
     //当出现滚动时，就检测一下，是否需要显示回到顶部按钮
     window.onscroll = function () {
       scrollFunction();
