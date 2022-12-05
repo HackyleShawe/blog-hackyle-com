@@ -1,12 +1,6 @@
+**一款简单且纯粹的博客系统** 
 
-
-**一个简单且纯粹的博客系统（0.6.0-测试版）** 
-
-**A Simple and Pure Blog System (Current version: 0.6.0-Alpha)**
-
-**后台管理端：** http://blog.hackyle.com:6199/business-front/
-**前台展示端：** http://blog.hackyle.com:6199/
-**OpenSource：** https://github.com/HackyleShawe/Blog
+**A Simple and Pure Blog System**
 
 
 
@@ -38,7 +32,7 @@
 
 # 功能特性
 
-> 版本0.6.0-Alpha功能特性
+> 版本0.6.0的功能特性
 
 **文章管理（Article）**
 
