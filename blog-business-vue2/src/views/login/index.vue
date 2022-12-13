@@ -51,7 +51,7 @@
           v-model="loginForm.code"
           name="code"
           type="text"
-          tabindex="1"
+          tabindex="3"
         />
 
         <!--
