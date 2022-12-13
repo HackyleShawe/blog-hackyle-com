@@ -44,7 +44,7 @@
 <body>
 <div th:replace="components/nav"></div>
 
-<div class="face feedback-container">
+<div class="face feedback-container" id="feedbackDiv">
   <p style="text-align: center; font-size: x-large">问题反馈与留言板</p>
   <div class="comment-input">
     <p style="height: 30px">
@@ -73,8 +73,22 @@
 <div th:replace="components/footer"></div>
 
 </body>
-<script>
 
+<script src="/js/common.js"></script>
+
+<!--响应式处理-->
+<script>
+  $(function () {
+    //检查浏览器类型，移除仅在PC端才会显示的元素
+    let type = clientType()
+    if("PC" !== type) {
+      $("#feedbackDiv").removeClass("face")
+    }
+  });
+</script>
+
+<!--TinyMCE初始化-->
+<script>
   tinymce.init({
     selector: 'textarea#feedbackTextarea',
     plugins: 'preview importcss searchreplace autolink autosave save directionality code ' +
@@ -90,6 +104,7 @@
   });
 </script>
 
+<!--评论提交以及数据输入框的控制-->
 <script>
   //清除所有输入框内的内容
   $("#resetFeedback").click(function () {
@@ -159,5 +174,4 @@
     }, 'json')
   }
 </script>
-<script src="/js/common.js"></script>
 </html>
