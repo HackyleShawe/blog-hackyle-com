@@ -363,6 +363,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             uri = "/" + uri;
         }
 
+        //URI中如果有空格，替换为横线
+        uri = uri.replaceAll(" ", "-");
+
         //在URI前拼接文章分类的编码
         String categoryIds = articleAddDto.getCategoryIds();
         if(StringUtils.isNotBlank(categoryIds) && categoryIds.split(",").length >= 1) {
@@ -400,6 +403,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         if(!uri.startsWith("/")) {
             uri = "/" + uri;
         }
+
+        //URI中如果有空格，替换为横线
+        uri = uri.replaceAll(" ", "-");
 
         articleAddDto.setUri(uri);
     }

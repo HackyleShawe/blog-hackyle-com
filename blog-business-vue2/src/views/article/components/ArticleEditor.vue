@@ -62,7 +62,7 @@
           <el-col :span="12">
             <el-form-item label="Tags" prop="tagList">
               <!--<select-tags :initTags="articleDataForm.tags" @chooseTags="chooseTagHandler"/>-->
-              <el-select v-model="articleDataForm.tags" placeholder="Please Select Tags"
+              <el-select v-model="articleDataForm.tags" placeholder="Please select tags"
                          :filterable="true" :multiple="true"
                          style="width: 100%;" value-key="id">
                 <!--NOTICE：v-model绑定的是一个对象，option里面也要绑定一个对象--->
