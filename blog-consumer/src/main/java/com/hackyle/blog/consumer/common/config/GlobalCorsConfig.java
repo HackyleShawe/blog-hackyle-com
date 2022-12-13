@@ -9,9 +9,9 @@ import org.springframework.web.filter.CorsFilter;
 /**
  * 后端跨域配置
  */
-@Configuration
+//@Configuration
 public class GlobalCorsConfig {
-    @Bean
+    //@Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         // 设置你要允许的网站域名
@@ -27,3 +27,4 @@ public class GlobalCorsConfig {
         return new CorsFilter(source);
     }
 }
+

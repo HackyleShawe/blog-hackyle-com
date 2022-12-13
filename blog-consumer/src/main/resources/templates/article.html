@@ -166,7 +166,9 @@
 
   <!-- 图片点击放大的蒙版层 -->
   <div class="imgPreview">
-    <img src="#" alt="" id="imgPreview">
+    <!--注意：img标签的src写#时，会造成对本页面二次请求-->
+    <!--例如：在浏览器输出文章URL：https://blog.hackyle.com/article/hello，点击回车后，后端会接收到两次这个请求，多余的查询-->
+    <img src="" alt="" id="imgPreview">
   </div>
 
   <!--回到顶部-->
