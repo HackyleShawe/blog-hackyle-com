@@ -126,10 +126,14 @@ function postComment(name, email, link, content, parentId, replyWhoId) {
 let commentEle = "<div class=\"add-child-comment-container\" id=\"addReply\">" +
     "  <p style=\"text-align: center; font-size: large\">回复评论</p>" +
     "  <div>" +
-    "    <p style=\"height: 20px\">" +
-    "      Name:&emsp;<input type=\"text\" id=\"nameReply\" size=\"10\" class=\"form-input\">" +
-    "      Email:&emsp;<input type=\"text\" id=\"emailReply\" size=\"23\" class=\"form-input\">" +
-    "      Link:&emsp;<input type=\"text\" id=\"linkReply\" size=\"23\" class=\"form-input\">" +
+    "    <p>" +
+    "      Name:&emsp;<input type=\"text\" id=\"nameReply\" size=\"35\" class=\"form-input\">" +
+    "    </p>" +
+    "    <p>" +
+    "      Email:&emsp;<input type=\"email\" id=\"emailReply\" size=\"35\" class=\"form-input\">" +
+    "    </p>" +
+    "    <p>" +
+    "      Link:&emsp;<input type=\"text\" id=\"linkReply\" size=\"35\" class=\"form-input\">" +
     "    </p>" +
     "  </div>" +
     "" +
