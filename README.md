@@ -89,7 +89,7 @@
 - Node：16.14.2
 - npm：8.5.0
 
-**Step2：启动MySQL、Redis、Minio**
+**Step2：启动MySQL、Redis**
 
 **step3：下载本仓库到本地**
 
@@ -105,6 +105,44 @@
 
 1. 进入到blog-consumer目录，在IDEA中打开，等待Maven自动配置
 2. 运行启动类：/src/main/java/com/hackyle/blog/consumer/BlogConsumerApp.java
+
+**Optional Step4：配置静态资源的存取**（如果不需要上传图片等静态资源可不配置）
+
+1. 进入配置文件：application-dev.yml，配置file-storage-path和file-domain
+2. 下载Nginx，编辑配置文件：conf/nginx.conf，然后启动
+
+```
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            # 这里需要和application-dev.yml中的file-storage-path一样
+            alias D:\\A03-Program\\A-Programming\\GitHub\\Blog\\res.hackyle.com\\;
+        }
+        
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }
+}
+```
+
+
 
 # 设计与实现概述
 
@@ -166,30 +204,19 @@ Redis：100MB
 
 
 
-## 静态资源存储器Minio
+## 静态资源存储
 
 **存储所有的静态资源文件：** 
 
 - 图片
-
 - 视频（由于网站的带宽比较小，不直接存放视频文件，存放于第三方站点上）
-
 - 音乐
-
 - Word、PDF等文档
-
 - 其他资源文件
 
-**环境准备**
-
-- cd /opt/minio
-- wget https://dl.min.io/server/minio/release/linux-amd64/minio
-- chmod +x minio
-- MINIO_ROOT_USER=kyle-minio MINIO_ROOT_PASSWORD=hackyle-minio nohup ./minio server /data/minio-data --console-address ":9001" >./init.log 2>&1 &
 
 
-
-**设定：访问Minio中的静态资源通过以下域：https://res.hackyle.com**
+**设定静态资源通过以下域访问：https://res.hackyle.com**
 
 1. 为域（res.hackyle.com）申请DigiCert 免费版 SSL，下载key和pem文件
 
@@ -198,42 +225,62 @@ Redis：100MB
 3. 配置Nginx
 
 ```
-# MinIO静态资源服务
+# 静态资源服务：res.conf
 server {
-  listen 80;
-  server_name res.hackyle.com;
-
-  #地址重写到https
-  rewrite ^(.*)$ https://$host$1;
+    listen 80;
+    server_name res.hackyle.com;
+    
+    #地址重写到https
+    rewrite ^(.*)$ https://$host$1;
 }
-
 server {
-  listen 443 ssl http2;
-  listen [::]:443 ssl http2;
-  server_name res.hackyle.com;
-
-  ssl_certificate "/etc/nginx/cert/res.hackyle.com.pem";
-  ssl_certificate_key "/etc/nginx/cert/res.hackyle.com.key";
-  ssl_session_cache shared:SSL:1m;
-  ssl_session_timeout 10m;
-  ssl_ciphers HIGH:!aNULL:!MD5;
-  ssl_prefer_server_ciphers on;
-
-  #对外提供静态资源的地址：https://res.hackyle.com/桶名/年份/月份/uuid.文件拓展名
-  location / {
-      proxy_pass http://localhost:9000/;
-  }
-
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+    server_name res.hackyle.com;
+    
+    ssl_certificate "/etc/nginx/cert/res.hackyle.com.pem";
+    ssl_certificate_key "/etc/nginx/cert/res.hackyle.com.key";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  10m;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    
+    #==存在问题：凡是不是从主页跳转到文章页面，都会被拦截
+    #防盗链：验证所有请求中的Referer是否来自*.hackyle.com，否则响应403
+    #valid_referers blocked *.hackyle.com;
+    #   if ($invalid_referer){
+    #    return 403;
+    #}
+    
+    # https://res.hackyle.com/业务名/年份/月份/uuid.文件拓展名
+    location / {
+        alias /data/res.hackyle.com/;
+    }
 }
 ```
 
+**确定静态资源的存储目录：**/data/res.hackyle.com/
 
+- 存储示例：/data/res.hackyle.com/业务名/年份/月份/文件名.拓展名
+- 例如博客（blog.hackyle），业务名为“blog” 
 
- **测试：**
+ 
 
-1. 创建一个hello桶，设置为public，上传一张图片在该桶下
+**主要步骤**
 
-2. 访问：res.hackyle.com/hello/balloon.jpg
+1. 在云服务器上，配置一个目录，专门存放静态资源（一般是图片），例如：/data/res.hackyle.com/
+
+2. 博客中的上传操作，经过文件流写到该个目录下
+
+3. 对外还是以https://res.hackyle.com的方式提供访问，通过nginx，解析到该个文件夹
+
+ 
+
+**移除Minio**
+
+- minio是分布式的文件存储系统，文件会被分割为多个块，分布式存储于多个节点上，这对于简单系统的静态资源管理十分繁杂、冗余
+
+- minio存储在单机节点上时，会产生多个文件夹，不方便备份、数据恢复
 
 ## Nginx
 
