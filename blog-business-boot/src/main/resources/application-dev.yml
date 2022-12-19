@@ -35,12 +35,3 @@ file-storage-path: D:\\A03-Program\\A-Programming\\GitHub\\Blog\\res.hackyle.com
 # 对外提供访问的路径，需要配置Nginx把请求解析到上个参数指定的目录下
 file-domain: http://localhost/blog-dev/
 
-
-#MinIO对象存储，文件服务器
-minio:
-  endpoint: http://127.0.0.1:9000/ # 网API，文件上传地址（只支持IP，不支持域名）
-  access-key: kyle-minio
-  secret-key: hackyle-minio
-  file-obj-domain: http://127.0.0.1:9000/ #外网访问文件对象的域，文件对象最终URL：https://res.hackyle.com/桶名/文件对象名
-  endpoint-in: http://127.0.0.1:9000/ # 内网API
-  bucket-name: blog-dev #本个项目所用的桶名

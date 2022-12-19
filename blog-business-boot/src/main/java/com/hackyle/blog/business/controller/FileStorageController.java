@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
-import com.hackyle.blog.business.common.pojo.MinioFile;
 import com.hackyle.blog.business.service.FileStorageService;
 import com.hackyle.blog.business.vo.FileVo;
 import org.slf4j.Logger;
@@ -128,7 +127,7 @@ public class FileStorageController {
      * 获取文件详细信息
      */
     @GetMapping("/fetch")
-    public ApiResponse<MinioFile> fileDetail(@RequestParam("fileName") String fileName) {
+    public ApiResponse<String> fileDetail(@RequestParam("fileName") String fileName) {
         if(null == fileName || "".equals(fileName.trim())) {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
