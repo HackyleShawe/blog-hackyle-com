@@ -100,7 +100,7 @@ public class FileStorageServiceImpl implements FileStorageService {
     private String pathSplitByDate() {
         LocalDate localDate = LocalDate.now();
         int month = localDate.getMonthValue();
-        return String.format("/%s/%s/", localDate.getYear(), month < 10 ? "0"+month: String.valueOf(month));
+        return String.format("%s/%s/", localDate.getYear(), month < 10 ? "0"+month: String.valueOf(month));
     }
 
 }
