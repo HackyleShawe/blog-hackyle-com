@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.common.pojo.MinioFile;
-import com.hackyle.blog.business.service.MinioService;
+import com.hackyle.blog.business.service.FileStorageService;
 import com.hackyle.blog.business.vo.FileVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import java.util.List;
 public class FileStorageController {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageController.class);
     @Autowired
-    private MinioService minioService;
+    private FileStorageService fileStorageService;
 
     /**
      * 上传文件
@@ -36,9 +36,9 @@ public class FileStorageController {
         if(multipartFiles == null || multipartFiles.length < 1) {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
-        List<String> fileObjects = null;
+        List<String> fileObjects;
         try {
-            fileObjects = minioService.fileUpload(multipartFiles);
+            fileObjects = fileStorageService.fileUpload(multipartFiles);
 
             List<FileVo> fileVoList = new ArrayList<>();
             for (String fileObject : fileObjects) {
@@ -64,9 +64,9 @@ public class FileStorageController {
         if(multipartFiles == null || multipartFiles.length < 1) {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
-        List<String> fileObjects = null;
+        List<String> fileObjects;
         try {
-            fileObjects = minioService.fileUpload(multipartFiles);
+            fileObjects = fileStorageService.fileUpload(multipartFiles);
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), fileObjects);
 
         } catch (Exception e) {
@@ -85,19 +85,16 @@ public class FileStorageController {
             return JSON.toJSONString(ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage()));
         }
 
-        List<String> fileObjects = null;
+        List<String> fileObjects;
         try {
-            fileObjects = minioService.fileUpload(multipartFiles);
-            if(fileObjects.size() == 1) {
-                JSONObject object = new JSONObject();
-                object.put("location", fileObjects.get(0));
-                return object.toJSONString();
-            } else {
-                return JSON.toJSONString(ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage()));
-            }
+            fileObjects = fileStorageService.fileUpload(multipartFiles);
+
+            JSONObject object = new JSONObject();
+            object.put("location", fileObjects.get(0));
+            return object.toJSONString();
 
         } catch (Exception e) {
-            LOGGER.error("上传图片出现异常：", e);
+            LOGGER.error("TinyMCE富文本编辑器上传图片出现异常：", e);
             return JSON.toJSONString(ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage()));
         }
     }
@@ -112,12 +109,14 @@ public class FileStorageController {
         }
 
         try {
-            boolean delFlag = minioService.fileDelete(fileName);
-            if(delFlag) {
-                return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-            } else {
-                return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
-            }
+            //boolean delFlag = minioService.fileDelete(fileName);
+            //if(delFlag) {
+            //    return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+            //} else {
+            //    return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+            //}
+            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+
         }catch (Exception e) {
             LOGGER.error("文件删除出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
@@ -135,12 +134,14 @@ public class FileStorageController {
         }
 
         try {
-            boolean delFlag = true; //minioService.fileDetail(fileName);
-            if(delFlag) {
-                return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-            } else {
-                return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
-            }
+            //boolean delFlag = true; //minioService.fileDetail(fileName);
+            //if(delFlag) {
+            //    return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+            //} else {
+            //    return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+            //}
+            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+
         }catch (Exception e) {
             LOGGER.error("文件删除出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
