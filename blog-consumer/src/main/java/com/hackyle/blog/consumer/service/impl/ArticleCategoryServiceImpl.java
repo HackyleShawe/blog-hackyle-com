@@ -60,10 +60,10 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         List<CategoryVo> categoryVoList = new ArrayList<>();
         for (ArticleCategoryPo categoryPo : articleCategoryPos) {
             CategoryVo categoryVo = BeanCopyUtils.copy(categoryPo, CategoryVo.class);
-            categoryVo.setId(IDUtils.encryptByAES(categoryPo.getCategoryId()));
-            if(null != categoryPo.getParentId()) {
-                categoryVo.setParentId(IDUtils.encryptByAES(categoryPo.getParentId()));
-            }
+            //categoryVo.setId(IDUtils.encryptByAES(categoryPo.getCategoryId()));
+            //if(null != categoryPo.getParentId()) {
+            //    categoryVo.setParentId(IDUtils.encryptByAES(categoryPo.getParentId()));
+            //}
 
             categoryVoList.add(categoryVo);
         }
