@@ -1,11 +1,12 @@
-package com.hackyle.blog.consumer.po;
+package com.hackyle.blog.consumer.vo;
 
 import java.util.Date;
 
-public class ArticleCategoryPo {
-    private Long articleId;
-
-    private Long categoryId;
+public class CategoryVo {
+    /**
+     * 加密后的ID
+     */
+    private String id;
 
     /**
      * 该个categoryId下的文章数量
@@ -32,26 +33,22 @@ public class ArticleCategoryPo {
      */
     private String iconUrl;
 
-    private Long parentId;
+    /**
+     * 上一级分类
+     */
+    private String parentId;
 
-    private Date createTime;
-
+    /**
+     * 更新时间
+     */
     private Date updateTime;
 
-    public Long getArticleId() {
-        return articleId;
+    public String getId() {
+        return id;
     }
 
-    public void setArticleId(Long articleId) {
-        this.articleId = articleId;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Integer getArticleNum() {
@@ -94,20 +91,12 @@ public class ArticleCategoryPo {
         this.iconUrl = iconUrl;
     }
 
-    public Long getParentId() {
+    public String getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(String parentId) {
         this.parentId = parentId;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
     }
 
     public Date getUpdateTime() {
