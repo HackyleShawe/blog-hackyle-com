@@ -92,8 +92,8 @@ DROP TABLE IF EXISTS tb_tag;
 CREATE TABLE tb_tag (
     id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
 
-    name VARCHAR(16) NOT NULL COMMENT '标签名称',
-    code  VARCHAR(16) NOT NULL COMMENT '标签编码',
+    name VARCHAR(64) NOT NULL COMMENT '标签名称',
+    code  VARCHAR(64) NOT NULL COMMENT '标签编码',
     color VARCHAR(16) DEFAULT NULL COMMENT '标签颜色',
     description VARCHAR(2048) DEFAULT NULL COMMENT '描述',
 
@@ -103,9 +103,6 @@ CREATE TABLE tb_tag (
     PRIMARY KEY (id)
 ) ENGINE=InnoDB COMMENT '文章标签';
 
-INSERT INTO tb_tag(id, name, code, color, description)
-VALUES ('100', 'JavaSE', 'JavaSE', 'red', 'JavaSE'),
-       ('110', 'Python', 'Python', 'blue', 'Python');
 
 # 文章-标签关联
 DROP TABLE IF EXISTS tr_article_tag;
