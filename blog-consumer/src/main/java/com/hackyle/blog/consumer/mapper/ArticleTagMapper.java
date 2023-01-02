@@ -2,6 +2,7 @@ package com.hackyle.blog.consumer.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hackyle.blog.consumer.entity.ArticleTagEntity;
+import com.hackyle.blog.consumer.entity.TagEntity;
 import com.hackyle.blog.consumer.po.ArticleTagPo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -12,6 +13,12 @@ import java.util.List;
 public interface ArticleTagMapper extends BaseMapper<ArticleTagEntity> {
 
     List<ArticleTagPo> selectByArticleIds(@Param("articleIds") List<Long> articleIds);
+
+    List<ArticleTagPo> selectTag();
+
+    TagEntity selectTagByTagCode(@Param("tagCode") String tagCode);
+
+    List<Long> selectArticleByTag(@Param("tagCode") String tagCode);
 }
 
 

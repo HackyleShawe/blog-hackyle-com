@@ -39,4 +39,26 @@
         </where>
     </select>
 
+    <!--List<ArticleTagPo> selectTag();-->
+    <select id="selectTag" resultType="com.hackyle.blog.consumer.po.ArticleTagPo">
+        SELECT at.tag_id, count(at.article_id) AS article_num,
+               tag.name, tag.code, tag.description, tag.color, tag.create_time, tag.update_time
+        FROM tr_article_tag at JOIN tb_tag tag ON at.tag_id = tag.id
+        WHERE at.is_deleted=FALSE AND tag.is_deleted=FALSE
+        GROUP BY at.tag_id
+    </select>
+
+    <!--TagEntity selectTagByTagCode(@Param("tagCode") String tagCode);-->
+    <select id="selectTagByTagCode" resultType="com.hackyle.blog.consumer.entity.TagEntity">
+        SELECT id, name, code, color, description, create_time, update_time, is_deleted
+        FROM tb_tag WHERE code = #{tagCode} and is_deleted = FALSE
+    </select>
+
+    <!--List<Long> selectArticleByTag(@Param("tagCode") String tagCode);-->
+    <select id="selectArticleByTag" resultType="long">
+        SELECT at.article_id
+        FROM tr_article_tag at JOIN tb_tag tag ON at.tag_id = tag.id
+        WHERE at.is_deleted=FALSE AND tag.is_deleted=FALSE AND tag.code = #{tagCode}
+    </select>
+
 </mapper>
