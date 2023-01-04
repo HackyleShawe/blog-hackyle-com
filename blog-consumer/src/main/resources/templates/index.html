@@ -49,17 +49,17 @@
     <!-- section1:文章列表 -->
     <section class="sec-container">
 
+      <!--<div class="article-pic">-->
+      <!--  <img src="http://127.0.0.1:9000/blog/2022/10/9da51ce4c8df47c6bbe326462baa24f8.png"/>-->
+      <!--</div>-->
       <!--scroll-animation-->
       <div class="box" th:each="articleVo : ${pageResponseDto.getRows()}">
-        <!--<div class="article-pic">-->
-        <!--  <img src="http://127.0.0.1:9000/blog/2022/10/9da51ce4c8df47c6bbe326462baa24f8.png"/>-->
-        <!--</div>-->
         <div class="article-abstract">
           <a th:href="${'/article' + articleVo.uri}" target="_blank">
             <p class="title"><h1><span th:text="${articleVo.title}">title</span> </h1>
             <p class="summary"><span th:text="${articleVo.summary}">summary</span></p>
             <p class="meta">
-              <span th:if="${articleVo.categories != null}">Category: <span th:text="${articleVo.categories}">category</span></span>
+              <span th:if="${articleVo.categories != null}">Category: <span th:text="${articleVo.categories}">category</span>；</span>
               <span th:if="${articleVo.updateTime != null}">Update Time: <span th:text="${articleVo.updateTime}">UpdateTime</span></span>
             </p>
           </a>

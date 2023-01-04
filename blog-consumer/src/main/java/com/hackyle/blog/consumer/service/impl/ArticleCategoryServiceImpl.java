@@ -127,7 +127,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
             ArticleEntity articleEntity = articleEntityList.get(i);
             Long articleId = articleEntity.getId();
             List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(articleId);
-            if(articleCategoryPos != null && articleCategoryPos.size() > 1) {
+            if(articleCategoryPos != null && articleCategoryPos.size() >= 1) {
                 String categories = "";
                 for (ArticleCategoryPo categoryPo : articleCategoryPos) {
                     categories = String.join(",", categoryPo.getName());
