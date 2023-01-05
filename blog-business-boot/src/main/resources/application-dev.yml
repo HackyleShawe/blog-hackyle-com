@@ -34,4 +34,6 @@ mybatis-plus:
 file-storage-path: D:\\A03-Program\\A-Programming\\GitHub\\Blog\\res.hackyle.com\\blog-dev\\
 # 对外提供访问的路径，需要配置Nginx把请求解析到上个参数指定的目录下
 file-domain: http://localhost/blog-dev/
+# 图片水印的文本
+water-mark-text: HACKYLE
 

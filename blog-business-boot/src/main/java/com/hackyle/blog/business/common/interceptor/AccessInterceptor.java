@@ -50,7 +50,7 @@ public class AccessInterceptor implements HandlerInterceptor {
         if(StringUtils.isNotBlank(token) && JwtUtils.validateJWT(token)) {
             String newToken = JwtUtils.refreshCheck(token);
             response.setHeader("Authorization", newToken);
-            LOGGER.info("{}-Token有效，旧的Token={}，新的Token={}", requestURI, token, newToken);
+            //LOGGER.info("{}-Token有效，旧的Token={}，新的Token={}", requestURI, token, newToken);
             return true; //拦截器放行
 
         } else {

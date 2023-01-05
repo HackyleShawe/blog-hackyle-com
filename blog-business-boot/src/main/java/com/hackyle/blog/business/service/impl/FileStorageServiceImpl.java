@@ -1,6 +1,7 @@
 package com.hackyle.blog.business.service.impl;
 
 import com.hackyle.blog.business.service.FileStorageService;
+import com.hackyle.blog.business.util.WaterMarkUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     @Value("${file-domain}")
     private String fileDomain;
 
+    /** 图片水印的文本 */
+    @Value("${water-mark-text}")
+    private String waterMarkText;
 
 
     @Override
@@ -38,20 +42,22 @@ public class FileStorageServiceImpl implements FileStorageService {
             InputStream inputStream = file.getInputStream(); //得到文件流
             String fileName = file.getOriginalFilename(); //文件名
             //String contentType = file.getContentType();  //类型
-            long sourceSize = file.getSize();
+            //long sourceSize = file.getSize();
 
             String pathSplit = pathSplitByDate();
             String nameByUUID = nameByUUID(fileName);
             File storagePathFile = storagePath(pathSplit);
 
-            String fullFile = storagePathFile.getAbsolutePath() + File.separator + nameByUUID;
-            FileOutputStream os = new FileOutputStream(fullFile);
+            String targetFile = storagePathFile.getAbsolutePath() + File.separator + nameByUUID;
+            FileOutputStream outputStream = new FileOutputStream(targetFile);
 
-            long transferSize = inputStream.transferTo(os);
+            //图片加水印后写出到指定位置
+            WaterMarkUtils.markByText(waterMarkText, inputStream, outputStream, fileName.substring(fileName.lastIndexOf(".")+1));
 
-            if(sourceSize != transferSize) {
-                throw new RuntimeException("File Storage Fail!");
-            }
+            //long transferSize = inputStream.transferTo(os);
+            //if(sourceSize != transferSize) {
+            //    throw new RuntimeException("File Storage Fail!");
+            //}
 
             fileObjects.add(fileDomain + pathSplit + nameByUUID);
         }
