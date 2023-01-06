@@ -15,17 +15,9 @@ public class WaterMarkUtils {
     private static final float alpha = 0.4f;
 
     /**
-     * 水印文字字体
-     * 此种文字格式下，平均一个英文字母占比的width为23.45px，height为35px
-     * <plaintext>
-     * 如何测得？
-     *  1.写一个HTML，<span style="font-family: 'Microsoft YaHei UI'; font-weight: bold; font-size: 35px">HACKYLE</span>
-     *  2.在浏览器打开，查看到大小为：164.18 * 44.55px
-     *  3.单个字符的宽度为：164.18/7 = 23.45px
-     *  4.44.55px是行高，字体大小为35px
-     *  </plaintext>
+     * 水印文字字体，size=25为字体的行高，单位px
      */
-    private static final Font font = new Font("Microsoft Yahei UI", Font.BOLD, 35);
+    private static final Font font = new Font("Microsoft Yahei UI", Font.BOLD, 25);
     // 水印文字颜色
     private static final Color color = Color.red;
 
@@ -153,7 +145,7 @@ public class WaterMarkUtils {
         graph.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, alpha));
 
         //文本水印，水印所在坐标
-        int widthLocation = sourceImageWidth - 40 - (int)(text.length()*23.45); //水印距离最右边有40px，另外的是字体的长度
+        int widthLocation = sourceImageWidth - 40 - getWatermarkLength(text, graph); //水印距离最右边有40px，另外的是字体的长度
         int heightLocation = sourceImageHeight - 40; //水印距离最下边有40px
         graph.drawString(text, widthLocation, heightLocation);
 
@@ -162,6 +154,13 @@ public class WaterMarkUtils {
 
         //图片写出
         ImageIO.write(sourceImage, imgType, targetImgStream);
+    }
+
+    /**
+     * 获取水印文字的长度
+     */
+    private static int getWatermarkLength(String waterMarkContent, Graphics2D g) {
+        return g.getFontMetrics(g.getFont()).charsWidth(waterMarkContent.toCharArray(), 0, waterMarkContent.length());
     }
 
 }
