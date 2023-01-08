@@ -42,7 +42,7 @@ public class FileStorageServiceImpl implements FileStorageService {
             InputStream inputStream = file.getInputStream(); //得到文件流
             String fileName = file.getOriginalFilename(); //文件名
             //String contentType = file.getContentType();  //类型
-            //long sourceSize = file.getSize();
+            long sourceSize = file.getSize();
 
             String pathSplit = pathSplitByDate();
             String nameByUUID = nameByUUID(fileName);
@@ -51,13 +51,18 @@ public class FileStorageServiceImpl implements FileStorageService {
             String targetFile = storagePathFile.getAbsolutePath() + File.separator + nameByUUID;
             FileOutputStream outputStream = new FileOutputStream(targetFile);
 
-            //图片加水印后写出到指定位置
-            WaterMarkUtils.markByText(waterMarkText, inputStream, outputStream, fileName.substring(fileName.lastIndexOf(".")+1));
+            String fileType = fileName.substring(fileName.lastIndexOf(".")+1);
+            //如果是图片，则需要加水印，然后再写出到指定位置
+            if("jpg".equalsIgnoreCase(fileType) || "png".equalsIgnoreCase(fileType)
+                    || "jpeg".equalsIgnoreCase(fileType) || "bpm".equalsIgnoreCase(fileType)) {
+                WaterMarkUtils.markByText(waterMarkText, inputStream, outputStream, fileType);
 
-            //long transferSize = inputStream.transferTo(os);
-            //if(sourceSize != transferSize) {
-            //    throw new RuntimeException("File Storage Fail!");
-            //}
+            } else {
+                long transferSize = inputStream.transferTo(outputStream);
+                if(sourceSize != transferSize) {
+                    throw new RuntimeException("File Storage Fail!");
+                }
+            }
 
             fileObjects.add(fileDomain + pathSplit + nameByUUID);
         }
