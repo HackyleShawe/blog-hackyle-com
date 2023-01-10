@@ -17,16 +17,22 @@
       </sticky>
 
       <div class="createPost-main-container">
-        <el-form-item style="margin-bottom: 5px;" label-width="40px" label="Title:">
+        <el-form-item style="margin-bottom: 2px;" label-width="40px" label="Title:">
           <el-input v-model="articleDataForm.title" :rows="1" type="textarea"
                     class="article-textarea" autosize placeholder="Please enter the article title" />
           <span v-show="titleContentLength" class="word-counter">{{ titleContentLength }}words</span>
         </el-form-item>
 
-        <el-form-item style="margin-bottom: 10px;" label-width="70px" label="Summary:">
+        <el-form-item style="margin-bottom: 2px;" label-width="70px" label="Summary:">
           <el-input v-model="articleDataForm.summary" :rows="1" type="textarea"
                     class="article-textarea" autosize placeholder="Please enter the article summery" />
           <span v-show="summaryContentLength" class="word-counter">{{ summaryContentLength }}words</span>
+        </el-form-item>
+
+        <el-form-item style="margin-bottom: 2px;" label-width="70px" label="Keywords:">
+          <el-input v-model="articleDataForm.keywords" :rows="1" type="textarea"
+                    class="article-textarea" autosize placeholder="Please enter the article keywords as meta tag of keywords for SEO" />
+          <span v-show="keywordsContentLength" class="word-counter">{{ keywordsContentLength }}words</span>
         </el-form-item>
 
         <el-row :gutter="20">
@@ -155,6 +161,7 @@ export default {
         tags: [], //文章标签
         title: '', //文章题目
         summary: '', //文章摘要
+        keywords: '', //文章关键字，直接用于meta标签，SEO
         content: '', //文章内容
         faceImgLink: '', //文章图片
         released: false, //是否发布
@@ -180,6 +187,9 @@ export default {
       return this.articleDataForm.title.length
     },
     summaryContentLength() {
+      return this.articleDataForm.summary.length
+    },
+    keywordsContentLength() {
       return this.articleDataForm.summary.length
     },
 
@@ -291,6 +301,7 @@ export default {
           "title": this.articleDataForm.title,
           "uri": this.articleDataForm.uri,
           "summary": this.articleDataForm.summary,
+          "keywords": this.articleDataForm.keywords,
           "content": this.articleDataForm.content,
           "linkUri": this.articleDataForm.linkUri,
           "faceImgLink": this.articleDataForm.faceImgLink,

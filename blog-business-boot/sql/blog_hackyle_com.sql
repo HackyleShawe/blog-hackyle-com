@@ -40,6 +40,7 @@ CREATE TABLE tb_article (
 
     title VARCHAR(256) NOT NULL COMMENT '标题',
     summary VARCHAR(5000) DEFAULT NULL COMMENT '总结概要',
+	keywords VARCHAR(1000) DEFAULT NULL COMMENT '文章关键字，直接用于meta标签，SEO',
     uri VARCHAR(256) NOT NULL COMMENT '文章的URI，文章链接最终为：https://domain.com/category-code/URI',
     content TEXT NOT NULL COMMENT '文章内容',
 

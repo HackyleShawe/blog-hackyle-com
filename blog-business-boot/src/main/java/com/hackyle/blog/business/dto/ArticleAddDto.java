@@ -14,6 +14,11 @@ public class ArticleAddDto {
     private String summary;
 
     /**
+     * 文章关键字，直接用于meta标签，SEO
+     */
+    private String keywords;
+
+    /**
      * 文章的URI，文章链接最终为：https://domain.com/category-code/URI
      */
     private String uri;
@@ -78,6 +83,14 @@ public class ArticleAddDto {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public String getUri() {
