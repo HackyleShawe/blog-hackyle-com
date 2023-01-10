@@ -21,7 +21,10 @@ public class ArticleVo {
     private String summary;
 
     private String uri;
-
+    /**
+     * 文章关键字，直接用于meta标签，SEO
+     */
+    private String keywords;
     /**
      * 文章内容
      */
@@ -79,6 +82,14 @@ public class ArticleVo {
 
     public void setSummary(String summary) {
         this.summary = summary;
+    }
+
+    public String getKeywords() {
+        return keywords;
+    }
+
+    public void setKeywords(String keywords) {
+        this.keywords = keywords;
     }
 
     public String getUri() {

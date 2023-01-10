@@ -99,7 +99,7 @@ public class ArticleController {
         MetaVo metaVo = new MetaVo();
         metaVo.setTitle(articleVo.getTitle());
         metaVo.setDescription(articleVo.getSummary());
-        metaVo.setKeywords(articleVo.getTags());
+        metaVo.setKeywords(articleVo.getKeywords());
 
         modelAndView.addObject("articleVo", articleVo);
         modelAndView.addObject("metaVo", metaVo);
