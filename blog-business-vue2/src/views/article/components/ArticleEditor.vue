@@ -190,7 +190,7 @@ export default {
       return this.articleDataForm.summary.length
     },
     keywordsContentLength() {
-      return this.articleDataForm.summary.length
+      return this.articleDataForm.keywords.length
     },
 
     displayTime: {
