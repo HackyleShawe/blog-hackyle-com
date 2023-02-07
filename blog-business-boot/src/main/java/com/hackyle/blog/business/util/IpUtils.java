@@ -4,17 +4,17 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Optional;
-import java.util.regex.Pattern;
+import java.util.*;
 
 public class IpUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IpUtils.class);
+
     private static String PUBLIC_IPv4;
 
     /**
@@ -26,38 +26,55 @@ public class IpUtils {
             return PUBLIC_IPv4;
         }
 
-        try {
-            URL urlIpecho = new URL("https://ipecho.net/plain");
-            HttpURLConnection urlConnIpecho = (HttpURLConnection) urlIpecho.openConnection();
-            if(200 == urlConnIpecho.getResponseCode()) {
-                InputStream inputStream = urlConnIpecho.getInputStream();
-                String ip = new String(inputStream.readAllBytes());
-                if(StringUtils.isNotBlank(ip)) {
-                    PUBLIC_IPv4 = ip;
-                    return PUBLIC_IPv4;
-                }
-            }
+        Map<String, String> urlMap = new HashMap<>();
+        urlMap.put("https://httpbin.org/get", "origin");
+        urlMap.put("https://ipecho.net/plain", "");
+        urlMap.put("https://ifconfig.co/json", "ip");
 
-            URL urlCo = new URL("https://ifconfig.co/json");
-            HttpURLConnection urlConnectionCo = (HttpURLConnection) urlCo.openConnection();
-            if(200 == urlConnectionCo.getResponseCode()) {
-                InputStream inputStream = urlConnectionCo.getInputStream();
-                if(null != inputStream) {
-                    JSONObject respBody = JSON.parseObject(new String(inputStream.readAllBytes()));
-                    String ip = respBody.get("ip").toString();
-                    if(StringUtils.isNotBlank(ip)) {
-                        PUBLIC_IPv4 = ip;
-                        return PUBLIC_IPv4;
-                    }
-                }
+        Set<String> keySet = urlMap.keySet();
+        for (String key : keySet) {
+            String publicIP = fetchIP(key, 300, urlMap.get(key));
+            if(StringUtils.isNotBlank(publicIP)) {
+                PUBLIC_IPv4 = publicIP;
+                return PUBLIC_IPv4;
             }
-
-        }catch (IOException e) {
-            //e.printStackTrace();
         }
 
         return "";
     }
+
+    /**
+     * 请求url获取自身的公网IP
+     * @param url 例如：https://httpbin.org/get
+     * @param connTimeout 连接超时
+     * @param ipTag 从那个字段提取IP。为空表示直接返回，不需要额外提取
+     * @return 公网IP
+     */
+    private static String fetchIP(String url, int connTimeout, String ipTag) {
+        //私用方法，无须入参校验
+        try {
+            URL urlInstance = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) urlInstance.openConnection();
+            connection.setConnectTimeout(connTimeout);
+            if(200 == connection.getResponseCode()) {
+                InputStream inputStream = connection.getInputStream();
+                String originalResp = new String(inputStream.readAllBytes());
+
+                if(null == ipTag || "".equals(ipTag)) {
+                    return originalResp;
+                }
+
+                JSONObject respBody = JSON.parseObject(originalResp);
+
+                return respBody.getString(ipTag);
+            }
+        } catch (IOException e) {
+            LOGGER.error("获取公网IP异常-入参：url={},connTimeout={},ipTag={}", url, connTimeout, ipTag);
+        }
+
+        return "";
+    }
+
 
     /*
      * 获取本地私网IPv4地址
