@@ -35,30 +35,6 @@
 
   <script src="https://cdn.tiny.cloud/1/r9kerxnm8ydga1tchdwlcs7tx8gsxqwjoxedsryjpsdche70/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
-  <!--图片点击放大CSS-->
-  <!--Reference：https://aqingya.cn/articl/df045814.html-->
-  <style>
-    .imgPreview {
-      display: none;
-      top: 0;
-
-      width: 100%;
-      height: 100%;
-      position: fixed;
-      background: rgba(0, 0, 0, 0.5);
-    }
-    .imgPreview img {
-      z-index: 100;
-      margin-top: 50px;
-      width: 90%;
-      height: 80%;
-      position: fixed;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      left: 50%;
-    }
-  </style>
-
   <script>
     // Code Reference：https://www.cnblogs.com/zhaohongcheng/p/12208492.html
     // 监听整个网页的copy(复制)事件
@@ -193,11 +169,13 @@
     </div>
   </div>
 
-  <!-- 图片点击放大的蒙版层 -->
-  <div class="imgPreview">
-    <!--注意：img标签的src写#时，会造成对本页面二次请求-->
-    <!--例如：在浏览器输出文章URL：https://blog.hackyle.com/article/hello，点击回车后，后端会接收到两次这个请求，多余的查询-->
-    <img src="" alt="" id="imgPreview">
+  <!-- 图片点击放大 -->
+  <div id="outerdiv" style="position:fixed;top:5%;left:0;background:rgba(0,0,0,0.7);z-index:2;width:100%;height:100%;display:none;">
+    <div id="innerdiv" style="position:absolute;">
+      <!--注意：img标签的src写#时，会造成对本页面二次请求-->
+      <!--例如：在浏览器输出文章URL：https://blog.hackyle.com/article/hello，点击回车后，后端会接收到两次这个请求，多余的查询-->
+      <img id="bigimg" style="border:3px solid rgb(222 15 170)" src="" />
+    </div>
   </div>
 
   <!--回到顶部-->
@@ -206,21 +184,9 @@
   <div th:replace="components/footer"></div>
 </body>
 
-<script>
-  <!--图片点击放大-->
-  $('img').on('click', function () {
-    var src = $(this).attr('src');
-    $('.imgPreview img').attr('src', src);
-    $('.imgPreview').show()
-  });
-  $('.imgPreview').on('click', function () {
-    $('.imgPreview').hide()
-  });
-</script>
-
 <script src="/js/article.js"></script>
-
 <script src="/js/common.js"></script>
+
 <script>
   $(function () {
     //检查浏览器类型，移除仅在PC端才会显示的元素
@@ -238,5 +204,50 @@
       scrollFunction();
     };
   });
+</script>
+<script>
+  //图片点击放大。Reference:https://blog.csdn.net/white1114579650/article/details/111941631
+  $("img").click(function (){
+    //debugger
+    var _this=$(this);
+    imgShow("#outerdiv","#innerdiv","#bigimg",_this);
+  })
+
+  function imgShow(outerdiv,innerdiv,bigimg,_this){
+    //debugger
+    var src=_this.attr("src");
+    $(bigimg).attr("src",src);
+    $("<img/>").attr("src",src).on('load',function () {
+      //debugger
+      var windowW=$(window).width()
+      var windowH=$(window).height();
+      var realWidth=this.width;
+      var readHeight=this.height;
+      var imgWidth,imgHeight;
+      var scale=0.8;
+      if(realWidth>windowW+scale){
+        imgHeight=windowH*scale;
+        imgWidth=imgHeight/readHeight*realWidth;
+        if(imgWidth>windowW*scale){
+          imgWidth=windowW*scale;
+        }
+      }else if(realWidth>windowW*scale){
+        imgWidth=windowW*scale;
+        imgHeight=imgWidth/realWidth*readHeight;
+      }else {
+        imgWidth=realWidth;
+        imgHeight=readHeight;
+      }
+      $(bigimg).css("width",imgWidth);
+      var w=(windowW-imgWidth)/2;
+      var h=(windowH-imgHeight)/2;
+      $(innerdiv).css({"top":h,"left":w});
+      $(outerdiv).fadeIn("fast");
+    });
+
+    $(outerdiv).click(function (){
+      $(this).fadeOut("fast");
+    });
+  }
 </script>
 </html>
