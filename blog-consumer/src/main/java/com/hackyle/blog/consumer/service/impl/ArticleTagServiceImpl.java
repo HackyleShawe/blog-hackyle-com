@@ -61,9 +61,11 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     public PageResponseDto<ArticleVo> selectArticleByTag(PageRequestDto<TagQo> requestDto) {
         TagQo tagQo = requestDto.getCondition();
 
+        //获取Tag名称
         TagEntity tagEntity = articleTagMapper.selectTagByTagCode(tagQo.getTagCode());
         tagQo.setTagName(tagEntity.getName());
 
+        //获取Tag下的所有文章ID
         List<Long> paramArticleIds = articleTagMapper.selectArticleByTag(tagQo.getTagCode());
 
         QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
@@ -106,6 +108,7 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
         Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
         List<ArticleVo> articleVoList = articleVoPageResponseDto.getRows();
 
+        //一个文章可能有多个Tag，获取所有Tag名，拼接
         for (int i = 0, len = articleEntityList.size(); i < len; i++) {
             ArticleEntity articleEntity = articleEntityList.get(i);
             Long articleId = articleEntity.getId();

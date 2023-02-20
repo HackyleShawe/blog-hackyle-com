@@ -76,20 +76,27 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         return categoryVoList;
     }
 
+    /**
+     * 该分类下的所有文章
+     */
     @Override
     public PageResponseDto<ArticleVo> selectArticleByCategory(PageRequestDto<CategoryQo> requestDto) {
         CategoryQo categoryQo = requestDto.getCondition();
 
+        //获取分类名称
         CategoryEntity categoryEntity = articleCategoryMapper.selectCategoryByCategory(categoryQo.getCategoryCode());
         categoryQo.setCategoryName(categoryEntity.getName());
 
+        //获取分类下的所有文章ID
         List<Long> paramArticleIds = articleCategoryMapper.selectArticleByCategory(categoryQo.getCategoryCode());
 
+        //构建查询条件
         QueryWrapper<ArticleEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(ArticleEntity::getDeleted, 0)
                 .eq(ArticleEntity::getReleased, 1)
                 .in(ArticleEntity::getId, paramArticleIds);
 
+        //查询条件：根据关键字搜索
         String keywords = categoryQo.getQueryKeywords();
         if(StringUtils.isNotBlank(keywords)) {
             String[] keywordArr = keywords.split(",");
@@ -125,6 +132,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
         List<ArticleVo> articleVoList = articleVoPageResponseDto.getRows();
 
+        //一个文章可能有多个分类，获取所有分类名，拼接
         for (int i = 0, len = articleEntityList.size(); i < len; i++) {
             ArticleEntity articleEntity = articleEntityList.get(i);
             Long articleId = articleEntity.getId();
