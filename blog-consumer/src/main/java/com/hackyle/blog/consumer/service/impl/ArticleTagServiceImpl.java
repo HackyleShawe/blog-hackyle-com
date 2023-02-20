@@ -21,6 +21,7 @@ import com.hackyle.blog.consumer.vo.ArticleVo;
 import com.hackyle.blog.consumer.vo.TagVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -38,6 +39,9 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
     private ArticleMapper articleMapper;
     @Autowired
     private ArticleCategoryService articleCategoryService;
+
+    @Value("${blog.article-path}")
+    private String articlePath;
 
     @Override
     public Map<Long, List<ArticleTagPo>> selectByArticleIds(List<Long> articleIds) {
@@ -114,6 +118,11 @@ public class ArticleTagServiceImpl extends ServiceImpl<ArticleTagMapper, Article
 
                 articleVoList.get(i).setCategories(categories);
             }
+        }
+
+        //填充文章的URL
+        for (ArticleVo articleVo : articleVoList) {
+            articleVo.setUri(articlePath + articleVo.getUri());
         }
 
         return articleVoPageResponseDto;

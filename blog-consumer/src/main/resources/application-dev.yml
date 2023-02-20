@@ -5,6 +5,11 @@ server:
   servlet:
     context-path: /
 
+# 自定义配置
+blog:
+  domain: http://localhost:${server.port}
+  article-path: ${blog.domain}/article
+
 # MySQL驱动以及连接参数
 spring:
   datasource:

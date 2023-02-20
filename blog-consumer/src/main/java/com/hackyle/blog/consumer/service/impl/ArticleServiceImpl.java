@@ -21,10 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,6 +42,9 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleTagService articleTagService;
     @Autowired
     private ArticleAuthorService articleAuthorService;
+
+    @Value("${blog.article-path}")
+    private String articlePath;
 
     @Override
     public PageResponseDto<ArticleVo> pageByNum(PageRequestDto<String> pageRequestDto) {
@@ -96,6 +99,11 @@ public class ArticleServiceImpl implements ArticleService {
 
                 articleVoList.get(i).setCategories(categories);
             }
+        }
+
+        //填充文章的URL
+        for (ArticleVo articleVo : articleVoList) {
+            articleVo.setUri(articlePath + articleVo.getUri());
         }
 
         return articleVoPageResponseDto;

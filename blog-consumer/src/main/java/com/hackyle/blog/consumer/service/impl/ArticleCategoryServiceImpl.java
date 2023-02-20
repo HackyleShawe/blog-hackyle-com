@@ -14,12 +14,12 @@ import com.hackyle.blog.consumer.po.ArticleCategoryPo;
 import com.hackyle.blog.consumer.qo.CategoryQo;
 import com.hackyle.blog.consumer.service.ArticleCategoryService;
 import com.hackyle.blog.consumer.util.BeanCopyUtils;
-import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.util.PaginationUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
 import com.hackyle.blog.consumer.vo.CategoryVo;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,6 +39,8 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     @Autowired
     private ArticleCategoryService articleCategoryService;
 
+    @Value("${blog.article-path}")
+    private String articlePath;
 
     @Override
     public Map<Long, List<ArticleCategoryPo>> selectByArticleIds(List<Long> articleIds) {
@@ -135,6 +137,11 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
 
                 articleVoList.get(i).setCategories(categories);
             }
+        }
+
+        //填充文章的URL
+        for (ArticleVo articleVo : articleVoList) {
+            articleVo.setUri(articlePath + articleVo.getUri());
         }
 
         return articleVoPageResponseDto;
