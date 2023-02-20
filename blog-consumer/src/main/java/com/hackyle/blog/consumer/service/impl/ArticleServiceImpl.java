@@ -147,6 +147,9 @@ public class ArticleServiceImpl implements ArticleService {
             articleVo.setAuthors(authors);
         }
 
+        //填充文章的URL
+        articleVo.setUri(articlePath + articleVo.getUri());
+
         return articleVo;
     }
 
