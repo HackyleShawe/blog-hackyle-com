@@ -12,7 +12,7 @@
             <result property="browser" column="browser" jdbcType="VARCHAR"/>
             <result property="timeUse" column="time_use" jdbcType="INTEGER"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="isDeleted" column="is_deleted" jdbcType="BIT"/>
+            <result property="deleted" column="is_deleted" jdbcType="BIT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
