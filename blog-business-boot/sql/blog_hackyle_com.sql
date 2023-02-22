@@ -244,3 +244,18 @@ CREATE TABLE tl_article_access (
 	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB COMMENT '文章访问日志';
+
+# 静态资源（图片、视频、音乐、文档等）管理
+DROP TABLE IF EXISTS tb_file_storage;
+CREATE TABLE tb_file_storage (
+	id BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
+
+	article_uri VARCHAR(256) DEFAULT '' COMMENT '文章地址，tb_article中的uri字段',
+	file_link VARCHAR(512) NOT NULL COMMENT '文件地址',
+
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id)
+) ENGINE=InnoDB COMMENT '静态资源（图片、视频、音乐、文档等）管理';
+

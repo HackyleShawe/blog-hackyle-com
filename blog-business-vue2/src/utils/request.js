@@ -43,9 +43,14 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
-    const res = response.data
-    console.log(response.config.url, 'response data: ', res)
+    console.log(response.config.url, 'response: ', response)
 
+    //是文件流
+    if("application/octet-stream" === response.data.type) {
+      return response
+    }
+
+    const res = response.data
     // if the custom state is not true, it is judged as an error.
     if (res.state !== true) {
       Message({

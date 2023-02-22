@@ -57,6 +57,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
     private ArticleCategoryService articleCategoryService;
     @Autowired
     private ArticleTagService articleTagService;
+    @Autowired
+    private FileStorageService fileStorageService;
 
     @Autowired
     private CategoryMapper categoryMapper;
@@ -103,6 +105,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
                 List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleAddDto.getTagIds().split(",")));
                 articleTagService.batchInsert(articleEntity.getId(), tagIds);
             }
+
+            //保存文章与图片的映射关系
+            fileStorageService.saveImg4ArticleAdd(articleEntity);
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -166,6 +171,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         long articleId = articleEntity.getId();
 
+        //更新文章的作者、分类、标签
         if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) {
             List<Long> authorIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getAuthorIds().split(",")));
             articleAuthorService.update(articleId, authorIds);
@@ -178,6 +184,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getTagIds().split(",")));
             articleTagService.update(articleId, tagIds);
         }
+
+        //更新文章与图片的映射关系
+        fileStorageService.saveImg4ArticleUpdate(articleEntity);
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
     }

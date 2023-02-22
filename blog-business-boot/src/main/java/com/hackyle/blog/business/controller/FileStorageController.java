@@ -3,8 +3,14 @@ package com.hackyle.blog.business.controller;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
+import com.hackyle.blog.business.common.pojo.ApiRequest;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
+import com.hackyle.blog.business.dto.FileStorageDto;
+import com.hackyle.blog.business.dto.PageRequestDto;
+import com.hackyle.blog.business.dto.PageResponseDto;
+import com.hackyle.blog.business.qo.FileStorageQo;
 import com.hackyle.blog.business.service.FileStorageService;
+import com.hackyle.blog.business.vo.FileStorageVo;
 import com.hackyle.blog.business.vo.FileVo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +18,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,48 +112,120 @@ public class FileStorageController {
     /**
      * 文件删除
      */
-    @GetMapping("/del")
-    public ApiResponse<String> fileDelete(@RequestParam("fileName") String fileName) {
-        if(null == fileName || "".equals(fileName.trim())) {
+    @DeleteMapping("/del")
+    public ApiResponse<String> fileDelete(@RequestBody ApiRequest<FileStorageDto> apiRequest) {
+        FileStorageDto storageDto = apiRequest.getData();
+        LOGGER.info("文件删除-入参storageDto={}", JSON.toJSONString(storageDto));
+
+        if(null == storageDto.getFileLink() || "".equals(storageDto.getFileLink().trim())) {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
 
         try {
-            //boolean delFlag = minioService.fileDelete(fileName);
-            //if(delFlag) {
-            //    return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-            //} else {
-            //    return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
-            //}
-            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+            fileStorageService.fileDelete(storageDto);
+            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
 
         }catch (Exception e) {
             LOGGER.error("文件删除出现异常：", e);
-            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
+            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), e.getMessage());
         }
     }
 
 
     /**
-     * 获取文件详细信息
+     * 文件修改
      */
-    @GetMapping("/fetch")
-    public ApiResponse<String> fileDetail(@RequestParam("fileName") String fileName) {
-        if(null == fileName || "".equals(fileName.trim())) {
+    @PutMapping("/update")
+    public ApiResponse<String> fileUpdate(@RequestBody ApiRequest<FileStorageDto> apiRequest) {
+        FileStorageDto storageDto = apiRequest.getData();
+        LOGGER.info("文件修改-入参storageDto={}", JSON.toJSONString(storageDto));
+
+        if(null == storageDto.getId() ||
+                null == storageDto.getFileLink() || "".equals(storageDto.getFileLink().trim())) {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
 
         try {
-            //boolean delFlag = true; //minioService.fileDetail(fileName);
-            //if(delFlag) {
-            //    return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
-            //} else {
-            //    return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
-            //}
-            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+            boolean delFlag = fileStorageService.fileUpdate(storageDto);
+            if(delFlag) {
+                return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+            } else {
+                return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), ResponseEnum.OP_FAIL.getMessage());
+            }
 
         }catch (Exception e) {
-            LOGGER.error("文件删除出现异常：", e);
+            LOGGER.error("文件修改出现异常：", e);
+            return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
+        }
+    }
+
+    /**
+     * 文件下载
+     */
+    @GetMapping("/download")
+    public void download(@RequestParam("fileLink") String fileLink, HttpServletResponse response) {
+        try {
+            String[] split = fileLink.split("/");
+            String fileName = split[split.length-1];
+            FileInputStream fis = fileStorageService.download(fileLink);
+            if(null == fis) {
+                response.setContentType("application/json;charset=UTF-8");
+                String respStr = JSON.toJSONString(ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage(), "文件不存在"));
+                ServletOutputStream outputStream = response.getOutputStream();
+                outputStream.write(respStr.getBytes(StandardCharsets.UTF_8));
+                response.flushBuffer();
+                outputStream.close();
+                return;
+            }
+
+            //response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setContentType("application/octet-stream;charset=UTF-8");
+
+            //因为是跨前后端分离，默认reponse header只能取到以下：Content-Language，Content-Type，Expires，Last-Modified，Pragma
+            //要想获取到文件名，需要采取这种方式。Reference：https://www.cnblogs.com/liuxianbin/p/13035809.html
+            response.setHeader("filename",URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+            response.setHeader("Access-Control-Expose-Headers","filename");
+
+            response.setHeader("Content-Disposition","attachment;filename="+ URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+            ServletOutputStream outputStream = response.getOutputStream();
+            outputStream.write(fis.readAllBytes());
+            outputStream.flush();
+            outputStream.close();
+            fis.close();
+
+            //return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
+        }catch (Exception e) {
+            LOGGER.error("文件下载出现异常：", e);
+            //return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
+        }
+    }
+
+    /**
+     * 获取文件列表
+     */
+    @PostMapping("/fetchList")
+    public ApiResponse<PageResponseDto<FileStorageVo>> fetchList(@RequestBody ApiRequest<PageRequestDto<FileStorageQo>> apiRequest) {
+        PageRequestDto<FileStorageQo> pageRequest = apiRequest.getData();
+        if(pageRequest == null) {
+            //return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
+            pageRequest = new PageRequestDto<>();
+            pageRequest.setCurrentPage(1);
+            pageRequest.setPageSize(10);
+        }
+
+        if(pageRequest.getCurrentPage() < 1) {
+            pageRequest.setCurrentPage(1);
+        }
+        if(pageRequest.getPageSize() < 1) {
+            pageRequest.setPageSize(10);
+        }
+
+        try {
+            PageResponseDto<FileStorageVo> pageResponse = fileStorageService.fetchList(pageRequest);
+            return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage(), pageResponse);
+
+        }catch (Exception e) {
+            LOGGER.error("获取文件列表出现异常：", e);
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
         }
     }
