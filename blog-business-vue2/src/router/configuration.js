@@ -8,7 +8,7 @@ export default {
   component: Layout,
   redirect: '/config/admin-info',
   name: 'Configuration',
-  meta: { title: 'Configuration', icon: 'el-icon-setting' },
+  meta: { title: 'Configuration', icon: 'el-icon-s-operation' },
   children: [
     {
       path: 'admin-info',
@@ -16,6 +16,11 @@ export default {
       component: () => import('@/views/configuration/admin-info'),
       meta: { title: 'Admin Info', icon: 'el-icon-user' }
     },
-
+    {
+      path: 'center',
+      name: 'Config Center',
+      component: () => import('@/views/configuration/config-center'),
+      meta: { title: 'Config Center', icon: 'el-icon-setting' }
+    },
   ]
 }
