@@ -9,6 +9,7 @@
         <is-comment v-model="articleDataForm.commented" style="margin-left: 50px;" />
         <is-release v-model="articleDataForm.released" style="margin-left: 10px;" />
         <!--<is-new-version v-model="articleDataForm.newVersion" style="margin-left: 10px;" />-->
+        <is-to-top v-model="articleDataForm.toTop" style="margin-left: 10px;" />
 
         <!--保存文章-->
         <el-button v-loading="loading" style="margin-left: 10px;" type="success" @click="submitForm">
@@ -84,8 +85,8 @@
           <Tinymce ref="editor" v-model="articleDataForm.content" :height="400" />
         </el-form-item>
 
-        <!--底部的图片上传组件-->
-        <p>上传封面图片</p>
+        <!--上传图片封面-->
+        <p>Upload Face Image</p>
         <el-form-item prop="image_uri" style="margin-bottom: 30px;">
           <Upload v-model="articleDataForm.faceImgLink" />
         </el-form-item>
@@ -104,6 +105,7 @@ import Sticky from '@/components/Sticky' //Header黏贴组件：当页面滚动�
 //导入子组件
 import IsComment from './IsComment'
 import IsRelease from './IsRelease'
+import IsToTop from './IsToTop'
 //import IsNewVersion from './IsNewVersion'
 //import SelectCategories from "./SelectCategories"
 //import SelectTags from "./SelectTags"
@@ -118,7 +120,7 @@ import authorApi from "@/api/article/author";
 
 export default {
   name: 'ArticleEditor',
-  components: {Tinymce, Upload, Sticky, IsRelease, IsComment},
+  components: {Tinymce, Upload, Sticky, IsRelease, IsComment, IsToTop},
   props: {
     isEdit: {
       type: Boolean,
@@ -166,7 +168,8 @@ export default {
         faceImgLink: '', //文章图片
         released: false, //是否发布
         commented: true, //是否可以评论
-        newVersion: false //是否保存为新版本
+        newVersion: false, //是否保存为新版本
+        toTop: false, //文章是否置顶类型
       },
       loading: false,
       //submitted: false, //是否已提交，用于防止多次发送新增文章请求。不设置这个限定条件，方便随时保存
@@ -308,6 +311,7 @@ export default {
           "released": this.articleDataForm.released,
           "commented": this.articleDataForm.commented,
           "newVersion": this.articleDataForm.newVersion,
+          "toTop": this.articleDataForm.toTop,
         }
       }
 

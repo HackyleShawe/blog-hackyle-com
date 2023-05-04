@@ -61,6 +61,9 @@ public class ArticleAddDto {
     /** 是否删除 */
     private Boolean deleted;
 
+    /** 是否置顶 */
+    private Boolean toTop;
+
     public String getId() {
         return id;
     }
@@ -171,5 +174,13 @@ public class ArticleAddDto {
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public Boolean getToTop() {
+        return toTop;
+    }
+
+    public void setToTop(Boolean toTop) {
+        this.toTop = toTop;
     }
 }

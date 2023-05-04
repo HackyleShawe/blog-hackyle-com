@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hackyle.blog.business.common.constant.ConfigItemEnum;
 import com.hackyle.blog.business.common.constant.RegexVerificationCons;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
@@ -13,6 +14,7 @@ import com.hackyle.blog.business.dto.PageRequestDto;
 import com.hackyle.blog.business.dto.PageResponseDto;
 import com.hackyle.blog.business.entity.ArticleEntity;
 import com.hackyle.blog.business.entity.CategoryEntity;
+import com.hackyle.blog.business.entity.ConfigurationEntity;
 import com.hackyle.blog.business.mapper.ArticleMapper;
 import com.hackyle.blog.business.mapper.CategoryMapper;
 import com.hackyle.blog.business.po.ArticleAuthorPo;
@@ -31,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -65,6 +69,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
     @Autowired
     private CommentService commentService;
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private ValueOperations<String, String> redisValueOperations;
 
     @Transactional
     @Override
@@ -108,6 +118,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
             //保存文章与图片的映射关系
             fileStorageService.saveImg4ArticleAdd(articleEntity);
+
+            //保存文章置顶信息
+            if(articleAddDto.getToTop() != null && articleAddDto.getToTop()) {
+                articleToTop(IDUtils.decryptByAES(articleAddDto.getId()), articleEntity.getUri());
+            }
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -188,6 +203,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         //更新文章与图片的映射关系
         fileStorageService.saveImg4ArticleUpdate(articleEntity);
 
+        //更新文章的置顶信息
+        if(articleUpdateDto.getToTop() != null && articleUpdateDto.getToTop()) {
+            articleToTop(IDUtils.decryptByAES(articleUpdateDto.getId()), articleEntity.getUri());
+        }
+
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
     }
 
@@ -224,6 +244,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
         IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
         articleVo.setTags(tagVos);
+
+        if (isArticleTop(idd)) {
+            articleVo.setToTop(Boolean.TRUE);
+        } else {
+            articleVo.setToTop(Boolean.FALSE);
+        }
 
         return articleVo;
     }
@@ -419,5 +445,63 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         articleAddDto.setUri(uri);
     }
 
+    /**
+     * 将该文章置顶
+     */
+    private void articleToTop(long articleId, String articleUri) {
+        ConfigurationEntity sourceConfig = configurationService.queryConfigByKey(ConfigItemEnum.ARTICLE_TOP);
+        if(sourceConfig == null) {
+            return;
+        }
 
+        //检查是否已包含
+        if(sourceConfig.getConfigValue().contains(String.valueOf(articleId))) {
+            return;
+        }
+
+        ConfigurationEntity updateConfig = new ConfigurationEntity();
+        updateConfig.setId(sourceConfig.getId());
+        String articleIds = sourceConfig.getConfigValue();
+        updateConfig.setConfigValue(StringUtils.isBlank(articleIds) ? articleId+"" : articleIds+","+articleId);
+        String uris = sourceConfig.getConfigExtend();
+        updateConfig.setConfigExtend(StringUtils.isBlank(uris) ? articleUri : uris+","+articleUri);
+        configurationService.updateConfigById(updateConfig);
+
+        //存入缓存
+        String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
+        String redisValue = updateConfig.getConfigValue();
+        redisValueOperations.set(redisKey, redisValue, 24, TimeUnit.HOURS);
+    }
+
+    /**
+     * 判定该文章是否置顶
+     * @return 改文章是否置顶
+     */
+    private boolean isArticleTop(long articleId) {
+        //先从缓存中取
+        String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
+        String configVal = redisValueOperations.get(redisKey);
+        if(StringUtils.isNotBlank(configVal)) {
+            String[] ids = configVal.split(",");
+            for (String id : ids) {
+                if(String.valueOf(articleId).equals(id)) {
+                    return true;
+                }
+            }
+        }
+
+        //查库
+        ConfigurationEntity configurationEntity = configurationService.queryConfigByKey(ConfigItemEnum.ARTICLE_TOP);
+        String configValue = configurationEntity.getConfigValue();
+        if(StringUtils.isNotBlank(configValue)) {
+            String[] ids = configValue.split(",");
+            for (String id : ids) {
+                if(String.valueOf(articleId).equals(id)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

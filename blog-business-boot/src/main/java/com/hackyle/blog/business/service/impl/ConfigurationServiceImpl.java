@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hackyle.blog.business.common.constant.ConfigItemEnum;
 import com.hackyle.blog.business.common.constant.ResponseEnum;
 import com.hackyle.blog.business.common.pojo.ApiResponse;
 import com.hackyle.blog.business.dto.ConfigurationAddDto;
@@ -153,8 +154,44 @@ public class ConfigurationServiceImpl extends ServiceImpl<ConfigurationMapper, C
         return PaginationUtils.IPage2PageResponse(resultPage, ConfigurationVo.class);
     }
 
+    @Override
+    public void updateConfigById(ConfigurationEntity configurationEntity) {
+        if(configurationEntity == null || configurationEntity.getId() == null) {
+            return;
+        }
+        configurationMapper.updateById(configurationEntity);
+    }
+
+
+    /**
+     * 查询某个分组下的所有配置项
+     */
+    @Override
+    public List<ConfigurationEntity> queryConfigByGroup(ConfigItemEnum configItemEnum) {
+        if(StringUtils.isEmpty(configItemEnum.getGroup())) {
+            return new ArrayList<>();
+        }
+
+        QueryWrapper<ConfigurationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ConfigurationEntity::getGroupName, configItemEnum.getGroup())
+                .eq(ConfigurationEntity::getDeleted, 0);
+        return configurationMapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 根据配置项Key查询，Key是唯一的
+     */
+    @Override
+    public ConfigurationEntity queryConfigByKey(ConfigItemEnum configItemEnum) {
+        if(StringUtils.isEmpty(configItemEnum.getKey())) {
+            return null;
+        }
+
+        QueryWrapper<ConfigurationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ConfigurationEntity::getConfigKey, configItemEnum.getKey())
+                .eq(ConfigurationEntity::getDeleted, 0);
+        return configurationMapper.selectOne(queryWrapper);
+    }
+
 }
-
-
-
 
