@@ -187,12 +187,15 @@ export default {
   },
   computed: {
     titleContentLength() {
+      if(null == this.articleDataForm.title) return 0
       return this.articleDataForm.title.length
     },
     summaryContentLength() {
+      if(null == this.articleDataForm.summary) return 0
       return this.articleDataForm.summary.length
     },
     keywordsContentLength() {
+      if(null == this.articleDataForm.keywords) return 0
       return this.articleDataForm.keywords.length
     },
 
