@@ -2,17 +2,16 @@ package com.hackyle.blog.consumer.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hackyle.blog.consumer.common.constant.ConfigItemEnum;
 import com.hackyle.blog.consumer.dto.PageRequestDto;
 import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.entity.ArticleEntity;
+import com.hackyle.blog.consumer.entity.ConfigurationEntity;
 import com.hackyle.blog.consumer.mapper.ArticleMapper;
 import com.hackyle.blog.consumer.po.ArticleAuthorPo;
 import com.hackyle.blog.consumer.po.ArticleCategoryPo;
 import com.hackyle.blog.consumer.po.ArticleTagPo;
-import com.hackyle.blog.consumer.service.ArticleAuthorService;
-import com.hackyle.blog.consumer.service.ArticleCategoryService;
-import com.hackyle.blog.consumer.service.ArticleService;
-import com.hackyle.blog.consumer.service.ArticleTagService;
+import com.hackyle.blog.consumer.service.*;
 import com.hackyle.blog.consumer.util.BeanCopyUtils;
 import com.hackyle.blog.consumer.util.IDUtils;
 import com.hackyle.blog.consumer.util.PaginationUtils;
@@ -22,11 +21,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -42,6 +40,11 @@ public class ArticleServiceImpl implements ArticleService {
     private ArticleTagService articleTagService;
     @Autowired
     private ArticleAuthorService articleAuthorService;
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Autowired
+    private ValueOperations<String, String> redisValueOperations;
 
     @Value("${blog.article-path}")
     private String articlePath;
@@ -75,10 +78,25 @@ public class ArticleServiceImpl implements ArticleService {
 
         Page<ArticleEntity> paramPage = PaginationUtils.PageRequest2IPage(pageRequestDto, ArticleEntity.class);
         Page<ArticleEntity> resultPage = articleMapper.selectPage(paramPage, queryWrapper);
-        List<ArticleEntity> articleEntityList = resultPage.getRecords();
 
+        //如果是第一页则塞入置顶文章
+        if(pageRequestDto.getCurrentPage() == 1) {
+            List<ArticleEntity> articleRecords = resultPage.getRecords();
+            //List<ArticleVo> articleRows = articleVoPageResponseDto.getRows();
+            List<ArticleEntity> topArticles = topArticleByIndexPage();
+            if(topArticles != null && topArticles.size() > 0) {
+                //过滤掉置顶已经出现过的文章
+                List<Long> topArticleIds = topArticles.stream().map(ArticleEntity::getId).collect(Collectors.toList());
+                articleRecords.removeIf(article -> topArticleIds.contains(article.getId()));
+
+                List<ArticleEntity> resArticleVos = new ArrayList<>();
+                resArticleVos.addAll(topArticles);
+                resArticleVos.addAll(articleRecords);
+                resultPage.setRecords(resArticleVos);
+            }
+        }
         PageResponseDto<ArticleVo> articleVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, ArticleVo.class);
-
+        List<ArticleEntity> articleEntityList = resultPage.getRecords();
         if(articleEntityList == null || articleEntityList.size() < 1) {
             return articleVoPageResponseDto;
         }
@@ -151,6 +169,44 @@ public class ArticleServiceImpl implements ArticleService {
         articleVo.setUri(articlePath + articleVo.getUri());
 
         return articleVo;
+    }
+
+    /**
+     * 获取置顶到首页的文章
+     */
+    private List<ArticleEntity> topArticleByIndexPage() {
+        //先从缓存中取
+        String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
+        String redisVal = redisValueOperations.get(redisKey);
+        LOGGER.info("从缓存中获取需要置顶的文章ID={}", redisVal);
+        if(StringUtils.isNotBlank(redisVal)) {
+            return articleMapper.selectBatchIds(Arrays.asList(redisVal.split(",")));
+            //List<ArticleVo> articleVoList = new ArrayList<>();
+            //for (ArticleEntity article : articleEntities) {
+            //    ArticleVo articleVo = new ArticleVo();
+            //    articleVo.setId(IDUtils.encryptByAES(article.getId()));
+            //    articleVo.setTitle(article.getTitle());
+            //    articleVo.setSummary(article.getSummary());
+            //    articleVo.setUri(article.getUri());
+            //    articleVo.setKeywords(article.getKeywords());
+            //    articleVo.setContent(article.getContent());
+            //    articleVo.setFaceImgLink(article.getFaceImgLink());
+            //    articleVo.setReleased(article.getReleased());
+            //    articleVo.setUpdateTime(article.getUpdateTime());
+            //    articleVoList.add(articleVo);
+            //}
+            //return articleVoList;
+        }
+
+        //查库
+        ConfigurationEntity configurationEntity = configurationService.queryConfigByKey(ConfigItemEnum.ARTICLE_TOP);
+        String configValue = configurationEntity.getConfigValue();
+        LOGGER.info("查库获取需要置顶的文章ID={}", configValue);
+        if(StringUtils.isNotBlank(configValue)) {
+            return articleMapper.selectBatchIds(Arrays.asList(configValue.split(",")));
+        }
+
+        return null;
     }
 
 }
