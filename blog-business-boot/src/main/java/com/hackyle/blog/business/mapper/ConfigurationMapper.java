@@ -12,6 +12,3 @@ public interface ConfigurationMapper extends BaseMapper<ConfigurationEntity> {
     int logicDeleteByIds(@Param("idList") List<Long> idList);
 }
 
-
-
-

@@ -43,6 +43,15 @@ public class ConfigurationServiceImpl extends ServiceImpl<ConfigurationMapper, C
         ConfigurationEntity configEntity = BeanCopyUtils.copy(addDto, ConfigurationEntity.class);
         configEntity.setId(IDUtils.timestampID());
 
+        //Key唯一性检验
+        QueryWrapper<ConfigurationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ConfigurationEntity::getConfigKey, addDto.getConfigKey());
+                //.eq(ConfigurationEntity::getDeleted, 0); 在校验Key时，包含已经逻辑删除了的，放置后续撤销逻辑删除后导致唯一性被破坏
+        Integer count = configurationMapper.selectCount(queryWrapper);
+        if(count >= 1) {
+            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Config Key已存在，请重新的定义");
+        }
+
         int inserted = configurationMapper.insert(configEntity);
         if(inserted == 1) {
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -75,6 +84,15 @@ public class ConfigurationServiceImpl extends ServiceImpl<ConfigurationMapper, C
     public ApiResponse<String> update(ConfigurationAddDto updateDto) {
         ConfigurationEntity configEntity = BeanCopyUtils.copy(updateDto, ConfigurationEntity.class);
         configEntity.setId(updateDto.getId());
+
+        //Key唯一性检验
+        QueryWrapper<ConfigurationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ConfigurationEntity::getConfigKey, updateDto.getConfigKey());
+        //.eq(ConfigurationEntity::getDeleted, 0); 在校验Key时，包含已经逻辑删除了的，放置后续撤销逻辑删除后导致唯一性被破坏
+        ConfigurationEntity checkEntity = configurationMapper.selectOne(queryWrapper);
+        if(checkEntity != null && !checkEntity.getId().equals(updateDto.getId())) {
+            return ApiResponse.error(ResponseEnum.OP_FAIL.getCode(), "Config Key已存在，请重新的定义");
+        }
 
         UpdateWrapper<ConfigurationEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(ConfigurationEntity::getId, configEntity.getId());
@@ -112,11 +130,8 @@ public class ConfigurationServiceImpl extends ServiceImpl<ConfigurationMapper, C
         //组装查询条件
         ConfigurationQo configurationQo = pageRequestDto.getCondition();
         if(configurationQo != null) {
-            if(StringUtils.isNotBlank(configurationQo.getConfigGroup())) {
-                queryWrapper.lambda().like(ConfigurationEntity::getConfigGroup, configurationQo.getConfigGroup());
-            }
-            if(StringUtils.isNotBlank(configurationQo.getName())) {
-                queryWrapper.lambda().like(ConfigurationEntity::getName, configurationQo.getName());
+            if(StringUtils.isNotBlank(configurationQo.getGroupName())) {
+                queryWrapper.lambda().like(ConfigurationEntity::getGroupName, configurationQo.getGroupName());
             }
             if(StringUtils.isNotBlank(configurationQo.getConfigKey())) {
                 queryWrapper.lambda().like(ConfigurationEntity::getConfigKey, configurationQo.getConfigKey());

@@ -259,3 +259,22 @@ CREATE TABLE tb_file_storage (
 	PRIMARY KEY (id)
 ) ENGINE=InnoDB COMMENT '静态资源（图片、视频、音乐、文档等）管理';
 
+# 系统配置信息
+DROP TABLE IF EXISTS tb_configuration;
+CREATE TABLE tb_configuration (
+	id BIGINT NOT NULL COMMENT 'ID：为了后续数据迁移，不使用自增主键，使用时间戳',
+
+	group_name VARCHAR(128) DEFAULT '' COMMENT '配置组，用于标识某一类型的配置项',
+	group_description VARCHAR(1024) DEFAULT '' COMMENT '配置组描述',
+	config_key VARCHAR(128) UNIQUE NOT NULL COMMENT '配置项Key',
+	config_value VARCHAR(8192) NOT NULL COMMENT '配置项Value',
+	config_extend VARCHAR(5120) DEFAULT '' COMMENT '配置项Value的拓展信息',
+	config_description VARCHAR(1024) DEFAULT '' COMMENT '配置项描述',
+
+	create_time DATETIME DEFAULT now() COMMENT '创建时间: 年-月-日 时:分:秒',
+	update_time DATETIME DEFAULT now() ON UPDATE now() COMMENT '更新时间',
+	is_deleted BIT DEFAULT 0 COMMENT '是否删除：0-false-未删除;1-true-已删除',
+	PRIMARY KEY (id),
+	INDEX config_key_idx (config_key) COMMENT '根据Key来查询，创建索引加快查询速度'
+) ENGINE=InnoDB COMMENT '系统配置信息';
+

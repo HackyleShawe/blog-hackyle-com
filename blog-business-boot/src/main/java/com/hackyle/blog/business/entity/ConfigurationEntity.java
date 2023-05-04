@@ -21,27 +21,32 @@ public class ConfigurationEntity implements Serializable {
     /**
      * 配置组，用于标识某一类型的配置项
      */
-    private String configGroup;
+    private String groupName;
 
     /**
-     * 名字
+     * 配置组描述
      */
-    private String name;
+    private String groupDescription;
 
     /**
-     * 描述
-     */
-    private String description;
-
-    /**
-     * 配置Key
+     * 配置项Key
      */
     private String configKey;
 
     /**
-     * 配置Value
+     * 配置项Value
      */
     private String configValue;
+
+    /**
+     * 配置项Value的拓展信息
+     */
+    private String configExtend;
+
+    /**
+     * 配置项描述
+     */
+    private String configDescription;
 
     /**
      * 创建时间: 年-月-日 时:分:秒
@@ -67,28 +72,20 @@ public class ConfigurationEntity implements Serializable {
         this.id = id;
     }
 
-    public String getConfigGroup() {
-        return configGroup;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setConfigGroup(String configGroup) {
-        this.configGroup = configGroup;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
-    public String getName() {
-        return name;
+    public String getGroupDescription() {
+        return groupDescription;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public void setGroupDescription(String groupDescription) {
+        this.groupDescription = groupDescription;
     }
 
     public String getConfigKey() {
@@ -105,6 +102,22 @@ public class ConfigurationEntity implements Serializable {
 
     public void setConfigValue(String configValue) {
         this.configValue = configValue;
+    }
+
+    public String getConfigExtend() {
+        return configExtend;
+    }
+
+    public void setConfigExtend(String configExtend) {
+        this.configExtend = configExtend;
+    }
+
+    public String getConfigDescription() {
+        return configDescription;
+    }
+
+    public void setConfigDescription(String configDescription) {
+        this.configDescription = configDescription;
     }
 
     public Date getCreateTime() {

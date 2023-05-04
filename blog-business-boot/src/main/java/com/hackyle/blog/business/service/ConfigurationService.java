@@ -20,4 +20,5 @@ public interface ConfigurationService extends IService<ConfigurationEntity> {
 
     PageResponseDto<ConfigurationVo> fetchList(PageRequestDto<ConfigurationQo> pageRequestDto);
 
+
 }

@@ -6,11 +6,12 @@
 
     <resultMap id="BaseResultMap" type="com.hackyle.blog.business.entity.ConfigurationEntity">
         <id property="id" column="id" jdbcType="BIGINT"/>
-        <result property="configGroup" column="config_group" jdbcType="VARCHAR"/>
-        <result property="name" column="name" jdbcType="VARCHAR"/>
-        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="groupName" column="group_name" jdbcType="VARCHAR"/>
+        <result property="groupDescription" column="group_description" jdbcType="VARCHAR"/>
         <result property="configKey" column="config_key" jdbcType="VARCHAR"/>
         <result property="configValue" column="config_value" jdbcType="VARCHAR"/>
+        <result property="configExtend" column="config_extend" jdbcType="VARCHAR"/>
+        <result property="configDescription" column="config_description" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
         <result property="deleted" column="is_deleted" jdbcType="BIT"/>

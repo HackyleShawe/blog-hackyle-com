@@ -6,17 +6,32 @@ public class ConfigurationQo {
     /**
      * 配置组，用于标识某一类型的配置项
      */
-    private String configGroup;
+    private String groupName;
 
     /**
-     * 名字
+     * 配置组描述
      */
-    private String name;
+    private String groupDescription;
 
     /**
-     * 配置Key
+     * 配置项Key
      */
     private String configKey;
+
+    /**
+     * 配置项Value
+     */
+    private String configValue;
+
+    /**
+     * 配置项Value的拓展信息
+     */
+    private String configExtend;
+
+    /**
+     * 配置项描述
+     */
+    private String configDescription;
 
     /**
      * 是否删除：0-false-未删除;1-true-已删除
@@ -31,20 +46,20 @@ public class ConfigurationQo {
         this.id = id;
     }
 
-    public String getConfigGroup() {
-        return configGroup;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void setConfigGroup(String configGroup) {
-        this.configGroup = configGroup;
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
-    public String getName() {
-        return name;
+    public String getGroupDescription() {
+        return groupDescription;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setGroupDescription(String groupDescription) {
+        this.groupDescription = groupDescription;
     }
 
     public String getConfigKey() {
@@ -53,6 +68,30 @@ public class ConfigurationQo {
 
     public void setConfigKey(String configKey) {
         this.configKey = configKey;
+    }
+
+    public String getConfigValue() {
+        return configValue;
+    }
+
+    public void setConfigValue(String configValue) {
+        this.configValue = configValue;
+    }
+
+    public String getConfigExtend() {
+        return configExtend;
+    }
+
+    public void setConfigExtend(String configExtend) {
+        this.configExtend = configExtend;
+    }
+
+    public String getConfigDescription() {
+        return configDescription;
+    }
+
+    public void setConfigDescription(String configDescription) {
+        this.configDescription = configDescription;
     }
 
     public Boolean getDeleted() {
