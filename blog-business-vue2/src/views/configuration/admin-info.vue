@@ -110,7 +110,7 @@ export default {
         this.$message.warning("The new password is not equals to the confirm password")
         return
       }
-      if(this.adminData.newPassword.length < 8) {
+      if(this.adminData.newPassword != null && this.adminData.newPassword.length < 8) {
         this.$message.warning("The new password length can not be less than 8")
         return
       }
