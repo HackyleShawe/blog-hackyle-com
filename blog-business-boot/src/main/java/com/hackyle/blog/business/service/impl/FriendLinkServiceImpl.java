@@ -88,7 +88,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
 
     @Override
     public FriendLinkVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         FriendLinkEntity friendLinkEntity = friendLinkMapper.selectById(idd);
         LOGGER.info("获取友链-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(friendLinkEntity));

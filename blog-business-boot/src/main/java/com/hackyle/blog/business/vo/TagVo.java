@@ -3,7 +3,7 @@ package com.hackyle.blog.business.vo;
 import java.util.Date;
 
 public class TagVo {
-    private String id;
+    private Long id;
 
     /**
      * 标签名称
@@ -30,11 +30,11 @@ public class TagVo {
      */
     private Date updateTime;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -90,7 +89,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         if(checkArticleEntity != null) {
             //文章已存在，执行更新操作
-            articleAddDto.setId(IDUtils.encryptByAES(checkArticleEntity.getId()));
+            articleAddDto.setId(checkArticleEntity.getId());
             return update(articleAddDto);
 
         } else {
@@ -102,17 +101,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             }
 
             if(StringUtils.isNotBlank(articleAddDto.getAuthorIds())) {
-                List<String> authorIdList = Arrays.asList(articleAddDto.getAuthorIds().split(","));
-                List<Long> authorIds = IDUtils.decrypt(authorIdList);
+                List<Long> authorIds = new ArrayList<>();
+                String[] authorIdArr = articleAddDto.getAuthorIds().split(",");
+                for (String id : authorIdArr) {
+                    authorIds.add(Long.parseLong(id));
+                }
                 articleAuthorService.batchInsert(articleEntity.getId(), authorIds);
             }
             if(StringUtils.isNotBlank(articleAddDto.getCategoryIds())) {
-                List<String> categoryIdList = Arrays.asList(articleAddDto.getCategoryIds().split(","));
-                List<Long> categoryIds = IDUtils.decrypt(categoryIdList);
+                List<Long> categoryIds = new ArrayList<>();
+                String[] categoryIdArr = articleAddDto.getCategoryIds().split(",");
+                for (String id : categoryIdArr) {
+                    categoryIds.add(Long.parseLong(id));
+                }
                 articleCategoryService.batchInsert(articleEntity.getId(), categoryIds);
             }
             if(StringUtils.isNotBlank(articleAddDto.getTagIds())) {
-                List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleAddDto.getTagIds().split(",")));
+                List<Long> tagIds = new ArrayList<>();
+                String[] tagIdArr = articleAddDto.getTagIds().split(",");
+                for (String id : tagIdArr) {
+                    tagIds.add(Long.parseLong(id));
+                }
                 articleTagService.batchInsert(articleEntity.getId(), tagIds);
             }
 
@@ -121,7 +130,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
             //保存文章置顶信息
             if(articleAddDto.getToTop() != null && articleAddDto.getToTop()) {
-                articleToTop(IDUtils.decryptByAES(articleAddDto.getId()), articleEntity.getUri());
+                articleToTop(articleAddDto.getId(), articleEntity.getUri());
             }
         }
 
@@ -135,7 +144,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(IDUtils.decryptByAES(idStr));
+            idList.add(Long.parseLong(idStr));
         }
         articleMapper.logicDeleteByIds(idList);
 
@@ -155,7 +164,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<Long> articleIds = new ArrayList<>();
         for (String idStr : idSplit) {
-            articleIds.add(IDUtils.decryptByAES(idStr));
+            articleIds.add(Long.parseLong(idStr));
         }
 
         this.removeByIds(articleIds);
@@ -175,7 +184,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         adjustURI(articleUpdateDto);
 
         ArticleEntity articleEntity = BeanCopyUtils.copy(articleUpdateDto, ArticleEntity.class);
-        IDUtils.decrypt(articleUpdateDto, articleEntity);
 
         UpdateWrapper<ArticleEntity> updateWrapper = new UpdateWrapper<>();
         updateWrapper.lambda().eq(ArticleEntity::getId, articleEntity.getId());
@@ -186,18 +194,37 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         long articleId = articleEntity.getId();
 
-        //更新文章的作者、分类、标签
-        if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) {
-            List<Long> authorIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getAuthorIds().split(",")));
+        //更新文章的作者
+        if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) { //作者信息不为空：先删除，再更新
+            List<Long> authorIds = new ArrayList<>();
+            for (String id : articleUpdateDto.getAuthorIds().split(",")) {
+                authorIds.add(Long.parseLong(id));
+            }
             articleAuthorService.update(articleId, authorIds);
+        } else { //作者信息为空：删除所有关联
+            articleAuthorService.update(articleId, null);
         }
-        if(StringUtils.isNotBlank(articleUpdateDto.getCategoryIds())) {
-            List<Long> categoryIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getCategoryIds().split(",")));
+
+        //更新文章的分类
+        if(StringUtils.isNotBlank(articleUpdateDto.getCategoryIds())) { //分类信息不为空：先删除，再更新
+            List<Long> categoryIds = new ArrayList<>();
+            for (String id : articleUpdateDto.getCategoryIds().split(",")) {
+                categoryIds.add(Long.parseLong(id));
+            }
             articleCategoryService.update(articleId, categoryIds);
+        } else { //分类信息为空：删除所有关联
+            articleCategoryService.update(articleId, null);
         }
-        if(StringUtils.isNotBlank(articleUpdateDto.getTagIds())) {
-            List<Long> tagIds = IDUtils.decrypt(Arrays.asList(articleUpdateDto.getTagIds().split(",")));
+
+        //更新文章的标签
+        if(StringUtils.isNotBlank(articleUpdateDto.getTagIds())) { //标签信息不为空：先删除，再更新
+            List<Long> tagIds = new ArrayList<>();
+            for (String id : articleUpdateDto.getTagIds().split(",")) {
+                tagIds.add(Long.parseLong(id));
+            }
             articleTagService.update(articleId, tagIds);
+        } else { //标签信息为空：删除所有关联
+            articleTagService.update(articleId, null);
         }
 
         //更新文章与图片的映射关系
@@ -205,7 +232,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         //更新文章的置顶信息
         if(articleUpdateDto.getToTop() != null && articleUpdateDto.getToTop()) {
-            articleToTop(IDUtils.decryptByAES(articleUpdateDto.getId()), articleEntity.getUri());
+            articleToTop(articleUpdateDto.getId(), articleEntity.getUri());
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -213,7 +240,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
     @Override
     public ArticleVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         ArticleEntity articleEntity = articleMapper.selectById(idd);
 
@@ -222,28 +249,55 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(articleEntityLog));
 
         ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
-        articleVo.setId(IDUtils.encryptByAES(articleEntity.getId()));
 
         List<Long> articleIds = new ArrayList<>();
         articleIds.add(idd);
 
         Map<Long, List<ArticleAuthorPo>> authorMap = articleAuthorService.selectByArticleIds(articleIds);
         List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
-        List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
-        IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
-        articleVo.setAuthors(authorVos);
+        if(articleAuthorPos != null && !articleAuthorPos.isEmpty()) {
+            List<AuthorVo> authorVos = new ArrayList<>();
+            for (ArticleAuthorPo articleAuthorPo : articleAuthorPos) {
+                AuthorVo authorVo = new AuthorVo();
+                authorVo.setId(articleAuthorPo.getAuthorId());
+                authorVo.setNickName(articleAuthorPo.getNickName());
+                authorVo.setRealName(articleAuthorPo.getRealName());
+                authorVo.setDescription(articleAuthorPo.getDescription());
+                authorVos.add(authorVo);
+            }
+            articleVo.setAuthors(authorVos);
+        }
 
         Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
         List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
-        List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
-        IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
-        articleVo.setCategories(categoryVos);
+        if(articleCategoryPos != null && !articleCategoryPos.isEmpty()) {
+            List<CategoryVo> categoryVos =  new ArrayList<>();
+            for (ArticleCategoryPo articleCategoryPo : articleCategoryPos) {
+                CategoryVo categoryVo = new CategoryVo();
+                categoryVo.setId(articleCategoryPo.getCategoryId());
+                categoryVo.setName(articleCategoryPo.getName());
+                categoryVo.setCode(articleCategoryPo.getCode());
+                categoryVo.setDescription(articleCategoryPo.getDescription());
+                categoryVo.setIconUrl(articleCategoryPo.getIconUrl());
+                categoryVos.add(categoryVo);
+            }
+            articleVo.setCategories(categoryVos);
+        }
 
         Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
         List<ArticleTagPo> articleTagPos = tagMap.get(idd);
-        List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
-        IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
-        articleVo.setTags(tagVos);
+        if(articleTagPos != null && !articleTagPos.isEmpty()) {
+            List<TagVo> tagVos = new ArrayList<>();
+            for (ArticleTagPo articleTagPo : articleTagPos) {
+                TagVo tagVo = new TagVo();
+                tagVo.setId(articleTagPo.getTagId());
+                tagVo.setCode(articleTagPo.getCode());
+                tagVo.setName(articleTagPo.getName());
+                tagVo.setColor(articleTagPo.getColor());
+                tagVos.add(tagVo);
+            }
+            articleVo.setTags(tagVos);
+        }
 
         if (isArticleTop(idd)) {
             articleVo.setToTop(Boolean.TRUE);
@@ -293,7 +347,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         PageResponseDto<ArticleVo> articleVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, ArticleVo.class);
         List<ArticleEntity> articleEntityList = resultPage.getRecords();
-        IDUtils.batchEncrypt(articleEntityList, articleVoPageResponseDto.getRows());
         List<Long> articleIdList = articleEntityList.stream().map(ArticleEntity::getId).collect(Collectors.toList());
         if(articleIdList.size() < 1) {
             return articleVoPageResponseDto;
@@ -305,21 +358,18 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<ArticleVo> articleVoList = articleVoPageResponseDto.getRows();
         for (ArticleVo articleVo : articleVoList) {
-            long idd = IDUtils.decryptByAES(articleVo.getId());
+            long idd = articleVo.getId();
 
             List<ArticleAuthorPo> articleAuthorPos = authorMap.get(idd);
             List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
-            IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
             articleVo.setAuthors(authorVos);
 
             List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
             List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
-            IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
             articleVo.setCategories(categoryVos);
 
             List<ArticleTagPo> articleTagPos = tagMap.get(idd);
             List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
-            IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
             articleVo.setTags(tagVos);
         }
         articleVoPageResponseDto.setRows(articleVoList);
@@ -329,7 +379,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
     @Override
     public List<AuthorVo> fetchAuthor(String articleId) {
-        long idd = IDUtils.decryptByAES(articleId);
+        long idd = Long.parseLong(articleId);
 
         List<Long> articleIds = new ArrayList<>();
         articleIds.add(idd);
@@ -338,14 +388,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
 
         List<ArticleAuthorPo> articleAuthorPos = articleMap.get(idd);
         List<AuthorVo> authorVos = BeanCopyUtils.copyList(articleAuthorPos, AuthorVo.class);
-        IDUtils.batchEncrypt(articleAuthorPos, "authorId", authorVos, "setId");
 
         return authorVos;
     }
 
     @Override
     public List<CategoryVo> fetchCategory(String articleId) {
-        long idd = IDUtils.decryptByAES(articleId);
+        long idd = Long.parseLong(articleId);
 
         List<Long> articleIds = new ArrayList<>();
         articleIds.add(idd);
@@ -353,14 +402,13 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
         List<ArticleCategoryPo> articleCategoryPos = categoryMap.get(idd);
         List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryPos, CategoryVo.class);
-        IDUtils.batchEncrypt(articleCategoryPos, "categoryId", categoryVos, "setId");
 
         return categoryVos;
     }
 
     @Override
     public List<TagVo> fetchTag(String articleId) {
-        long idd = IDUtils.decryptByAES(articleId);
+        long idd = Long.parseLong(articleId);
 
         List<Long> articleIds = new ArrayList<>();
         articleIds.add(idd);
@@ -368,7 +416,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         Map<Long, List<ArticleTagPo>> tagMap = articleTagService.selectByArticleIds(articleIds);
         List<ArticleTagPo> articleTagPos = tagMap.get(idd);
         List<TagVo> tagVos = BeanCopyUtils.copyList(articleTagPos, TagVo.class);
-        IDUtils.batchEncrypt(articleTagPos, "tagId", tagVos, "setId");
 
         return tagVos;
     }
@@ -406,7 +453,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         if(StringUtils.isNotBlank(categoryIds) && categoryIds.split(",").length >= 1) {
             String[] categoryIdArr = categoryIds.split(",");
 
-            long decryptedCategoryId = IDUtils.decryptByAES(categoryIdArr[0]);
+            long decryptedCategoryId = Long.parseLong(categoryIdArr[0]);
             CategoryEntity categoryEntity = categoryMapper.selectById(decryptedCategoryId);
             if(categoryEntity != null && StringUtils.isNotBlank(categoryEntity.getCode())) {
                 uri = "/" + categoryEntity.getCode().toLowerCase() + uri;
@@ -463,8 +510,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         updateConfig.setId(sourceConfig.getId());
         String articleIds = sourceConfig.getConfigValue();
         updateConfig.setConfigValue(StringUtils.isBlank(articleIds) ? articleId+"" : articleIds+","+articleId);
-        String uris = sourceConfig.getConfigExtend();
-        updateConfig.setConfigExtend(StringUtils.isBlank(uris) ? articleUri : uris+","+articleUri);
+        //String uris = sourceConfig.getConfigExtend();
+        //updateConfig.setConfigExtend(StringUtils.isBlank(uris) ? articleUri : uris+","+articleUri);
         configurationService.updateConfigById(updateConfig);
 
         //存入缓存

@@ -63,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(IDUtils.decryptByAES(idStr));
+            idList.add(Long.parseLong(idStr));
         }
         int deleted = categoryMapper.logicDeleteByIds(idList);
 
@@ -78,7 +78,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public ApiResponse<String> update(CategoryAddDto categoryAddDto) {
         CategoryEntity categoryEntity = BeanCopyUtils.copy(categoryAddDto, CategoryEntity.class);
-        categoryEntity.setId(IDUtils.decryptByAES(categoryAddDto.getId()));
         categoryEntity.setCode(categoryEntity.getCode().toLowerCase());
 
         //Code重复性检查
@@ -104,7 +103,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         CategoryEntity categoryEntity = categoryMapper.selectById(idd);
         return BeanCopyUtils.copy(categoryEntity, CategoryVo.class);
@@ -134,7 +133,6 @@ public class CategoryServiceImpl implements CategoryService {
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
         PageResponseDto<CategoryVo> categoryVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, CategoryVo.class);
-        IDUtils.batchEncrypt(resultPage.getRecords(), categoryVoPageResponseDto.getRows());
 
         return categoryVoPageResponseDto;
     }
@@ -149,7 +147,6 @@ public class CategoryServiceImpl implements CategoryService {
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 
         List<CategoryVo> categoryVos = BeanCopyUtils.copyList(articleCategoryEntityList, CategoryVo.class);
-        IDUtils.batchEncrypt(articleCategoryEntityList, categoryVos);
 
         return categoryVos;
     }

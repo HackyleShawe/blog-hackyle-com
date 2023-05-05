@@ -67,7 +67,7 @@ public class TagServiceImpl implements TagService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(IDUtils.decryptByAES(idStr));
+            idList.add(Long.parseLong(idStr));
         }
         int deleted = tagMapper.logicDeleteByIds(idList);
         if(deleted == idSplit.length) {
@@ -81,7 +81,6 @@ public class TagServiceImpl implements TagService {
     @Override
     public ApiResponse<String>  update(TagAddDto addDto) {
         TagEntity tagEntity = BeanCopyUtils.copy(addDto, TagEntity.class);
-        tagEntity.setId(IDUtils.decryptByAES(addDto.getId()));
         tagEntity.setCode(tagEntity.getCode().toLowerCase()); //Code全部转换为小写
 
         //Code重复性检查
@@ -107,7 +106,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         TagEntity tagEntity = tagMapper.selectById(idd);
         return BeanCopyUtils.copy(tagEntity, TagVo.class);
@@ -137,7 +136,6 @@ public class TagServiceImpl implements TagService {
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
         PageResponseDto<TagVo> tagVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, TagVo.class);
-        IDUtils.batchEncrypt(resultPage.getRecords(), tagVoPageResponseDto.getRows());
 
         return tagVoPageResponseDto;
     }
@@ -152,7 +150,6 @@ public class TagServiceImpl implements TagService {
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(articleCategoryEntityList));
 
         List<TagVo> tagVos = BeanCopyUtils.copyList(articleCategoryEntityList, TagVo.class);
-        IDUtils.batchEncrypt(articleCategoryEntityList, tagVos);
 
         return tagVos;
     }

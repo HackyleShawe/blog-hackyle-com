@@ -76,7 +76,7 @@ public class AdministratorServiceImpl implements AdministratorService {
         }
 
         UpdateWrapper<AdministratorEntity> updateWrapper = new UpdateWrapper<>();
-        updateWrapper.lambda().eq(AdministratorEntity::getId, IDUtils.decryptByAES(adminSignUpDto.getId()));
+        updateWrapper.lambda().eq(AdministratorEntity::getId, adminSignUpDto.getId());
 
         int update = administratorMapper.update(administratorEntity, updateWrapper);
         if(update != 1) {
@@ -110,7 +110,6 @@ public class AdministratorServiceImpl implements AdministratorService {
         if(administratorVo == null) {
             return null;
         }
-        administratorVo.setId(IDUtils.encryptByAES(administratorEntity.getId()));
 
         //签发Token
         JwtPayload jwtPayload = new JwtPayload(String.valueOf(administratorVo.getId()), administratorVo.getUsername(), administratorVo.getUsername());
@@ -129,12 +128,11 @@ public class AdministratorServiceImpl implements AdministratorService {
         JwtPayload jwtPayload = JwtUtils.parseJWT(token);
 
         QueryWrapper<AdministratorEntity> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("id", IDUtils.decryptByAES(jwtPayload.getId()))
+        queryWrapper.eq("id", jwtPayload.getId())
                 .eq("username", jwtPayload.getIssuer())
                 .eq("is_deleted", 0);
         AdministratorEntity administratorEntity = administratorMapper.selectOne(queryWrapper);
         AdministratorVo administratorVo = BeanCopyUtils.copy(administratorEntity, AdministratorVo.class);
-        administratorVo.setId(IDUtils.encryptByAES(administratorEntity.getId()));
 
         return administratorVo;
     }

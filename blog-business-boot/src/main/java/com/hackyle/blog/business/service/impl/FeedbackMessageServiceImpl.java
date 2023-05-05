@@ -79,7 +79,7 @@ public class FeedbackMessageServiceImpl extends ServiceImpl<FeedbackMessageMappe
 
     @Override
     public FeedbackMessageVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         FeedbackMessageEntity entity = feedbackMessageMapper.selectById(idd);
         LOGGER.info("获取留言反馈-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(entity));

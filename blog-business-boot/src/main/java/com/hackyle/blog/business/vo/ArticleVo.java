@@ -7,7 +7,7 @@ import java.util.List;
  * Article View Object
  */
 public class ArticleVo {
-    private String id;
+    private Long id;
     /**
      * 标题
      */
@@ -73,11 +73,11 @@ public class ArticleVo {
      */
     private Boolean toTop;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

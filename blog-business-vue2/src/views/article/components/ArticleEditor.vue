@@ -244,7 +244,7 @@ export default {
     setTagsViewTitle() {
       const title = 'Edit'
       //提取ID的前10个字符，展示在路由页上
-      const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.articleDataForm.id.substr(0, 10)}` })
+      const route = Object.assign({}, this.tempRoute, { title: `${title}-${this.articleDataForm.id}` })
       this.$store.dispatch('tagsView/updateVisitedView', route)
     },
     setPageTitle() {
@@ -287,15 +287,21 @@ export default {
       //console.log("this.articleDataForm.authors: ", this.articleDataForm.authors)
       //console.log("this.articleDataForm.tags: ", this.articleDataForm.tags)
 
-      this.articleDataForm.categories.forEach(ele => {
-        categoryIds += ele.id + ","
-      })
-      this.articleDataForm.authors.forEach(ele => {
-        authorIds += ele.id + ","
-      })
-      this.articleDataForm.tags.forEach(ele => {
-        tagIds += ele.id + ","
-      })
+      if(this.articleDataForm.categories != null) {
+        this.articleDataForm.categories.forEach(ele => {
+          categoryIds += ele.id + ","
+        })
+      }
+      if(this.articleDataForm.authors != null) {
+        this.articleDataForm.authors.forEach(ele => {
+          authorIds += ele.id + ","
+        })
+      }
+      if(this.articleDataForm.tags != null) {
+        this.articleDataForm.tags.forEach(ele => {
+          tagIds += ele.id + ","
+        })
+      }
 
       //准备请求参数
       let param = {
@@ -321,7 +327,7 @@ export default {
       //编辑模式
       if (this.isEdit) {
         articleApi.update(param).then(resp => {
-          console.log(resp)
+          console.log("文章编辑模式resp", resp)
           this.$notify({
             title: 'SUCCESS',
             message: '编辑文章保存成功',
@@ -329,7 +335,7 @@ export default {
             duration: 2000
           })
         }).catch(err => {
-          console.log(err)
+          console.log("文章编辑模式err", err)
           this.$notify({
             title: '失败',
             message: '编辑文章保存失败',
@@ -339,7 +345,7 @@ export default {
         });
       } else { //新增模式
         articleApi.add(param).then(resp => {
-          console.log(resp)
+          console.log("文章新增模式resp", resp)
           this.$notify({
             title: '成功',
             message: '新建文章保存成功',
@@ -347,7 +353,7 @@ export default {
             duration: 2000
           })
         }).catch(err => {
-          console.log(err)
+          console.log("文章新增模式err", err)
           this.$notify({
             title: '失败',
             message: '新建文章保存失败',

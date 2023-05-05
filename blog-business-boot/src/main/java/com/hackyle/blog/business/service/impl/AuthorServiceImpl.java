@@ -63,7 +63,7 @@ public class AuthorServiceImpl implements AuthorService {
 
         List<Long> idList = new ArrayList<>();
         for (String idStr : idSplit) {
-            idList.add(IDUtils.decryptByAES(idStr));
+            idList.add(Long.parseLong(idStr));
         }
         int deleted = authorMapper.logicDeleteByIds(idList);
         if(deleted == idSplit.length) {
@@ -77,7 +77,6 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public ApiResponse<String> update(AuthorAddDto updateDto) {
         AuthorEntity authorEntity = BeanCopyUtils.copy(updateDto, AuthorEntity.class);
-        authorEntity.setId(IDUtils.decryptByAES(updateDto.getId()));
 
         //nick name存在性检查
         QueryWrapper<AuthorEntity> queryWrapper = new QueryWrapper<>();
@@ -128,21 +127,19 @@ public class AuthorServiceImpl implements AuthorService {
                 JSON.toJSONString(pageRequestDto), JSON.toJSONString(resultPage.getRecords()));
 
         PageResponseDto<AuthorVo> authorVoPageResponseDto = PaginationUtils.IPage2PageResponse(resultPage, AuthorVo.class);
-        IDUtils.batchEncrypt(resultPage.getRecords(), authorVoPageResponseDto.getRows());
 
         return authorVoPageResponseDto;
     }
 
     @Override
     public AuthorVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         AuthorEntity authorEntity = authorMapper.selectById(idd);
         LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(authorEntity));
 
         AuthorVo articleVo = new AuthorVo();
         BeanUtils.copyProperties(authorEntity, articleVo);
-        articleVo.setId(IDUtils.encryptByAES(authorEntity.getId()));
 
         return articleVo;
     }
@@ -157,7 +154,6 @@ public class AuthorServiceImpl implements AuthorService {
         LOGGER.info("获取所有文章分类-查询数据库出参-articleCategoryList={}", JSON.toJSONString(authorEntityList));
 
         List<AuthorVo> authorVoList = BeanCopyUtils.copyList(authorEntityList, AuthorVo.class);
-        IDUtils.batchEncrypt(authorEntityList, authorVoList);
 
         return authorVoList;
     }

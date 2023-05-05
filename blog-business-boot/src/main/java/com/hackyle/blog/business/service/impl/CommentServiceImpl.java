@@ -24,10 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,8 +37,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentEntity
 
     @Autowired
     private CommentMapper commentMapper;
-    
-    
+
+
     @Override
     public ApiResponse<String> add(CommentAddDto addDto) {
         CommentEntity commentEntity = BeanCopyUtils.copy(addDto, CommentEntity.class);
@@ -81,7 +79,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentEntity
 
         List<Long> commentIds = new ArrayList<>();
         for (String idStr : idSplit) {
-            commentIds.add(IDUtils.decryptByAES(idStr));
+            commentIds.add(Long.parseLong(idStr));
         }
 
         this.removeByIds(commentIds);

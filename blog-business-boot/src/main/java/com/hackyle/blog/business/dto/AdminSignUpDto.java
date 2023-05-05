@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class AdminSignUpDto {
     /**
-     * 加密过的ID
+     * ID
      */
-    private String id;
+    private Long id;
 
     /** 用户名 */
     private String username;
@@ -64,11 +64,11 @@ public class AdminSignUpDto {
      */
     private Boolean locked;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

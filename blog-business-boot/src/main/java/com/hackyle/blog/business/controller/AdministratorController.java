@@ -59,7 +59,7 @@ public class AdministratorController {
         AdminSignUpDto adminSignUpDto = apiRequest.getData();
         LOGGER.info("更新信息-Controller层入参-adminSignUpDto={}", JSON.toJSONString(adminSignUpDto));
 
-        if(adminSignUpDto == null || adminSignUpDto.getId() == null || StringUtils.isBlank(adminSignUpDto.getId())) {
+        if(adminSignUpDto == null || adminSignUpDto.getId() == null) {
             return ApiResponse.error(ResponseEnum.PARAMETER_MISSING.getCode(), ResponseEnum.PARAMETER_MISSING.getMessage());
         }
 

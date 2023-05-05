@@ -1,5 +1,7 @@
 package com.hackyle.blog.business.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hackyle.blog.business.entity.ArticleCategoryEntity;
@@ -46,7 +48,16 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     @Transactional
     @Override
     public void update(long articleId, List<Long> categoryIds) {
-        if(articleId < 0 || categoryIds == null || categoryIds.size() < 1) {
+        if(articleId < 0) {
+            return;
+        }
+
+        //检查一下是否与以前的一样，如果一样，则不用再执行删除、插入了
+        QueryWrapper<ArticleCategoryEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(ArticleCategoryEntity::getArticleId, articleId);
+        List<ArticleCategoryEntity> existCategories = articleCategoryMapper.selectList(queryWrapper);
+        List<Long> existCategoryIds = existCategories.stream().map(ArticleCategoryEntity::getCategoryId).collect(Collectors.toList());
+        if(categoryIds != null && CollectionUtil.isEqualList(categoryIds, existCategoryIds)) {
             return;
         }
 
@@ -54,8 +65,9 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         updateWrapper.lambda().eq(ArticleCategoryEntity::getArticleId, articleId);
         articleCategoryMapper.delete(updateWrapper);
 
-
-        this.batchInsert(articleId, categoryIds);
+        if(categoryIds != null && !categoryIds.isEmpty()) {
+            this.batchInsert(articleId, categoryIds);
+        }
     }
 
     @Override

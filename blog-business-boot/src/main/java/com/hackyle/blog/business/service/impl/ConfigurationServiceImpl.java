@@ -108,7 +108,7 @@ public class ConfigurationServiceImpl extends ServiceImpl<ConfigurationMapper, C
 
     @Override
     public ConfigurationVo fetch(String id) {
-        long idd = IDUtils.decryptByAES(id);
+        long idd = Long.parseLong(id);
 
         ConfigurationEntity configEntity = configurationMapper.selectById(idd);
         LOGGER.info("获取文章-入参-idd={}-数据库查询结果-article={}", idd, JSON.toJSONString(configEntity));
