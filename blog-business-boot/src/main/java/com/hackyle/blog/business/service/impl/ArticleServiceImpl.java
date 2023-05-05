@@ -195,15 +195,16 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         long articleId = articleEntity.getId();
 
         //更新文章的作者
-        if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) { //作者信息不为空：先删除，再更新
+        if(StringUtils.isNotBlank(articleUpdateDto.getAuthorIds())) { //作者信息不为空：先删除，再更新；Notice：无法清空文章的作者
             List<Long> authorIds = new ArrayList<>();
             for (String id : articleUpdateDto.getAuthorIds().split(",")) {
                 authorIds.add(Long.parseLong(id));
             }
             articleAuthorService.update(articleId, authorIds);
-        } else { //作者信息为空：删除所有关联
-            articleAuthorService.update(articleId, null);
         }
+        //else { //作者信息为空：删除所有关联
+        //    articleAuthorService.update(articleId, null); Notice：在更新其他字段时会丢失原有的文章作者
+        //}
 
         //更新文章的分类
         if(StringUtils.isNotBlank(articleUpdateDto.getCategoryIds())) { //分类信息不为空：先删除，再更新
@@ -212,9 +213,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
                 categoryIds.add(Long.parseLong(id));
             }
             articleCategoryService.update(articleId, categoryIds);
-        } else { //分类信息为空：删除所有关联
-            articleCategoryService.update(articleId, null);
         }
+        //else { //分类信息为空：删除所有关联
+        //    articleCategoryService.update(articleId, null); Notice：在更新其他字段时会丢失原有的文章分类
+        //}
 
         //更新文章的标签
         if(StringUtils.isNotBlank(articleUpdateDto.getTagIds())) { //标签信息不为空：先删除，再更新
@@ -223,9 +225,10 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
                 tagIds.add(Long.parseLong(id));
             }
             articleTagService.update(articleId, tagIds);
-        } else { //标签信息为空：删除所有关联
-            articleTagService.update(articleId, null);
         }
+        //else { //标签信息为空：删除所有关联
+        //    articleTagService.update(articleId, null); Notice：在更新其他字段时会丢失原有的文章标签
+        //}
 
         //更新文章与图片的映射关系
         fileStorageService.saveImg4ArticleUpdate(articleEntity);
