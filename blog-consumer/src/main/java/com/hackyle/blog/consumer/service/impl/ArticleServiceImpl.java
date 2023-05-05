@@ -190,8 +190,11 @@ public class ArticleServiceImpl implements ArticleService {
             return topArticleIds.isEmpty() ? null : articleMapper.selectBatchIds(topArticleIds);
         }
 
-        //查库
+        //再查库
         ConfigurationEntity configurationEntity = configurationService.queryConfigByKey(ConfigItemEnum.ARTICLE_TOP);
+        if(configurationEntity == null) { //库中没有相关配置，直接返回
+            return null;
+        }
         String configValue = configurationEntity.getConfigValue();
         LOGGER.info("查库获取需要置顶的文章ID={}", configValue);
         if(StringUtils.isNotBlank(configValue)) {
