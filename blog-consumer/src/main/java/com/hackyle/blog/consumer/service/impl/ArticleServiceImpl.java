@@ -180,22 +180,14 @@ public class ArticleServiceImpl implements ArticleService {
         String redisVal = redisValueOperations.get(redisKey);
         LOGGER.info("从缓存中获取需要置顶的文章ID={}", redisVal);
         if(StringUtils.isNotBlank(redisVal)) {
-            return articleMapper.selectBatchIds(Arrays.asList(redisVal.split(",")));
-            //List<ArticleVo> articleVoList = new ArrayList<>();
-            //for (ArticleEntity article : articleEntities) {
-            //    ArticleVo articleVo = new ArticleVo();
-            //    articleVo.setId(IDUtils.encryptByAES(article.getId()));
-            //    articleVo.setTitle(article.getTitle());
-            //    articleVo.setSummary(article.getSummary());
-            //    articleVo.setUri(article.getUri());
-            //    articleVo.setKeywords(article.getKeywords());
-            //    articleVo.setContent(article.getContent());
-            //    articleVo.setFaceImgLink(article.getFaceImgLink());
-            //    articleVo.setReleased(article.getReleased());
-            //    articleVo.setUpdateTime(article.getUpdateTime());
-            //    articleVoList.add(articleVo);
-            //}
-            //return articleVoList;
+            List<Long> topArticleIds = new ArrayList<>();
+            for (String aid : redisVal.split(",")) {
+                if(StringUtils.isBlank(aid)) {
+                    continue;
+                }
+                topArticleIds.add(Long.parseLong(aid));
+            }
+            return topArticleIds.isEmpty() ? null : articleMapper.selectBatchIds(topArticleIds);
         }
 
         //查库
@@ -203,7 +195,14 @@ public class ArticleServiceImpl implements ArticleService {
         String configValue = configurationEntity.getConfigValue();
         LOGGER.info("查库获取需要置顶的文章ID={}", configValue);
         if(StringUtils.isNotBlank(configValue)) {
-            return articleMapper.selectBatchIds(Arrays.asList(configValue.split(",")));
+            List<Long> topArticleIds = new ArrayList<>();
+            for (String aid : configValue.split(",")) {
+                if(StringUtils.isBlank(aid)) {
+                    continue;
+                }
+                topArticleIds.add(Long.parseLong(aid));
+            }
+            return topArticleIds.isEmpty() ? null : articleMapper.selectBatchIds(topArticleIds);
         }
 
         return null;

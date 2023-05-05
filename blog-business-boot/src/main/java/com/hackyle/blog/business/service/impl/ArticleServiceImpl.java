@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -129,9 +130,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             fileStorageService.saveImg4ArticleAdd(articleEntity);
 
             //保存文章置顶信息
-            if(articleAddDto.getToTop() != null && articleAddDto.getToTop()) {
-                articleToTop(articleAddDto.getId(), articleEntity.getUri());
-            }
+            articleToTop(articleAddDto.getToTop(), articleAddDto.getId());
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -234,9 +233,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         fileStorageService.saveImg4ArticleUpdate(articleEntity);
 
         //更新文章的置顶信息
-        if(articleUpdateDto.getToTop() != null && articleUpdateDto.getToTop()) {
-            articleToTop(articleUpdateDto.getId(), articleEntity.getUri());
-        }
+        articleToTop(articleUpdateDto.getToTop(), articleUpdateDto.getId());
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
     }
@@ -498,29 +495,68 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
     /**
      * 将该文章置顶
      */
-    private void articleToTop(long articleId, String articleUri) {
+    private void articleToTop(Boolean toTop, long articleId) {
         ConfigurationEntity sourceConfig = configurationService.queryConfigByKey(ConfigItemEnum.ARTICLE_TOP);
         if(sourceConfig == null) {
             return;
         }
 
-        //检查是否已包含
-        if(sourceConfig.getConfigValue().contains(String.valueOf(articleId))) {
-            return;
+        if(toTop != null && toTop) { //将该文章置顶
+            //检查是否已包含
+            if(sourceConfig.getConfigValue().contains(String.valueOf(articleId))) {
+                return;
+            }
+
+            ConfigurationEntity updateConfig = new ConfigurationEntity();
+            updateConfig.setId(sourceConfig.getId());
+            String articleIds = sourceConfig.getConfigValue();
+            updateConfig.setConfigValue(StringUtils.isBlank(articleIds) ? articleId+"" : articleIds+","+articleId);
+            //String uris = sourceConfig.getConfigExtend();
+            //updateConfig.setConfigExtend(StringUtils.isBlank(uris) ? articleUri : uris+","+articleUri);
+            configurationService.updateConfigById(updateConfig);
+
+            //存入缓存
+            String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
+            String redisValue = updateConfig.getConfigValue();
+            redisValueOperations.set(redisKey, redisValue, 24, TimeUnit.HOURS);
+        } else { //将该文章取消置顶
+            //检查是否已包含：该文章不包含在置顶文章中，无需取消
+            if(!sourceConfig.getConfigValue().contains(String.valueOf(articleId))) {
+                return;
+            }
+
+            ConfigurationEntity updateConfig = new ConfigurationEntity();
+            updateConfig.setId(sourceConfig.getId());
+            String articleIds = sourceConfig.getConfigValue();
+            articleIds = articleIds.replaceAll(String.valueOf(articleId), "");
+            updateConfig.setConfigValue(articleIds);
+            configurationService.updateConfigById(updateConfig);
+
+            //存入缓存
+            String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
+            String redisValue = updateConfig.getConfigValue();
+            redisValueOperations.set(redisKey, redisValue, 24, TimeUnit.HOURS);
+        }
+    }
+
+    public static void main(String[] args) {
+
+        String str = ",,,asdf,,,adf,,,,";
+
+        System.out.println(Arrays.toString(str.split(",")));
+        for (String s : str.split(",")) {
+            if(StringUtils.isBlank(s)) {
+                continue;
+            }
+            System.out.println(s);
+
+            //if(StringUtils.isNotBlank(s)) {
+            //    System.out.println(s);
+            //} else {
+            //    System.out.println("empty");
+            //}
         }
 
-        ConfigurationEntity updateConfig = new ConfigurationEntity();
-        updateConfig.setId(sourceConfig.getId());
-        String articleIds = sourceConfig.getConfigValue();
-        updateConfig.setConfigValue(StringUtils.isBlank(articleIds) ? articleId+"" : articleIds+","+articleId);
-        //String uris = sourceConfig.getConfigExtend();
-        //updateConfig.setConfigExtend(StringUtils.isBlank(uris) ? articleUri : uris+","+articleUri);
-        configurationService.updateConfigById(updateConfig);
-
-        //存入缓存
-        String redisKey = ConfigItemEnum.ARTICLE_TOP.getGroup() + "::" + ConfigItemEnum.ARTICLE_TOP.getKey();
-        String redisValue = updateConfig.getConfigValue();
-        redisValueOperations.set(redisKey, redisValue, 24, TimeUnit.HOURS);
     }
 
     /**
