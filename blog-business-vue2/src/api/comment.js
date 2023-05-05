@@ -22,7 +22,7 @@ function del(ids) {
 
 function delReal(ids) {
   return axios({
-    url: 'comment/del',
+    url: 'comment/delReal',
     method: 'DELETE',
     params: {
       ids
