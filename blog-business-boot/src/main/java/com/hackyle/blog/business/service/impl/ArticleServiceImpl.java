@@ -539,26 +539,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
         }
     }
 
-    public static void main(String[] args) {
-
-        String str = ",,,asdf,,,adf,,,,";
-
-        System.out.println(Arrays.toString(str.split(",")));
-        for (String s : str.split(",")) {
-            if(StringUtils.isBlank(s)) {
-                continue;
-            }
-            System.out.println(s);
-
-            //if(StringUtils.isNotBlank(s)) {
-            //    System.out.println(s);
-            //} else {
-            //    System.out.println("empty");
-            //}
-        }
-
-    }
-
     /**
      * 判定该文章是否置顶
      * @return 改文章是否置顶
