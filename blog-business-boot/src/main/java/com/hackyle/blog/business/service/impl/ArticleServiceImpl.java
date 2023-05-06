@@ -38,7 +38,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -130,7 +129,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, ArticleEntity
             fileStorageService.saveImg4ArticleAdd(articleEntity);
 
             //保存文章置顶信息
-            articleToTop(articleAddDto.getToTop(), articleAddDto.getId());
+            articleToTop(articleAddDto.getToTop(), articleEntity.getId());
         }
 
         return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
