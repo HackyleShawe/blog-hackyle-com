@@ -14,7 +14,14 @@ export default {
       path: 'system-status',
       name: 'System Status',
       component: () => import('@/views/system/system-status'),
-      meta: { title: 'System Status', icon: 'el-icon-s-platform' }
+      meta: { title: 'System Status', icon: 'el-icon-monitor' }
+    },
+
+    {
+      path: 'data-backup',
+      name: 'Data Backup',
+      component: () => import('@/views/system/data-backup'),
+      meta: { title: 'Data Backup', icon: 'el-icon-sort' }
     },
 
     {

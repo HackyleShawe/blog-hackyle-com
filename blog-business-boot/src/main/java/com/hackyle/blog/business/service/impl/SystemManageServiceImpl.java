@@ -3,12 +3,19 @@ package com.hackyle.blog.business.service.impl;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
 import com.hackyle.blog.business.common.constant.OperationTypeEnum;
+import com.hackyle.blog.business.service.ConfigurationService;
 import com.hackyle.blog.business.service.SystemManageService;
+import com.hackyle.blog.business.util.DatabaseUtils;
+import com.hackyle.blog.business.util.FileCompressUtils;
 import com.hackyle.blog.business.util.FileHandleUtils;
 import com.hackyle.blog.business.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -20,7 +27,11 @@ import oshi.software.os.OperatingSystem;
 import oshi.util.FormatUtil;
 import oshi.util.Util;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import java.util.*;
 
@@ -28,6 +39,14 @@ import java.util.*;
 public class SystemManageServiceImpl implements SystemManageService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemManageServiceImpl.class);
     private final DecimalFormat df = new DecimalFormat("0.00");
+
+    @Autowired
+    private ConfigurationService configurationService;
+
+    @Value("${spring.datasource.username}")
+    private String databaseUser;
+    @Value("${spring.datasource.password}")
+    private String databasePassword;
 
     @Override
     public Map<String,Object> systemStatus() {
@@ -52,6 +71,55 @@ public class SystemManageServiceImpl implements SystemManageService {
         }
 
         return systemStatusMap;
+    }
+
+    /**
+     * 数据库备份
+     */
+    @Override
+    public File databaseBackup(String databaseName){
+        String command = "mysqldump -u" + databaseUser + " -p" + databasePassword + " --set-charset=utf8 --databases " + databaseName;
+
+        File tmpFile = null;
+        String databaseBackupFilePath = null;
+
+        try {
+            //使用临时文件暂存备份数据
+            //注意：不管怎样，最终需要删除临时文件
+            tmpFile = Files.createTempFile("DatabaseBackup-", ".sql").toFile();
+            String backupFilePath = tmpFile.getAbsolutePath();
+
+            DatabaseUtils.backup(command, backupFilePath);
+            databaseBackupFilePath = FileCompressUtils.compressFilesByZIP(tmpFile.getAbsolutePath(), tmpFile.getParent());
+        } catch (IOException e) {
+            LOGGER.error("数据库备份-写入文件时异常：", e);
+        } finally {
+            if(tmpFile != null) {
+                tmpFile.delete(); //删除该个临时文件
+            }
+        }
+        LOGGER.info("数据库备份-command={}，databaseBackupFilePath={}", command, databaseBackupFilePath);
+
+        return databaseBackupFilePath == null ? null : new File(databaseBackupFilePath);
+    }
+
+    /**
+     * 从SQL恢复数据库
+     */
+    @Transactional
+    @Override
+    public void databaseRestore(MultipartFile[] multipartFiles) throws IOException {
+        String sqlFileName = "";
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            InputStream inputStream = multipartFile.getInputStream();
+            String command = "mysql -u" + databaseUser + " -p" + databasePassword + " --default-character-set=utf8 ";
+            DatabaseUtils.restore(command, inputStream);
+
+            sqlFileName += multipartFile.getOriginalFilename();
+        }
+
+        LOGGER.info("数据库恢复完成-sqlFileName={}", sqlFileName);
     }
 
 
