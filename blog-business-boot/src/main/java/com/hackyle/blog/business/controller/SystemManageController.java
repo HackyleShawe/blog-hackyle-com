@@ -93,6 +93,17 @@ public class SystemManageController {
             return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage());
         }
 
+        //目前只支持恢复zip文件
+        for (MultipartFile multipartFile : multipartFiles) {
+            String fileName = multipartFile.getOriginalFilename();
+            String contentType = multipartFile.getContentType();
+            //判定是否为zip压缩文件，目前只支持zip
+            if((StringUtils.isNotBlank(fileName) && !fileName.substring(fileName.lastIndexOf(".")+1).equalsIgnoreCase("zip"))
+                    || (StringUtils.isNotBlank(contentType) && !contentType.contains("zip")) ) {
+                return ApiResponse.error(ResponseEnum.FRONT_END_ERROR.getCode(), ResponseEnum.FRONT_END_ERROR.getMessage(), "目前只支持从zip文件恢复");
+            }
+        }
+
         try {
             systemManageService.databaseRestore(multipartFiles);
             return ApiResponse.success(ResponseEnum.OP_OK.getCode(), ResponseEnum.OP_OK.getMessage());
@@ -101,4 +112,5 @@ public class SystemManageController {
             return ApiResponse.error(ResponseEnum.EXCEPTION.getCode(), ResponseEnum.EXCEPTION.getMessage());
         }
     }
+
 }

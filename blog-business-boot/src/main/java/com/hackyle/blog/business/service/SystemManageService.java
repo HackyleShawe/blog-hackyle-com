@@ -12,4 +12,5 @@ public interface SystemManageService {
     File databaseBackup(String databaseName) throws IOException;
 
     void databaseRestore(MultipartFile[] multipartFiles) throws IOException ;
+
 }

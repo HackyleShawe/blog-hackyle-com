@@ -3,15 +3,13 @@ package com.hackyle.blog.business.service.impl;
 import cn.hutool.core.date.BetweenFormatter;
 import cn.hutool.core.date.DateUtil;
 import com.hackyle.blog.business.common.constant.OperationTypeEnum;
-import com.hackyle.blog.business.service.ConfigurationService;
 import com.hackyle.blog.business.service.SystemManageService;
-import com.hackyle.blog.business.util.DatabaseUtils;
+import com.hackyle.blog.business.util.CommandExecutionUtils;
 import com.hackyle.blog.business.util.FileCompressUtils;
 import com.hackyle.blog.business.util.FileHandleUtils;
 import com.hackyle.blog.business.util.IpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +26,7 @@ import oshi.util.FormatUtil;
 import oshi.util.Util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
@@ -39,9 +38,6 @@ import java.util.*;
 public class SystemManageServiceImpl implements SystemManageService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SystemManageServiceImpl.class);
     private final DecimalFormat df = new DecimalFormat("0.00");
-
-    @Autowired
-    private ConfigurationService configurationService;
 
     @Value("${spring.datasource.username}")
     private String databaseUser;
@@ -77,25 +73,27 @@ public class SystemManageServiceImpl implements SystemManageService {
      * 数据库备份
      */
     @Override
-    public File databaseBackup(String databaseName){
+    public File databaseBackup(String databaseName) {
+        //需要设置MySQL的bin目录到环境变量，否则会报错找不到mysqldump命令
         String command = "mysqldump -u" + databaseUser + " -p" + databasePassword + " --set-charset=utf8 --databases " + databaseName;
 
         File tmpFile = null;
         String databaseBackupFilePath = null;
 
-        try {
+        try { //这里使用try的目的是确保最终临时文件能被删除
             //使用临时文件暂存备份数据
-            //注意：不管怎样，最终需要删除临时文件
             tmpFile = Files.createTempFile("DatabaseBackup-", ".sql").toFile();
-            String backupFilePath = tmpFile.getAbsolutePath();
 
-            DatabaseUtils.backup(command, backupFilePath);
+            //导出数据库中的数据，并且重定向到一个临时文件中
+            CommandExecutionUtils.executeCommandAndExportResult(command, null, tmpFile);
+
+            //进行文件压缩
             databaseBackupFilePath = FileCompressUtils.compressFilesByZIP(tmpFile.getAbsolutePath(), tmpFile.getParent());
-        } catch (IOException e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.error("数据库备份-写入文件时异常：", e);
         } finally {
             if(tmpFile != null) {
-                tmpFile.delete(); //删除该个临时文件
+                tmpFile.delete(); //注意：不管怎样，最终需要删除临时文件
             }
         }
         LOGGER.info("数据库备份-command={}，databaseBackupFilePath={}", command, databaseBackupFilePath);
@@ -109,17 +107,45 @@ public class SystemManageServiceImpl implements SystemManageService {
     @Transactional
     @Override
     public void databaseRestore(MultipartFile[] multipartFiles) throws IOException {
-        String sqlFileName = "";
+        StringBuilder sqlFileName = new StringBuilder();
 
         for (MultipartFile multipartFile : multipartFiles) {
             InputStream inputStream = multipartFile.getInputStream();
-            String command = "mysql -u" + databaseUser + " -p" + databasePassword + " --default-character-set=utf8 ";
-            DatabaseUtils.restore(command, inputStream);
 
-            sqlFileName += multipartFile.getOriginalFilename();
+            File tmpFile = null;
+            File decompressFileDir = null;
+            try { //这里使用try的目的是确保最终临时文件能被删除
+                tmpFile = Files.createTempFile("DatabaseRestore-", ".zip").toFile();
+
+                //解压zip文件
+                decompressFileDir = FileCompressUtils.decompressFilesByZIP(multipartFile.getOriginalFilename(), inputStream, tmpFile.getParent());
+                File[] files = decompressFileDir.listFiles(File::isFile);
+                if(files != null) {
+                    for (File file : files) {
+                        FileInputStream sqlFileStream = new FileInputStream(file);
+
+                        //需要设置MySQL的bin目录到环境变量，否则会报错找不到mysql命令
+                        String command = "mysql -u" + databaseUser + " -p" + databasePassword + " --default-character-set=utf8 ";
+
+                        //执行数据库备份命令，并且加载流到备份命令中
+                        CommandExecutionUtils.executeCommandAndImportData(command, null, sqlFileStream);
+
+                        sqlFileName.append(multipartFile.getOriginalFilename()).append("  ");
+                    }
+                }
+            } catch (IOException | InterruptedException e) {
+                LOGGER.error("从SQL恢复数据库时文件异常：", e);
+            } finally {
+                if(tmpFile != null) {
+                    tmpFile.delete(); //注意：不管怎样，最终需要删除临时文件
+                }
+                if(decompressFileDir != null) {
+                    decompressFileDir.delete();
+                }
+            }
         }
 
-        LOGGER.info("数据库恢复完成-sqlFileName={}", sqlFileName);
+        LOGGER.info("数据库恢复完成-sqlFileName={}", sqlFileName.toString());
     }
 
 

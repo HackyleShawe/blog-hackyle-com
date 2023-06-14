@@ -84,7 +84,6 @@ export default {
       this.$message({
         showClose: true,
         message: response.message,
-        type: 'success'
       });
     }
   }

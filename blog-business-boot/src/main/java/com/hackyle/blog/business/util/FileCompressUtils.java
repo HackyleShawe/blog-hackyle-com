@@ -72,11 +72,12 @@ public class FileCompressUtils {
     }
 
     /**
-     * ZIP解压
+     * ZIP解压：最终解压后的文件存放路径：targetDir/zipFileName/[压缩文件目录]/文件名.拓展名
      * @param zipFilePath zip文件绝对路径
-     * @param targetDir 解压后的存放路径
+     * @param targetDir 解压后的存放目录
+     * @return 文件解压后的根目录
      */
-    public static String decompressFilesByZIP(String zipFilePath, String targetDir) throws IOException {
+    public static File decompressFilesByZIP(String zipFilePath, String targetDir) throws IOException {
         //入参校验与矫正
         targetDir = parameterCheck(zipFilePath, targetDir);
 
@@ -86,17 +87,28 @@ public class FileCompressUtils {
         ZipInputStream zipInputStream = new ZipInputStream(checkedInputStream);
         ZipEntry zipEntry;
 
-        //输出位置
-        String zipFilePureName = zipFile.getName().substring(0, zipFile.getName().indexOf("."));//切割出文件名，不要文件拓展名
-        File outputDir = new File(targetDir + File.separator + zipFilePureName);
-        if(!outputDir.mkdirs()) {
-            throw new RuntimeException("The dir haven't Created!");
+        File outputDir = new File(targetDir + File.separator +
+                zipFile.getName().substring(0, zipFile.getName().lastIndexOf(".")));
+        //if(!outputDir.mkdirs()) {
+        //    //防止多次调用，将解压的文件都放在一起
+        //    throw new RuntimeException("The output dir haven't Created!");
+        //}
+        if(!outputDir.exists()) {
+            boolean mkdirs = outputDir.mkdirs();
+            if(!mkdirs) {
+                throw new RuntimeException("The output dir haven't Created!");
+            }
         }
 
-        FileOutputStream fileOutputStream = null;
+        FileOutputStream fileOutputStream;
         BufferedInputStream bufferedInputStream = new BufferedInputStream(zipInputStream);
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-            fileOutputStream = new FileOutputStream(outputDir.getAbsolutePath() +File.separator+ zipEntry.getName());
+            File tmpFile = new File(outputDir.getAbsolutePath() +File.separator+ zipEntry.getName());
+            if(!tmpFile.getParentFile().exists()) { //层级检查，压缩文件内部还有子目录的情况
+                tmpFile.getParentFile().mkdirs();
+            }
+
+            fileOutputStream = new FileOutputStream(tmpFile);
             int len;
             byte[] bytes = new byte[1024];
             while ((len = bufferedInputStream.read(bytes)) != -1) {
@@ -107,7 +119,58 @@ public class FileCompressUtils {
         zipInputStream.close();
         fileInputStream.close();
 
-        return targetDir;
+        return outputDir;
+    }
+
+    /**
+     * ZIP解压：最终解压后的文件存放路径：targetDir/zipFileName/[压缩文件目录]/文件名.拓展名
+     * @param zipFileName zip文件名，必须以.zip结尾
+     * @param zipFileStream zip文件流
+     * @param targetDir 解压后的存放目录
+     * @return 文件解压后的根目录
+     */
+    public static File decompressFilesByZIP(String zipFileName, InputStream zipFileStream, String targetDir) throws IOException {
+        //入参校验与矫正
+        if(zipFileName == null || "".equals(zipFileName) || targetDir == null || "".equals(targetDir)) {
+            throw new RuntimeException("The zipFileName or targetDir can't be null!");
+        }
+
+        CheckedInputStream checkedInputStream = new CheckedInputStream(zipFileStream, new Adler32());
+        ZipInputStream zipInputStream = new ZipInputStream(checkedInputStream);
+        ZipEntry zipEntry;
+
+        File outputDir = new File(targetDir + File.separator + zipFileName);
+        //if(!outputDir.mkdirs()) {
+        //    //防止多次调用，将解压的文件都放在一起
+        //    throw new RuntimeException("The output dir haven't Created!");
+        //}
+        if(!outputDir.exists()) {
+            boolean mkdirs = outputDir.mkdirs();
+            if(!mkdirs) {
+                throw new RuntimeException("The output dir haven't Created!");
+            }
+        }
+
+        FileOutputStream fileOutputStream;
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(zipInputStream);
+        while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+            File tmpFile = new File(outputDir.getAbsolutePath() +File.separator+ zipEntry.getName());
+            if(!tmpFile.getParentFile().exists()) { //层级检查，压缩文件内部还有子目录的情况
+                tmpFile.getParentFile().mkdirs();
+            }
+
+            fileOutputStream = new FileOutputStream(tmpFile);
+            int len;
+            byte[] bytes = new byte[1024];
+            while ((len = bufferedInputStream.read(bytes)) != -1) {
+                fileOutputStream.write(bytes, 0, len);
+            }
+            fileOutputStream.close();
+        }
+        zipInputStream.close();
+        zipFileStream.close();
+
+        return outputDir;
     }
 
     /**
