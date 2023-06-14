@@ -8,6 +8,7 @@ import com.hackyle.blog.business.util.CommandExecutionUtils;
 import com.hackyle.blog.business.util.FileCompressUtils;
 import com.hackyle.blog.business.util.FileHandleUtils;
 import com.hackyle.blog.business.util.IpUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,10 +26,7 @@ import oshi.software.os.OperatingSystem;
 import oshi.util.FormatUtil;
 import oshi.util.Util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.text.DecimalFormat;
@@ -146,6 +144,73 @@ public class SystemManageServiceImpl implements SystemManageService {
         }
 
         LOGGER.info("数据库恢复完成-sqlFileName={}", sqlFileName.toString());
+    }
+
+
+
+    /**
+     * 文件夹备份
+     * @param fileDir 要备份那个目录
+     */
+    @Override
+    public File dirBackup(File fileDir) throws Exception{
+        String osName = System.getProperty("os.name");
+        if(osName.toLowerCase().startsWith(OperationTypeEnum.WIN.getName())) {
+            throw new RuntimeException("The Windows Can't Be Backup!");
+        }
+
+        String parentDir = fileDir.getParent();
+        String dirName = fileDir.getName();
+        String backName = dirName + ".tar";
+        String command = "tar -cf " + dirName + ".tar " + dirName;
+        String tarFilePath = parentDir + File.separator + backName;
+
+        CommandExecutionUtils.executeCommand(command, fileDir.getParentFile());
+        String fileZipFilePath = FileCompressUtils.compressFilesByZIP(tarFilePath, parentDir);
+        LOGGER.info("备份文件夹压缩后fileZipFilePath={}，压缩前的打包文件tarFilePath={}，tarFilePath删除状态={}", fileZipFilePath, tarFilePath, new File(tarFilePath).delete());
+
+        return new File(fileZipFilePath);
+    }
+
+    /**
+     * 从压缩文件恢复文件夹
+     */
+    @Override
+    public void dirRestore(MultipartFile[] multipartFiles, String restoreDir) throws Exception{
+        String restoreFileName = "";
+
+        for (MultipartFile multipartFile : multipartFiles) {
+            InputStream inputStream = multipartFile.getInputStream();
+
+            String fileName = StringUtils.isBlank(multipartFile.getOriginalFilename()) ?
+                    System.currentTimeMillis()+"tar.zip" : multipartFile.getOriginalFilename();
+            File tmpFile = new File(restoreDir + File.separator + fileName);
+            if(!tmpFile.getParentFile().exists()) {
+                tmpFile.getParentFile().mkdirs();
+            }
+
+            BufferedInputStream bis = new BufferedInputStream(inputStream);
+            //接收tar.zip文件流到restoreDir目录
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(tmpFile));
+            //FileOutputStream fileOutputStream = new FileOutputStream(restoreDir + File.separator + fileName);
+            int len;
+            byte[] bytes = new byte[1024];
+            while ((len = bis.read(bytes)) != -1) {
+                bos.write(bytes, 0, len);
+            }
+            bos.close();
+            bis.close();
+
+            //解压
+            CommandExecutionUtils.executeCommand("unzip " + fileName, tmpFile.getParentFile());
+            //解包
+            CommandExecutionUtils.executeCommand("tar -xvf " + fileName.substring(0, fileName.lastIndexOf(".zip"))
+                    + tmpFile.getParentFile(), tmpFile.getParentFile());
+
+            restoreFileName += multipartFile.getOriginalFilename();
+        }
+
+        LOGGER.info("文件夹恢复完成-恢复至restoreDir={}，restoreFileName={}", restoreDir, restoreFileName);
     }
 
 

@@ -13,4 +13,7 @@ public interface SystemManageService {
 
     void databaseRestore(MultipartFile[] multipartFiles) throws IOException ;
 
+    File dirBackup(File fileDir) throws Exception;
+
+    void dirRestore(MultipartFile[] multipartFiles, String restoreDir) throws Exception;
 }
