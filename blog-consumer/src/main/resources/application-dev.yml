@@ -1,7 +1,7 @@
 # 本地开发的项目配置文件
 
 server:
-  port: 6111
+  port: 6001
   servlet:
     context-path: /
 
