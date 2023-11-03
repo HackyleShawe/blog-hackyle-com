@@ -43,14 +43,14 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentEntity
     @Override
     public ApiResponse<String> add(CommentAddDto addDto) {
         CommentEntity commentEntity = BeanCopyUtils.copy(addDto, CommentEntity.class);
-        commentEntity.setTargetId(IDUtils.decryptByAES(addDto.getTargetId()));
+        commentEntity.setTargetId(IDUtils.decrypt(addDto.getTargetId()));
         commentEntity.setId(IDUtils.timestampID());
 
         if(StringUtils.isNotBlank(addDto.getParentId())) {
-            commentEntity.setParentId(IDUtils.decryptByAES(addDto.getParentId()));
+            commentEntity.setParentId(IDUtils.decrypt(addDto.getParentId()));
 
             String replyWhoId = addDto.getReplyWhoId();
-            CommentEntity commentReplyWho = commentMapper.selectById(IDUtils.decryptByAES(replyWhoId));
+            CommentEntity commentReplyWho = commentMapper.selectById(IDUtils.decrypt(replyWhoId));
             commentEntity.setReplyWho(commentReplyWho.getName());
         }
 
@@ -83,7 +83,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, CommentEntity
         List<CommentVo> resultComments = new ArrayList<>(parentComments.size());
         for (CommentEntity parentComment : parentComments) {
             CommentVo commentVo = BeanCopyUtils.copy(parentComment, CommentVo.class);
-            commentVo.setId(IDUtils.encryptByAES(parentComment.getId()));
+            commentVo.setId(IDUtils.encrypt(parentComment.getId()));
 
             List<CommentEntity> subComments = groupByParentIdMap.get(parentComment.getId());
             if(subComments != null && subComments.size() > 0) {

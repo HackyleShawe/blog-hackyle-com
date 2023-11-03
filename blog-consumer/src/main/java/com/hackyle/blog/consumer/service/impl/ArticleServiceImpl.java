@@ -137,7 +137,7 @@ public class ArticleServiceImpl implements ArticleService {
 
         ArticleVo articleVo = BeanCopyUtils.copy(articleEntity, ArticleVo.class);
         //加密ID
-        articleVo.setId(IDUtils.encryptByAES(articleEntity.getId()));
+        articleVo.setId(IDUtils.encrypt(articleEntity.getId()));
 
         Long articleId = articleEntity.getId();
         List<Long> articleIds = new ArrayList<>();

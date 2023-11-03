@@ -104,7 +104,7 @@ public class ArticleController {
         modelAndView.addObject("articleVo", articleVo);
         modelAndView.addObject("metaVo", metaVo);
 
-        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
+        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decrypt(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
 
         ArticleVo articleVoLog = BeanCopyUtils.copy(articleVo, ArticleVo.class);
@@ -147,7 +147,7 @@ public class ArticleController {
         metaVo.setKeywords(articleVo.getTags());
         modelAndView.addObject("metaVo", metaVo);
 
-        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decryptByAES(articleVo.getId()));
+        List<CommentVo> commentVos = commentService.fetchListByHierarchy(IDUtils.decrypt(articleVo.getId()));
         modelAndView.addObject("commentVos", commentVos);
 
         ArticleVo articleVoLog = BeanCopyUtils.copy(articleVo, ArticleVo.class);

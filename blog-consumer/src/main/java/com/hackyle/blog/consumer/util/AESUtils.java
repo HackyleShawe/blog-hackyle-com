@@ -26,7 +26,7 @@ public class AESUtils {
      * @param password 密码
      * @return 加密后的Base64
      */
-    public static String encrypt(String plaintext, String password) {
+    public static String encryptAndToBase64(String plaintext, String password) {
         byte[] passwordKeyBytes = passwordKey(password);
         byte[] plaintextBytes = plaintext.getBytes(StandardCharsets.UTF_8);
         byte[] encryptedBytes = doFinal(Cipher.ENCRYPT_MODE, plaintextBytes, passwordKeyBytes);
@@ -39,8 +39,34 @@ public class AESUtils {
      * @param password 密码
      * @return 解密后的字节数组
      */
-    public static String decrypt(String ciphertext, String password) {
+    public static String decryptAndToBase64(String ciphertext, String password) {
         byte[] ciphertextBytes = Base64.getDecoder().decode(ciphertext);
+        byte[] passwordKeyBytes = passwordKey(password);
+        byte[] decryptedBytes = doFinal(Cipher.DECRYPT_MODE, ciphertextBytes, passwordKeyBytes);
+        return new String(decryptedBytes);
+    }
+
+    /**
+     * 加密后转为Base64串
+     * @param plaintext 待加密的数据
+     * @param password 密码
+     * @return 加密后的Base64
+     */
+    public static String encryptAndToBase64URL(String plaintext, String password) {
+        byte[] passwordKeyBytes = passwordKey(password);
+        byte[] plaintextBytes = plaintext.getBytes(StandardCharsets.UTF_8);
+        byte[] encryptedBytes = doFinal(Cipher.ENCRYPT_MODE, plaintextBytes, passwordKeyBytes);
+        return Base64.getUrlEncoder().encodeToString(encryptedBytes);
+    }
+
+    /**
+     * 解密前解码Base64
+     * @param ciphertext 待解密的数据
+     * @param password 密码
+     * @return 解密后的字节数组
+     */
+    public static String decryptAndToBase64URL(String ciphertext, String password) {
+        byte[] ciphertextBytes = Base64.getUrlDecoder().decode(ciphertext);
         byte[] passwordKeyBytes = passwordKey(password);
         byte[] decryptedBytes = doFinal(Cipher.DECRYPT_MODE, ciphertextBytes, passwordKeyBytes);
         return new String(decryptedBytes);
@@ -96,10 +122,10 @@ public class AESUtils {
         String data = "1658814571488";
         String password = "kyle";
 
-        String encrypt = encrypt(data, password);
+        String encrypt = encryptAndToBase64(data, password);
         System.out.println(encrypt);
 
-        String decrypt = decrypt(encrypt, password);
+        String decrypt = decryptAndToBase64(encrypt, password);
         System.out.println(decrypt);
     }
 }
