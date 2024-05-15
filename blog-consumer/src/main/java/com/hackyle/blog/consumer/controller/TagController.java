@@ -1,12 +1,12 @@
 package com.hackyle.blog.consumer.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.hackyle.blog.consumer.dto.PageRequestDto;
-import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.qo.TagQo;
 import com.hackyle.blog.consumer.service.ArticleTagService;
 import com.hackyle.blog.consumer.vo.ArticleVo;
 import com.hackyle.blog.consumer.vo.TagVo;
+import com.hackyle.blog.common.dto.PageRequestDto;
+import com.hackyle.blog.common.dto.PageResponseDto;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

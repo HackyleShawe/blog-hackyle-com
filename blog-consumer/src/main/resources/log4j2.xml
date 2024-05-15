@@ -26,7 +26,7 @@
         <!--"\"：以当前项目的为根目录。Windows下有时"\"会被解释为磁盘盘符所在根目录，则用".\"替换 -->
         <!--"/"：Linux下就是从根目录开始的路径，Windows下为项目所在磁盘盘符的根目录 -->
         <!--最佳实践："./"表示在当前项目所在目录下-->
-        <Property name="logDirectory" value="./blog-consumer-logs"/>
+        <Property name="logDirectory" value="./logs"/>
 
         <!-- 日志文件的名字（可以根据业务进行命名） -->
         <Property name="logFileName" value="blog-consumer" />

@@ -1,22 +1,21 @@
-**一款简单且纯粹的博客系统** 
-
-**A Simple and Pure Blog System**
+**一款简单且纯粹的博客系统**  | **A Simple and Pure Blog System**
 
 
 
-**文件夹释义**
-
-- blog-business-boot：后台管理系统后端
-
-- blog-business-vue2：后台管理系统前端
-
-- blog-consumer：前台用户端
-
-**B端、C端**
+**B端、C端的概念**
 
 - C端：Consumer（也可理解为Customer），通常为消费者、个人终端用户使用的客户端。如：淘宝主页、网易云主页。在博客系统中，C端主要为客户提供文章展示。
 
 - B端：Business，通常为企业内部或商家使用的系统或平台。如：企业内部ERP管理系统、财务管理平台等。在博客系统，B端主要为作者提供文章的管理（写文章、修改文章等）。
+
+
+
+**项目聚合：Blog**
+
+- blog-business：后台管理端的SpringBoot后端项目，单独打成Jar包运行
+- blog-business-web：后台管理的Vue2前端项目
+- blog-consumer：前台客户端的SpringBoot+Thymeleaf项目，前后端不分离（在服务器上渲染成HTML发给浏览器解析，这么做的主要目的是便于SEO），单独打成Jar运行
+- blog-common：通用的代码模块，例如配置类、util
 
 
 
@@ -32,7 +31,7 @@
 
 # 功能特性
 
-> 版本0.6.0的功能特性
+**当前最新版本：1.0.0-RELEASE**
 
 **文章管理（Article）**
 
@@ -83,7 +82,7 @@
 **step1：环境准备&检查**
 
 - Java：11
-- SpringBoot：2.3.12.RELEASE
+- SpringBoot：2.7.18
 - Apache Maven：3.6.3
 - Vue：2.6.11
 - Node：16.14.2
@@ -95,16 +94,15 @@
 
 **B端**
 
-1. 进入到blog-business-boot目录，执行初始化SQL：sql/blog_hackyle_com.sql
-2. 在IDEA中打开，等待Maven自动配置
-3. 运行启动类：/src/main/java/com/hackyle/blog/business/BlogBusinessApp.java
-4. 进入到blog-business-vue2目录，打开一个终端，安装依赖：npm install
+1. 执行初始化SQL：sql/blog_hackyle_com_dev.sql
+3. 运行启动类：blog-business#BlogBusinessApp.java
+4. 进入到blog-business-web目录，打开一个终端，安装依赖：npm install
 5. 运行项目：npm run serve
 
 **C端**
 
-1. 进入到blog-consumer目录，在IDEA中打开，等待Maven自动配置
-2. 运行启动类：/src/main/java/com/hackyle/blog/consumer/BlogConsumerApp.java
+1. 进入到blog-consumer目录
+2. 运行启动类：BlogConsumerApp.java
 
 **Optional Step4：配置静态资源的存取**（如果不需要上传图片等静态资源可不配置）
 
@@ -147,8 +145,7 @@ http {
 # 设计与实现概述
 
 - 所有的请求全部打在Nginx上，使用Nginx进行分流到不同的本地服务上
-- 使用Minio作为静态资源的存取容器，符合数据与程序分离的思想
-- 使用HTTPs保证数据传输的安全性（测试环境的服务除外）
+- 正式环境使用HTTPs保证数据传输的安全性（测试环境为了方便不使用HTTPs）
 
 
 
@@ -160,7 +157,7 @@ http {
 
 
 
-## 阿里云服务器与域名
+## 云服务器
 
 **Step1：购买云服务器** 基于以下服务所占用的内存，我购买的是2核2GB突发型实例（CentOS7.8-x64）
 
@@ -180,10 +177,10 @@ Redis：100MB
 
 **Step4：项目部署**
 
-1. 前台项目部署：blog-consumer-boot.jar
+1. 前台项目部署：blog-consumer.jar
    1. **nohup java -jar blog-consumer-test.jar --spring.profiles.active=test >/dev/null 2>&1 &**
    2. 运行于端口：6111
-2. 后台后端项目部署
+2. 后台后端项目部署：blog-business.jar
    1. **nohup java -jar blog-business-boot-test.jar --spring.profiles.active=test >/dev/null 2>&1 &**
    2. 运行于端口：6101
 3. 后台前端项目部署：由于是Vue项目，直接使用npm打包为静态资源，上传到某个位置，直接交给Nginx解析
@@ -215,6 +212,21 @@ Redis：100MB
 - 其他资源文件
 
 
+
+**主要步骤**
+
+1. 在云服务器上，配置一个目录，专门存放静态资源（一般是图片），例如：/data/res.hackyle.com/
+2. 博客中的上传操作，经过文件流写到该个目录下
+3. 对外还是以https://res.hackyle.com的方式提供访问，通过nginx，解析到该个文件夹
+
+
+
+ **确定静态资源的存储目录：**/data/res.hackyle.com/
+
+- 存储示例：/data/res.hackyle.com/业务名/年份/月份/文件名.拓展名
+- 例如博客（https://blog.hackyle.com），业务名为“blog” 
+
+ 
 
 **设定静态资源通过以下域访问：https://res.hackyle.com**
 
@@ -259,22 +271,7 @@ server {
 }
 ```
 
-**确定静态资源的存储目录：**/data/res.hackyle.com/
 
-- 存储示例：/data/res.hackyle.com/业务名/年份/月份/文件名.拓展名
-- 例如博客（blog.hackyle），业务名为“blog” 
-
- 
-
-**主要步骤**
-
-1. 在云服务器上，配置一个目录，专门存放静态资源（一般是图片），例如：/data/res.hackyle.com/
-
-2. 博客中的上传操作，经过文件流写到该个目录下
-
-3. 对外还是以https://res.hackyle.com的方式提供访问，通过nginx，解析到该个文件夹
-
- 
 
 **移除Minio**
 
@@ -282,7 +279,7 @@ server {
 
 - minio存储在单机节点上时，会产生多个文件夹，不方便备份、数据恢复
 
-## Nginx
+## Nginx Conf
 
 ```
 # Blog-Test
@@ -296,7 +293,7 @@ server {
   }
   #B端的测试环境：前台
   location /business-front {
-      alias /data/blog.hackyle.com/business-vue2-test/;
+      alias /data/blog.hackyle.com/business-web-test/;
       index index.html;
   }
   #B端的测试环境：后台

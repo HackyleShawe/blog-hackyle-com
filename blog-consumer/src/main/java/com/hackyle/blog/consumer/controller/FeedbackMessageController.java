@@ -1,11 +1,11 @@
 package com.hackyle.blog.consumer.controller;
 
 import com.alibaba.fastjson2.JSON;
-import com.hackyle.blog.consumer.common.constant.ResponseEnum;
-import com.hackyle.blog.consumer.common.pojo.ApiResponse;
+import com.hackyle.blog.common.constant.ResponseEnum;
+import com.hackyle.blog.common.pojo.ApiResponse;
 import com.hackyle.blog.consumer.dto.FeedbackMessageAddDto;
 import com.hackyle.blog.consumer.service.FeedbackMessageService;
-import com.hackyle.blog.consumer.util.IpUtils;
+import com.hackyle.blog.common.util.IpUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

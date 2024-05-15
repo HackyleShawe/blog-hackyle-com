@@ -1,13 +1,13 @@
 package com.hackyle.blog.consumer.service.impl;
 
-import com.hackyle.blog.consumer.common.constant.ResponseEnum;
-import com.hackyle.blog.consumer.common.pojo.ApiResponse;
+import com.hackyle.blog.common.constant.ResponseEnum;
+import com.hackyle.blog.common.pojo.ApiResponse;
 import com.hackyle.blog.consumer.dto.FeedbackMessageAddDto;
 import com.hackyle.blog.consumer.entity.FeedbackMessageEntity;
 import com.hackyle.blog.consumer.mapper.FeedbackMessageMapper;
 import com.hackyle.blog.consumer.service.FeedbackMessageService;
-import com.hackyle.blog.consumer.util.BeanCopyUtils;
-import com.hackyle.blog.consumer.util.IDUtils;
+import com.hackyle.blog.common.util.BeanCopyUtils;
+import com.hackyle.blog.common.util.IDUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

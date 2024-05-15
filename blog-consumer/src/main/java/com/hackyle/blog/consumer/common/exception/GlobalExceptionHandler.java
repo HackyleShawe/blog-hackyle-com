@@ -1,6 +1,6 @@
 package com.hackyle.blog.consumer.common.exception;
 
-import com.hackyle.blog.consumer.common.constant.ResponseEnum;
+import com.hackyle.blog.common.constant.ResponseEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ControllerAdvice;

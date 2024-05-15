@@ -3,8 +3,6 @@ package com.hackyle.blog.consumer.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hackyle.blog.consumer.dto.PageRequestDto;
-import com.hackyle.blog.consumer.dto.PageResponseDto;
 import com.hackyle.blog.consumer.entity.ArticleCategoryEntity;
 import com.hackyle.blog.consumer.entity.ArticleEntity;
 import com.hackyle.blog.consumer.entity.CategoryEntity;
@@ -13,10 +11,12 @@ import com.hackyle.blog.consumer.mapper.ArticleMapper;
 import com.hackyle.blog.consumer.po.ArticleCategoryPo;
 import com.hackyle.blog.consumer.qo.CategoryQo;
 import com.hackyle.blog.consumer.service.ArticleCategoryService;
-import com.hackyle.blog.consumer.util.BeanCopyUtils;
-import com.hackyle.blog.consumer.util.PaginationUtils;
 import com.hackyle.blog.consumer.vo.ArticleVo;
 import com.hackyle.blog.consumer.vo.CategoryVo;
+import com.hackyle.blog.common.util.BeanCopyUtils;
+import com.hackyle.blog.common.util.PaginationUtils;
+import com.hackyle.blog.common.dto.PageRequestDto;
+import com.hackyle.blog.common.dto.PageResponseDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,8 +36,6 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
     private ArticleCategoryMapper articleCategoryMapper;
     @Autowired
     private ArticleMapper articleMapper;
-    @Autowired
-    private ArticleCategoryService articleCategoryService;
 
     @Value("${blog.article-path}")
     private String articlePath;
@@ -129,7 +127,7 @@ public class ArticleCategoryServiceImpl extends ServiceImpl<ArticleCategoryMappe
         }
 
         List<Long> articleIds = articleEntityList.stream().map(ArticleEntity::getId).collect(Collectors.toList());
-        Map<Long, List<ArticleCategoryPo>> categoryMap = articleCategoryService.selectByArticleIds(articleIds);
+        Map<Long, List<ArticleCategoryPo>> categoryMap = selectByArticleIds(articleIds);
         List<ArticleVo> articleVoList = articleVoPageResponseDto.getRows();
 
         //一个文章可能有多个分类，获取所有分类名，拼接

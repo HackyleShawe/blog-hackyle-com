@@ -2,7 +2,7 @@ package com.hackyle.blog.consumer.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hackyle.blog.consumer.common.constant.ConfigItemEnum;
+import com.hackyle.blog.common.constant.ConfigItemEnum;
 import com.hackyle.blog.consumer.entity.ConfigurationEntity;
 import com.hackyle.blog.consumer.mapper.ConfigurationMapper;
 import com.hackyle.blog.consumer.service.ConfigurationService;
