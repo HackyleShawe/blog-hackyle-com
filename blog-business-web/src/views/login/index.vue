@@ -108,8 +108,8 @@ export default {
 
     return {
       loginForm: {
-        username: 'blog_hackyle_admin',
-        password: 'kyleshawe',
+        username: 'hackyle',
+        password: 'hackyle',
         code: '', //验证码
       },
       loginRules: {

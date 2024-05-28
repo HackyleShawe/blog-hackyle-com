@@ -60,13 +60,13 @@ public class HashUtils {
 
     public static void main(String[] args) {
 
-        String md5 = md5("kyleshawe");
-        System.out.println(md5);
+        //String md5 = md5("hackyle");
+        //System.out.println(md5);
 
-        String sha1 = sha1("kyleshawe");
-        System.out.println(sha1);
+        //String sha1 = sha1("hackyle");
+        //System.out.println(sha1);
 
-        String sha256 = sha256("kyleshawe");
+        String sha256 = sha256("hackyle");
         System.out.println(sha256);
     }
 }
