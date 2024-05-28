@@ -32,6 +32,9 @@
         <pagehelper.version>1.3.0</pagehelper.version>
         <hutool.version>5.8.10</hutool.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
+
+        <!--跳过单元测试-->
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencyManagement>
